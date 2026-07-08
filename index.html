@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Offer Page — Interactive Prototype · Uncapped</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --canvas:#f7f4f2; --surface:#fff; --panel:#fbfaf9;
+    --ink:#193a43; --ink2:#374d53; --muted:#879092;
+    --teal:#128081; --tealBright:#1ebdc0; --tealDark:#004b4d;
+    --border:#d7dee0; --divider:#e9e4df;
+    --amberBg:#fff6e5; --amberBorder:#ffd68f; --amberText:#9e5700;
+    --successBg:#f1f9f9; --successBorder:#c1e5e6;
+    --bar:#a5d3d4; --barFaded:#d9ebeb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--canvas);color:var(--ink);font-family:Sora,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased}
+  .head-font{font-family:Commissioner,Sora,sans-serif}
+  button{font-family:inherit}
+
+  .page{display:flex;align-items:flex-start;padding:40px;gap:0;min-width:1200px}
+  aside{width:270px;flex-shrink:0;align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;min-height:820px}
+  .logo svg{height:26px;width:auto;display:block}
+  nav{margin-top:32px;display:flex;flex-direction:column;gap:8px}
+  .navrow{display:flex;align-items:center;gap:12px;width:240px;height:38px;padding:0 8px;border-radius:8px;border:none;background:transparent;cursor:pointer}
+  .navrow.active{background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+  .navrow span.lbl{font-size:16px;color:var(--ink);flex:1;text-align:left}
+  .navchip{min-width:20px;height:20px;border-radius:9999px;background:var(--successBg);border:1px solid var(--successBorder);color:var(--teal);font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+
+  .tile{width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+  .tile svg{width:15px;height:15px;display:block}
+  .tile.brand{background:#eaf6f6;color:var(--tealBright)}
+  .tile.amber{background:#fff0d6;color:#ffac30}
+  .tile.indigo{background:#f0f2fe;color:#7286f6}
+
+  main{flex:1;min-width:0}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start}
+  h1{margin:0;font-size:24px;font-weight:700;color:var(--ink)}
+  .sub{margin:4px 0 0;font-size:14px;color:var(--ink2)}
+  .actions{display:flex;gap:4px}
+  .actbtn{display:flex;align-items:center;gap:8px;height:38px;padding:0 8px;border-radius:8px;border:none;background:transparent;cursor:pointer}
+  .actbtn span.al{font-size:14px;color:var(--ink)}
+
+  .panel{margin-top:24px;background:var(--panel);border-radius:16px;padding:16px;display:flex;gap:16px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.04);width:fit-content;max-width:100%}
+  .card{width:426px;background:var(--surface);border-radius:12px;padding:24px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .rightcol{width:426px;padding:24px;background:transparent;align-self:flex-start}
+
+  .divider{height:1px;background:var(--divider);margin:20px 0}
+  .titlerow{display:flex;align-items:center;gap:12px}
+  .titlerow .name{font-size:16px;font-weight:700;color:var(--ink);flex:1}
+  .chip{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:9999px;font-size:12px;font-weight:600;white-space:nowrap}
+  .chip.amber{background:var(--amberBg);border:1px solid var(--amberBorder);color:var(--amberText)}
+  .chip.amber b{color:var(--amberText)}
+  .chip.success{background:var(--successBg);border:1px solid var(--successBorder);color:var(--teal)}
+
+  .amount{font-family:Commissioner;font-size:36px;font-weight:700;color:var(--ink);line-height:1.1;margin-top:24px}
+  .cardsub{margin-top:8px;font-size:14px;color:var(--ink2);line-height:1.5}
+  .strip{display:flex;gap:4px;height:28px;align-items:flex-end}
+  .strip>div{flex:1;border-radius:3px}
+  .strip>div.full{height:28px;background:var(--bar)}
+  .strip>div.short{height:13px;background:var(--barFaded)}
+  .perpay{margin-top:12px;font-size:12px;color:var(--ink2)}
+  .perpay b{color:var(--ink);font-weight:700}
+
+  .rows{display:flex;flex-direction:column;gap:16px}
+  .row{display:flex;align-items:center;justify-content:space-between;min-height:24px}
+  .row .l{font-size:14px;color:var(--ink2)}
+  .row .l.strong{font-weight:700}
+  .row .v{font-size:14px;font-weight:700;color:var(--ink)}
+  .row .v.teal{color:var(--teal)}
+  .strike{text-decoration:line-through;color:var(--muted);font-weight:600;margin-right:6px}
+  .totalrep{display:flex;align-items:center;justify-content:space-between}
+  .totalrep .l{font-size:16px;font-weight:700;color:var(--ink)}
+  .totalrep .v{font-family:Commissioner;font-size:24px;font-weight:700;color:var(--teal)}
+
+  .ctrl{display:flex;gap:12px;align-items:flex-start}
+  .ctrl .body{flex:1}
+  .ctrl .t{font-size:14px;font-weight:700;color:var(--ink)}
+  .ctrl .d{margin-top:2px;font-size:12px;color:var(--ink2);line-height:1.5}
+  .link{background:none;border:none;padding:0;color:var(--teal);font-weight:700;cursor:pointer;font-size:12px}
+  .link:hover{text-decoration:underline}
+  .notice-danger{margin-top:8px;background:#fdecea;border:1px solid #f5c6c2;border-radius:12px;padding:10px;display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#9e2b25;line-height:1.5}
+  .notice-danger .ndicon{color:#d64a3f;flex:none;display:inline-flex}
+  .notice-danger .ndicon svg{width:16px;height:16px;display:block}
+  .notice-danger b{color:#7a221d}
+
+  .tog{width:28px;height:16px;border-radius:9999px;background:var(--border);position:relative;cursor:pointer;border:none;flex:none;padding:0;transition:background .18s}
+  .tog.on{background:var(--teal)}
+  .tog::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:left .18s}
+  .tog.on::after{left:14px}
+
+  .slider .top{display:flex;justify-content:space-between;align-items:baseline}
+  .slider .st{font-size:14px;font-weight:700;color:var(--ink)}
+  .slider .sv{font-size:16px;font-weight:700;color:var(--ink)}
+  .slider .mm{display:flex;justify-content:space-between}
+  .slider .mm span{font-size:12px;color:var(--muted)}
+  .rng{-webkit-appearance:none;appearance:none;height:4px;border-radius:9999px;outline:none;cursor:pointer;width:100%;margin:12px 0}
+  .rng::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:var(--teal);box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer}
+  .rng::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:50%;background:var(--teal);box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer}
+
+  .phlabel{font-size:14px;font-weight:700;color:var(--ink)}
+  .promo{margin-top:8px;background:var(--successBg);border:1px solid var(--successBorder);border-radius:12px;padding:8px 10px;display:flex;gap:8px;align-items:flex-start}
+  .gifticon{color:var(--teal);flex:none;display:inline-flex}
+  .gifticon svg{width:18px;height:18px;display:block}
+  .promo .pt{font-size:14px;font-weight:700;color:var(--ink)}
+  .promo .pd{font-size:12px;color:var(--ink2)}
+  .days{margin-top:12px;display:flex;gap:4px;background:#f4f1ee;border-radius:10px;padding:4px}
+  .day{flex:1;height:38px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--ink2);font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:background .15s}
+  .day.active{background:#fff;color:var(--teal);border:1px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+  .day.dis{opacity:.38;cursor:not-allowed;pointer-events:none}
+  .day.twoline{flex-direction:column;gap:1px;line-height:1.15}
+  .day .dayfee{font-size:11px;font-weight:600;opacity:.7}
+  .day svg{width:14px;height:14px;display:block}
+  .accept{margin-top:24px;width:100%;height:44px;border-radius:12px;border:none;background:var(--teal);color:#fff;font-weight:600;font-size:14px;cursor:pointer}
+  .accept-sec{margin-top:10px;width:100%;background:none;border:none;color:var(--teal);font-weight:700;font-size:14px;cursor:pointer;padding:6px}
+  .accept-sec:hover{text-decoration:underline}
+  /* cash-advance selector */
+  #ca-cards{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+  .adv{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:border-color .15s,box-shadow .15s;font-family:Sora,sans-serif}
+  .adv.sel{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
+  .adv-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex:none;position:relative}
+  .adv.sel .adv-radio{border-color:var(--teal)}
+  .adv.sel .adv-radio::after{content:'';position:absolute;top:3px;left:3px;right:3px;bottom:3px;border-radius:50%;background:var(--teal)}
+  .adv-main{flex:1;display:flex;flex-direction:column;gap:2px}
+  .adv-amt{font-size:18px;font-weight:800;color:var(--ink);font-family:Commissioner,Sora,sans-serif}
+  .adv-fee{font-size:13px;color:var(--ink2)}
+  .adv-pct{text-align:right}
+  .adv-pct-n{font-size:16px;font-weight:800;color:var(--ink);display:block}
+  .adv-pct-l{display:block;font-size:12px;color:var(--ink2)}
+  /* line-of-credit progress bar */
+  .locbar{height:12px;border-radius:9999px;margin-top:2px;background:repeating-linear-gradient(45deg,#d3e9e9,#d3e9e9 3px,#eaf6f6 3px,#eaf6f6 7px)}
+  .locbar .fill{height:100%;border-radius:9999px;background:var(--teal)}
+
+  /* demo drawer */
+  .tab{position:fixed;top:20px;right:0;z-index:60;height:40px;display:flex;align-items:center;gap:8px;padding:0 14px;border-radius:8px 0 0 8px;border:none;background:var(--tealDark);color:#fff;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.18);transition:right .26s}
+  .tab svg{width:16px;height:16px;display:block}
+  body.drawer-open .tab{right:340px}
+  .drawer{position:fixed;top:0;right:0;height:100vh;width:340px;background:#0d3536;color:#fff;z-index:55;transform:translateX(100%);transition:transform .26s;overflow-y:auto;box-shadow:-8px 0 30px rgba(0,0,0,.25)}
+  body.drawer-open .drawer{transform:translateX(0)}
+  .dhead{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08)}
+  .dhead .dt{font-size:15px;font-weight:800}
+  .dhead button{background:none;border:none;cursor:pointer;color:#9fc7c8}
+  .dhead svg{width:18px;height:18px;display:block}
+  .dsec{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .dsec .dst{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#7fc9cb;margin-bottom:12px}
+  .drow{display:flex;align-items:center;justify-content:space-between;padding:6px 0}
+  .drow span{font-size:13px;color:#e7f1f1}
+  .pills{display:flex;flex-wrap:wrap;gap:6px}
+  .pill{padding:7px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:transparent;color:#fff;font-size:12.5px;font-weight:600;cursor:pointer}
+  .pill.active{border-color:var(--tealBright);background:rgba(30,189,192,.18)}
+  .pill.disabled{color:rgba(255,255,255,.35);cursor:not-allowed}
+  .dnote{padding:14px 18px;font-size:11px;color:#7fa9aa;line-height:1.5}
+  .dnote b{color:#cfe9e9}
+  .drng{-webkit-appearance:none;appearance:none;height:4px;border-radius:9999px;outline:none;cursor:pointer;width:100%}
+  .drng::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--tealBright);cursor:pointer}
+  .drng::-moz-range-thumb{width:16px;height:16px;border:none;border-radius:50%;background:var(--tealBright);cursor:pointer}
+  .dsub{font-size:11px;color:#7fa9aa;margin:2px 0 10px}
+  /* upsell modal */
+  .modal-overlay{position:fixed;inset:0;background:rgba(13,53,54,.45);display:none;align-items:center;justify-content:center;z-index:70;padding:20px}
+  .modal-overlay.open{display:flex}
+  .modal{background:#fff;border-radius:16px;max-width:430px;width:100%;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;border-top:4px solid #ffac30}
+  .modal-close{position:absolute;top:14px;right:14px;background:none;border:none;cursor:pointer;color:var(--muted)}
+  .modal-close svg{width:18px;height:18px;display:block}
+  .modal-icon{width:44px;height:44px;border-radius:12px;background:#fff0d6;color:#ffac30;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .modal-icon svg{width:24px;height:24px;display:block}
+  .modal-title{font-family:Commissioner,Sora,sans-serif;font-size:20px;font-weight:700;color:var(--ink);margin-bottom:8px}
+  .modal-body{font-size:14px;color:var(--ink2);line-height:1.55;margin-bottom:20px}
+  .modal-body b{color:var(--ink)}
+  .modal-actions{display:flex;flex-direction:column;gap:10px}
+  .btn-primary{height:44px;border-radius:12px;border:none;background:var(--teal);color:#fff;font-weight:600;font-size:14px;cursor:pointer}
+  .btn-ghost{height:44px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--ink);font-weight:600;font-size:14px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="page">
+  <!-- SIDEBAR -->
+  <aside>
+    <div>
+      <div class="logo">
+        <svg viewBox="0 0 366.3 80.2" xmlns="http://www.w3.org/2000/svg"><style>.st0{fill:#063844}</style>
+        <path class="st0" d="m41.6 15.2v44.1h-9.2v-9.6c-1.1 3.3-3.1 5.8-5.8 7.6-2.8 1.8-6 2.7-9.7 2.7-5.1 0-9.2-1.7-12.3-5s-4.6-8-4.6-14.2v-25.6h9.1v24.6c0 4 1 7.1 3 9.2 2 2.2 4.8 3.2 8.3 3.2 3.6 0 6.5-1.2 8.7-3.5s3.3-5.8 3.3-10.2v-23.3z"/>
+        <path class="st0" d="m69.3 19.5c3.1 3.3 4.6 8 4.6 14.2v25.7h-9.1v-24.7c0-3.9-1-7-3-9.2s-4.8-3.2-8.3-3.2c-3.6 0-6.5 1.2-8.7 3.5s-3.3 5.7-3.3 10.2v23.4h-9.1v-44.2h9.1v9.7c1.2-3.3 3.1-5.9 5.9-7.7s6-2.7 9.6-2.7c5.1 0 9.2 1.7 12.3 5z"/>
+        <path class="st0" d="m114.8 19.2c3.7 3 6.1 7.1 7 12.3h-9.7c-0.5-2.8-1.8-4.9-3.9-6.5s-4.6-2.4-7.7-2.4c-3.5 0-6.5 1.2-8.8 3.7s-3.5 6.1-3.5 10.9 1.2 8.5 3.5 11 5.3 3.8 8.8 3.8c3.1 0 5.7-0.8 7.7-2.4 2.1-1.6 3.3-3.8 3.9-6.6h9.7c-0.9 5.2-3.2 9.3-7 12.3-3.7 3-8.5 4.6-14.2 4.6-4.3 0-8-0.9-11.3-2.7s-5.9-4.4-7.7-7.8c-1.9-3.4-2.8-7.4-2.8-12.1 0-4.6 0.9-8.6 2.8-12s4.4-6 7.7-7.8 7.1-2.7 11.3-2.7c5.7-0.1 10.4 1.4 14.2 4.4z"/>
+        <path class="st0" d="m154.8 17.6c2.8 2 4.8 4.6 6 7.8v-10.2h9.1v44.1h-9.1v-10.2c-1.2 3.3-3.2 5.9-6 7.8-2.8 2-6.2 3-10.2 3-3.8 0-7.3-0.9-10.3-2.7s-5.4-4.4-7.1-7.8-2.6-7.4-2.6-12.1c0-4.6 0.9-8.6 2.6-12s4.1-6 7.1-7.8 6.4-2.7 10.3-2.7c4-0.1 7.4 0.9 10.2 2.8zm-17.1 9c-2.4 2.6-3.6 6.1-3.6 10.7 0 4.5 1.2 8.1 3.6 10.7s5.7 3.9 9.7 3.9c2.6 0 4.9-0.6 6.9-1.8s3.6-2.9 4.8-5.1 1.8-4.7 1.8-7.7c0-2.9-0.6-5.4-1.8-7.6s-2.8-3.9-4.8-5.1-4.3-1.8-6.9-1.8c-4.1-0.1-7.3 1.2-9.7 3.8z"/>
+        <path class="st0" d="m211.9 17.4c3 1.8 5.4 4.4 7.1 7.8s2.6 7.4 2.6 12-0.9 8.7-2.6 12.1-4.1 6-7.1 7.8-6.4 2.7-10.3 2.7c-4 0-7.4-1-10.2-3s-4.8-4.6-5.9-7.8v31.2h-9.1v-65h9.1v10.2c1.1-3.3 3.1-5.9 5.9-7.8 2.8-2 6.2-3 10.2-3 3.8 0.1 7.3 1 10.3 2.8zm-20 7.1c-2 1.2-3.6 2.9-4.8 5.1s-1.8 4.8-1.8 7.6c0 2.9 0.6 5.5 1.8 7.7s2.8 3.9 4.8 5.1 4.3 1.8 6.9 1.8c4.1 0 7.3-1.3 9.8-3.9s3.7-6.1 3.7-10.7c0-4.5-1.2-8-3.7-10.6s-5.7-3.9-9.8-3.9c-2.6 0-4.9 0.6-6.9 1.8z"/>
+        <path class="st0" d="m262.3 17.4c3 1.8 5.4 4.4 7.1 7.8s2.6 7.4 2.6 12-0.9 8.7-2.6 12.1-4.1 6-7.1 7.8-6.4 2.7-10.3 2.7c-4 0-7.4-1-10.2-3s-4.8-4.6-5.9-7.8v31.2h-9.1v-65h9.1v10.2c1.1-3.3 3.1-5.9 5.9-7.8 2.8-2 6.2-3 10.2-3 3.8 0.1 7.3 1 10.3 2.8zm-20 7.1c-2 1.2-3.6 2.9-4.8 5.1s-1.8 4.8-1.8 7.6c0 2.9 0.6 5.5 1.8 7.7s2.8 3.9 4.8 5.1 4.3 1.8 6.9 1.8c4.1 0 7.3-1.3 9.8-3.9s3.7-6.1 3.7-10.7c0-4.5-1.2-8-3.7-10.6s-5.7-3.9-9.8-3.9c-2.6 0-4.9 0.6-6.9 1.8z"/>
+        <path class="st0" d="m317.7 39.1h-33.9c0.2 4.5 1.4 7.9 3.8 10.1 2.3 2.2 5.3 3.3 8.7 3.3 3 0 5.6-0.8 7.7-2.3s3.4-3.6 3.9-6.2h9.8c-0.6 3.1-1.8 5.8-3.7 8.2s-4.3 4.3-7.3 5.6c-3 1.4-6.3 2-10 2-4.3 0-8-0.9-11.3-2.7s-5.9-4.4-7.7-7.8c-1.9-3.4-2.8-7.4-2.8-12.1 0-4.6 0.9-8.6 2.8-12s4.4-6 7.7-7.8 7.1-2.7 11.3-2.7c4.3 0 8.1 0.9 11.3 2.7s5.7 4.2 7.4 7.4c1.7 3.1 2.6 6.6 2.6 10.4 0.1 1.5 0 2.8-0.3 3.9zm-10.3-11.4c-1.1-1.9-2.6-3.4-4.5-4.3s-4-1.4-6.2-1.4c-3.6 0-6.6 1.1-9 3.3s-3.7 5.4-3.9 9.7h25c0.2-3-0.3-5.4-1.4-7.3z"/>
+        <path class="st0" d="m351.2 17.6c2.8 2 4.8 4.6 5.9 7.8v-25.4h9.2v59.2h-9.2v-10.2c-1.1 3.3-3.1 5.9-5.9 7.8-2.8 2-6.2 3-10.2 3-3.8 0-7.3-0.9-10.3-2.7s-5.4-4.4-7.1-7.8-2.6-7.4-2.6-12.1c0-4.6 0.9-8.6 2.6-12s4.1-6 7.1-7.8 6.4-2.7 10.3-2.7 7.4 1 10.2 2.9zm-17.2 9c-2.4 2.6-3.6 6.1-3.6 10.7 0 4.5 1.2 8.1 3.6 10.7s5.7 3.9 9.7 3.9c2.6 0 4.9-0.6 6.9-1.8s3.6-2.9 4.8-5.1 1.8-4.7 1.8-7.7c0-2.9-0.6-5.4-1.8-7.6s-2.8-3.9-4.8-5.1-4.3-1.8-6.9-1.8c-4-0.1-7.2 1.2-9.7 3.8z"/>
+        </svg>
+      </div>
+      <nav>
+        <button class="navrow"><span class="tile brand" data-icon="check"></span><span class="lbl">Your application</span></button>
+        <button class="navrow active"><span class="tile brand" data-icon="cart"></span><span class="lbl">Your offer</span><span class="navchip">1</span></button>
+      </nav>
+    </div>
+    <button class="navrow"><span class="tile amber" data-icon="logout"></span><span class="lbl">Log out</span></button>
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+    <div class="topbar">
+      <div>
+        <h1 class="head-font"><span id="hdr-prefix">Top-up an additional </span><span id="hdr-amount"></span></h1>
+        <p class="sub" id="hdr-sub">Customise your top-up offer and refinance your existing balance</p>
+      </div>
+      <div class="actions">
+        <button class="actbtn"><span class="tile brand" data-icon="call"></span><span class="al">Book a call</span></button>
+        <button class="actbtn"><span class="tile indigo" data-icon="users"></span><span class="al">Invite team</span></button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <!-- LEFT: summary -->
+      <section class="card">
+        <div class="titlerow">
+          <span class="tile brand" data-icon="moneybag"></span>
+          <span class="name" id="card-title">Term Loan Top-Up</span>
+          <span class="chip amber">Available until&nbsp;<b>9 Jul</b></span>
+        </div>
+
+        <div class="amount" id="card-amount"></div>
+        <div class="cardsub" id="card-sub" style="display:none"></div>
+
+        <div id="strip-wrap">
+          <div class="divider"></div>
+          <div class="strip" id="strip"></div>
+          <div class="locbar" id="loc-bar" style="display:none"><div class="fill" id="loc-fill"></div></div>
+          <div class="perpay" id="perpay"></div>
+        </div>
+
+        <div id="grp-ladder">
+          <div class="divider"></div>
+          <div class="rows">
+            <div class="row" id="row-additional"><span class="l">Additional funds to you</span><span class="v" id="val-additional"></span></div>
+            <div class="row" id="row-paysoff"><span class="l">Pays off existing balance</span><span class="v" id="val-paysoff"></span></div>
+            <div class="row" id="row-totalnewloan"><span class="l strong">Total new loan</span><span class="v teal" id="val-totalnewloan"></span></div>
+          </div>
+        </div>
+
+        <div id="grp-fees">
+          <div class="divider"></div>
+          <div class="rows">
+            <div class="row" id="row-fixedfee"><span class="l">Fixed fee</span><span class="v" id="val-fixedfee"></span></div>
+            <div class="row" id="row-totalfee"><span class="l">Total fee</span><span class="v" id="val-totalfee"></span></div>
+            <div class="row" id="row-holiday"><span class="l">Payment holiday</span><span class="v" id="val-holiday"></span></div>
+            <div class="row" id="row-noearly"><span class="l">No early repayment fee</span><span class="chip success">New</span></div>
+          </div>
+        </div>
+
+        <div id="grp-ca">
+          <div class="divider"></div>
+          <div class="rows">
+            <div class="row"><span class="l">Capital you receive</span><span class="v" id="ca-capital"></span></div>
+            <div class="row"><span class="l">Fixed fee</span><span class="v" id="ca-fee"></span></div>
+            <div class="row"><span class="l">Weekly collection</span><span class="v" id="ca-pay"></span></div>
+          </div>
+        </div>
+
+        <div id="grp-loc">
+          <div class="divider"></div>
+          <div class="rows">
+            <div class="row"><span class="l">Annual interest (APR)</span><span class="v" id="loc-apr"></span></div>
+            <div class="row"><span class="l">Interest charged</span><span class="v">Only on what you draw</span></div>
+            <div class="row"><span class="l">Set-up fee</span><span class="v">$0 if you draw · 1% if unused</span></div>
+            <div class="row"><span class="l">Estimated interest</span><span class="v" id="loc-interest"></span></div>
+            <div class="row"><span class="l">No early repayment fee</span><span class="chip success">New</span></div>
+          </div>
+        </div>
+
+        <div id="sec-totalrep">
+          <div class="divider"></div>
+          <div class="totalrep"><span class="l" id="totalrep-label">Total repayable</span><span class="v" id="val-totalrep"></span></div>
+        </div>
+      </section>
+
+      <!-- RIGHT: customisation -->
+      <section class="rightcol">
+        <div id="block-autorepay">
+          <div class="ctrl">
+            <div class="body">
+              <div class="t">Auto-repay from your payouts</div>
+              <div class="d">Amazon will automatically send the repayment amount to us. Any remaining balance from your payout will be disbursed into your bank account. <button class="link">Learn how it works</button></div>
+            </div>
+            <button class="tog" id="tg-autorepay" aria-label="Auto-repay"></button>
+          </div>
+        </div>
+
+        <div id="block-refinance">
+          <div class="divider"></div>
+          <div class="ctrl">
+            <div class="body">
+              <div class="t">Refinance my existing loan</div>
+              <div class="d">Your existing balance and new funds become one loan with one schedule. Turning this off reduces your amount.</div>
+            </div>
+            <button class="tog" id="tg-refinance" aria-label="Refinance"></button>
+          </div>
+        </div>
+
+        <div id="block-amount">
+          <div class="divider"></div>
+          <div class="slider">
+            <div class="top"><span class="st" id="lbl-amount">Additional funds</span><span class="sv" id="ro-additional"></span></div>
+            <input class="rng" id="sl-additional" type="range" min="100000" max="5888416.88" step="0.01" aria-label="Additional funds" />
+            <div class="mm"><span id="mm-min">$100,000</span><span id="mm-additional"></span></div>
+          </div>
+        </div>
+
+        <div id="block-term">
+          <div class="divider"></div>
+          <div class="slider">
+            <div class="top"><span class="st">Repayment term</span><span class="sv" id="ro-term"></span></div>
+            <input class="rng" id="sl-term" type="range" min="3" max="6" step="1" aria-label="Repayment term" />
+            <div class="mm"><span>3 mo</span><span>6 mo max</span></div>
+          </div>
+        </div>
+
+        <div id="block-holiday">
+          <div class="divider"></div>
+          <div class="phlabel" id="ph-title">Payment holiday</div>
+          <div class="promo" id="promo">
+            <span class="gifticon" data-icon="gift"></span>
+            <div><div class="pt">1 month of payment holiday on us</div><div class="pd">Pick 42 days and pay no extra fee</div></div>
+          </div>
+          <div class="days" id="days"></div>
+        </div>
+
+        <div id="ca-select">
+          <div style="font-size:16px;font-weight:700;color:var(--ink)">Select your advance</div>
+          <div style="margin-top:4px;font-size:12px;color:var(--ink2);line-height:1.5">Cash upfront for one fixed fee. You repay it as a % of weekly sales — the fee is the total cost, the % just sets the pace.</div>
+          <div id="ca-cards"></div>
+        </div>
+
+        <div id="loc-select">
+          <div style="font-size:16px;font-weight:700;color:var(--ink)">Choose your draw</div>
+          <div style="margin-top:4px;font-size:12px;color:var(--ink2);line-height:1.5">Nothing's borrowed until you draw.</div>
+          <div class="locbar" id="loc-bar2" style="margin-top:14px"><div class="fill" id="loc-fill2"></div></div>
+          <div style="margin-top:8px;font-size:12px;color:var(--ink2)"><b id="loc-avail2"></b> available · <span id="loc-locked2"></span> unlocks as sales grow</div>
+          <div class="divider"></div>
+          <div class="slider">
+            <div class="top"><span class="st">Draw amount</span><span class="sv" id="ro-draw"></span></div>
+            <input class="rng" id="sl-draw" type="range" min="10000" max="275000" step="5000" aria-label="Draw amount" />
+            <div class="mm"><span id="mm-draw-min">$10,000</span><span id="mm-draw-max">$275,000 available</span></div>
+          </div>
+          <div class="divider"></div>
+          <div class="slider">
+            <div class="top"><span class="st">Estimated hold</span><span class="sv" id="ro-held"></span></div>
+            <input class="rng" id="sl-held" type="range" min="1" max="12" step="1" aria-label="Estimated hold" />
+            <div class="mm"><span>1 mo</span><span>12 mo max</span></div>
+          </div>
+        </div>
+
+        <button class="accept" id="accept-btn">Accept offer</button>
+        <button class="accept-sec" id="accept-secondary" style="display:none">Set up line, draw later</button>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- DEMO CONTROLS -->
+<button class="tab" id="tab"><span data-icon="gear" style="display:inline-flex"></span>Demo controls</button>
+
+<div class="drawer">
+  <div class="dhead"><div class="dt">Demo controls</div><button id="drawer-close" aria-label="Close"><span data-icon="x" style="display:inline-flex"></span></button></div>
+
+  <div class="dsec">
+    <div class="dst">Product</div>
+    <div class="pills">
+      <button class="pill" data-product="refinance">Refinance &amp; Top-Up</button>
+      <button class="pill" data-product="termloan">Term Loan</button>
+      <button class="pill" data-product="cashadvance">Cash Advance</button>
+      <button class="pill" data-product="lineofcredit">Line of Credit</button>
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:#7fa9aa">Other products land in v2.</div>
+  </div>
+
+  <div class="dsec">
+    <div class="dst">Modifiers</div>
+    <div class="dsub">Blocks on the right-hand customisation panel.</div>
+    <div class="drow"><span>Auto-repay toggle</span><button class="tog" data-block="autoRepay"></button></div>
+    <div class="drow"><span>Refinance toggle</span><button class="tog" data-block="refinance"></button></div>
+    <div class="drow"><span>Additional funds slider</span><button class="tog" data-block="amount"></button></div>
+    <div class="drow"><span>Repayment term slider</span><button class="tog" data-block="term"></button></div>
+    <div class="drow"><span>Payment holiday section</span><button class="tog" data-block="holiday"></button></div>
+    <div id="fee-control">
+      <div style="display:flex;justify-content:space-between;margin:14px 0 8px"><span style="font-size:13px;color:#e7f1f1">Fixed fee rate</span><span style="font-size:13px;font-weight:700" id="ro-fee"></span></div>
+      <input class="drng" id="sl-fee" type="range" min="1" max="15" step="0.5" aria-label="Fee rate" />
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="dst">Offer summary card</div>
+    <div class="dsub">What appears on the left summary card.</div>
+    <div class="drow"><span>Instalment strip</span><button class="tog" data-show="showStrip"></button></div>
+    <div class="drow"><span>Per-payment line</span><button class="tog" data-show="showPerPayment"></button></div>
+    <div class="drow"><span>APR equivalent</span><button class="tog" data-show="showApr"></button></div>
+    <div class="drow"><span>Additional funds to you</span><button class="tog" data-row="additional"></button></div>
+    <div class="drow"><span>Pays off existing balance</span><button class="tog" data-row="paysOff"></button></div>
+    <div class="drow"><span>Total new loan</span><button class="tog" data-row="totalNewLoan"></button></div>
+    <div class="drow"><span>Fixed fee</span><button class="tog" data-row="fixedFee"></button></div>
+    <div class="drow"><span>Total fee</span><button class="tog" data-row="totalFee"></button></div>
+    <div class="drow"><span>Payment holiday</span><button class="tog" data-row="paymentHoliday"></button></div>
+    <div class="drow"><span>No early repayment fee</span><button class="tog" data-row="noEarlyFee"></button></div>
+    <div class="drow"><span>Total repayable</span><button class="tog" data-row="totalRepayable"></button></div>
+  </div>
+
+  <div class="dnote">Numbers are illustrative and recalculate live. State is saved to the web address — copy the link to share this exact setup. Press <b>D</b> to hide/show this panel.</div>
+</div>
+
+<!-- UPSELL MODAL (auto-repay off + accept) -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <button class="modal-close" id="modal-close" aria-label="Close"><span data-icon="x"></span></button>
+    <div class="modal-icon"><span data-icon="gift"></span></div>
+    <div class="modal-title">You could get a bigger top-up</div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="modal-turnon">Turn on auto-repay</button>
+      <button class="btn-ghost" id="modal-continue">Continue without it</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------- real Hugeicons path data (solid-rounded) ----------
+var ICONS = {
+  moneybag:["M11.9996 1.25C11.3523 1.25 10.8873 1.65936 10.641 1.90644C10.5378 2.01 10.4419 2.13129 10.3448 2.25393C10.1612 2.48602 9.97372 2.723 9.72585 2.85411C9.45986 2.99481 9.12847 2.89996 8.84314 2.8183C8.79247 2.8038 8.74325 2.78972 8.69612 2.77744C8.39818 2.69989 7.94408 2.58244 7.46289 2.64649C7.25379 2.67432 6.97942 2.74083 6.76685 2.9301C6.51511 3.15425 6.47447 3.43315 6.51128 3.64394C6.55607 3.9004 6.71491 4.11086 6.87083 4.31102L7.76315 5.4599L7.80338 5.51191C8.01996 5.79212 8.23862 6.07503 8.5264 6.28636C8.75278 6.4526 9.03923 6.5 9.32009 6.5H14.679C14.9599 6.5 15.2463 6.4526 15.4727 6.28636C15.7605 6.07504 15.9791 5.79215 16.1957 5.51194L16.236 5.4599L17.1283 4.31102C17.2842 4.11086 17.443 3.90039 17.4878 3.64394C17.5246 3.43315 17.484 3.15425 17.2323 2.9301C17.0197 2.74083 16.7453 2.67432 16.5362 2.64649C16.055 2.58244 15.6009 2.69989 15.303 2.77744C15.2559 2.78972 15.2067 2.8038 15.156 2.81829L15.156 2.8183L15.156 2.81831C14.8706 2.89997 14.5393 2.9948 14.2733 2.85411C14.0254 2.723 13.8379 2.48602 13.6543 2.25393C13.5572 2.13129 13.4613 2.01001 13.3581 1.90644C13.1118 1.65936 12.6468 1.25 11.9996 1.25ZM21.4339 16.8954C20.8804 13.5816 19.2507 10.4506 16.8355 8.11274L16.8355 8.11274C16.7348 8.01526 16.6844 7.9665 16.5724 7.88473C16.3473 7.72042 15.945 7.5576 15.6691 7.51914C15.5317 7.5 15.4329 7.5 15.2354 7.5H8.76409C8.56657 7.5 8.46781 7.5 8.33046 7.51914C8.05447 7.5576 7.65216 7.72042 7.42712 7.88473C7.32296 7.96078 7.23045 8.04847 7.13799 8.13796C5.31986 9.89741 3.23574 12.883 2.56564 16.8954C2.28233 18.5918 2.93708 20.0804 4.0623 21.12C5.17625 22.1493 6.75561 22.75 8.40281 22.75H15.5967C17.2439 22.75 18.8233 22.1493 19.9372 21.12C21.0624 20.0804 21.7172 18.5918 21.4339 16.8954ZM12.6628 11.8047C12.6628 11.3905 12.327 11.0547 11.9128 11.0547C11.4986 11.0547 11.1628 11.3905 11.1628 11.8047V11.9182C10.7744 12.0091 10.416 12.1703 10.1148 12.3925C9.62718 12.7523 9.24976 13.31 9.24976 13.9941C9.24976 14.5757 9.4606 15.1396 10.0155 15.5134C10.507 15.8445 11.1688 15.954 11.9128 15.954C12.5661 15.954 12.9068 16.0546 13.0683 16.1599C13.1623 16.2212 13.2498 16.3109 13.2498 16.6155C13.2498 16.8375 13.1709 16.9552 13.0023 17.0565C12.7882 17.185 12.4209 17.2771 11.9128 17.2771C11.3794 17.2771 10.9649 17.1019 10.747 16.9069C10.4383 16.6307 9.96415 16.657 9.68792 16.9656C9.41168 17.2743 9.43797 17.7484 9.74662 18.0246C10.1229 18.3614 10.6188 18.5922 11.1628 18.7026V18.8047C11.1628 19.2189 11.4986 19.5547 11.9128 19.5547C12.327 19.5547 12.6628 19.2189 12.6628 18.8047V18.7221C13.0586 18.6605 13.4421 18.5421 13.7747 18.3423C14.3615 17.9899 14.7498 17.4018 14.7498 16.6155C14.7498 15.9119 14.4894 15.2959 13.8877 14.9035C13.3536 14.5551 12.6508 14.454 11.9128 14.454C11.2655 14.454 10.9708 14.3484 10.8536 14.2694C10.7998 14.2332 10.7498 14.1921 10.7498 13.9941C10.7498 13.8987 10.8006 13.7506 11.0054 13.5995C11.2099 13.4486 11.5283 13.3326 11.9128 13.3326C12.4476 13.3326 12.8285 13.5521 12.9854 13.7585C13.2361 14.0883 13.7066 14.1524 14.0364 13.9018C14.3661 13.6511 14.4302 13.1806 14.1796 12.8508C13.8227 12.3813 13.2753 12.0619 12.6628 11.9185V11.8047Z"],
+  check:["M1.25 12C1.25 17.9371 6.06294 22.75 12 22.75C17.9371 22.75 22.75 17.9371 22.75 12C22.75 6.06294 17.9371 1.25 12 1.25C6.06294 1.25 1.25 6.06294 1.25 12ZM16.6757 8.26285C17.0828 8.63604 17.1103 9.26861 16.7372 9.67573L11.2372 15.6757C11.0528 15.8768 10.7944 15.9938 10.5217 15.9998C10.249 16.0057 9.98576 15.9 9.79289 15.7071L7.29289 13.2071C6.90237 12.8166 6.90237 12.1834 7.29289 11.7929C7.68342 11.4024 8.31658 11.4024 8.70711 11.7929L10.4686 13.5544L15.2628 8.32428C15.636 7.91716 16.2686 7.88966 16.6757 8.26285Z"],
+  cart:["M8.24997 20.25C8.24997 19.4216 8.92154 18.75 9.74997 18.75C10.5784 18.75 11.25 19.4216 11.25 20.25C11.25 21.0784 10.5784 21.75 9.74997 21.75C8.92154 21.75 8.24997 21.0784 8.24997 20.25Z","M16.75 20.25C16.75 19.4216 17.4215 18.75 18.25 18.75C19.0784 18.75 19.75 19.4216 19.75 20.25C19.75 21.0784 19.0784 21.75 18.25 21.75C17.4215 21.75 16.75 21.0784 16.75 20.25Z","M2.457 2.25L3.35739 2.25684C3.63809 2.26392 3.89755 2.27829 4.12985 2.30859C4.62309 2.37298 5.12894 2.5219 5.55661 2.91992C5.98434 3.31819 6.16913 3.81228 6.26852 4.2998C6.32538 4.57871 6.36044 4.8994 6.39059 5.25H19.25C19.8927 5.25 20.3808 5.2418 20.7978 5.36816C21.6766 5.63475 22.3642 6.32335 22.6308 7.20215C22.7573 7.61925 22.75 8.107 22.75 8.75C22.75 10.7885 22.7576 11.9741 22.459 12.959C21.8045 15.1163 20.1162 16.8046 17.959 17.459C16.974 17.7577 15.7816 17.75 13.7314 17.75C11.7786 17.75 10.6415 17.7575 9.68454 17.4766C7.64398 16.8772 6.00477 15.3511 5.26169 13.3584C4.94213 12.5012 4.82222 11.2842 4.70309 9.62598L4.45114 6.10742C4.40202 5.41976 4.37009 5.001 4.30856 4.69922C4.25287 4.42614 4.19864 4.38779 4.19431 4.38379C4.19009 4.37987 4.14796 4.32814 3.87106 4.29199C3.71832 4.27207 3.53698 4.26134 3.30759 4.25586L2.457 4.25H2.24997C1.69768 4.25 1.24997 3.80228 1.24997 3.25C1.24997 2.69772 1.69768 2.25 2.24997 2.25H2.457ZM11 9.25C10.5858 9.25 10.25 9.58579 10.25 10V13C10.25 13.4142 10.5858 13.75 11 13.75C11.4142 13.75 11.75 13.4142 11.75 13V10C11.75 9.58579 11.4142 9.25 11 9.25ZM16 9.25C15.5858 9.25 15.25 9.58579 15.25 10V13C15.25 13.4142 15.5858 13.75 16 13.75C16.4142 13.75 16.75 13.4142 16.75 13V10C16.75 9.58579 16.4142 9.25 16 9.25Z"],
+  call:["M9.09136 5.05591L8.83811 4.48608C8.49698 3.71854 8.32641 3.33477 8.04571 3.06351C7.86043 2.88445 7.64239 2.74275 7.40351 2.64615C7.04162 2.49982 6.62165 2.49982 5.78172 2.49982C4.53106 2.49982 3.90574 2.49982 3.41852 2.80345C3.11969 2.98967 2.83389 3.30583 2.67868 3.62188C2.4256 4.13717 2.48301 4.70489 2.59783 5.84033C3.55056 15.2621 8.73783 20.4494 18.1596 21.4021C19.2951 21.517 19.8628 21.5744 20.3781 21.3213C20.6941 21.1661 21.0103 20.8803 21.1965 20.5815C21.5002 20.0942 21.5002 19.4689 21.5002 18.2183C21.5002 17.3783 21.5002 16.9584 21.3538 16.5965C21.2572 16.3576 21.1155 16.1395 20.9365 15.9543C20.6652 15.6736 20.2814 15.503 19.5139 15.1619L18.9441 14.9086C18.2715 14.6097 17.9352 14.4602 17.5979 14.4318C17.2391 14.4016 16.8788 14.4686 16.5547 14.6255C16.2501 14.7731 15.9899 15.0333 15.4695 15.5538C14.9575 16.0658 14.7015 16.3218 14.3681 16.4725C14.0436 16.6192 13.5877 16.6816 13.2358 16.6274C12.8742 16.5717 12.6084 16.4218 12.0768 16.1219C10.1924 15.0591 8.94089 13.8076 7.87802 11.9231C7.57821 11.3916 7.4283 11.1258 7.3726 10.7641C7.3184 10.4123 7.38076 9.95632 7.52746 9.6319C7.67822 9.29851 7.93421 9.04251 8.44621 8.53052C8.96662 8.0101 9.22683 7.7499 9.37442 7.44525C9.53142 7.12119 9.59832 6.76086 9.56812 6.40205C9.53973 6.06473 9.39027 5.72845 9.09136 5.05591Z"],
+  users:["M4.25 7C4.25 4.37665 6.37665 2.25 9 2.25C11.6234 2.25 13.75 4.37665 13.75 7C13.75 9.62335 11.6234 11.75 9 11.75C6.37665 11.75 4.25 9.62335 4.25 7Z","M1.25 19C1.25 15.8244 3.82436 13.25 7 13.25H11C14.1756 13.25 16.75 15.8244 16.75 19C16.75 20.5188 15.5188 21.75 14 21.75H4C2.48122 21.75 1.25 20.5188 1.25 19Z","M13.374 11.4644C13.8812 11.6492 14.4288 11.75 15 11.75C17.6233 11.75 19.75 9.62335 19.75 7C19.75 4.37665 17.6233 2.25 15 2.25C14.4288 2.25 13.8812 2.35081 13.374 2.5356C14.5317 3.67 15.25 5.25111 15.25 7C15.25 8.74889 14.5317 10.33 13.374 11.4644Z","M17.24 21.75H19.9995C21.5183 21.75 22.7495 20.5188 22.7495 19C22.7495 15.8244 20.1752 13.25 16.9995 13.25H15.416C17.1391 14.5754 18.2495 16.658 18.2495 19C18.2495 20.0488 17.8697 21.0088 17.24 21.75Z"],
+  logout:["M16.5722 7.15124C16.116 6.84413 15.5122 6.54996 14.8554 6.8026L14.7461 6.8485C14.1004 7.1484 13.9072 7.79007 13.8291 8.32702C13.7728 8.71388 13.7575 9.19553 13.7529 9.75182H9.49997C9.27726 9.75182 9.07224 9.75188 8.90134 9.76354C8.72381 9.77568 8.52838 9.80248 8.33005 9.88463C7.90129 10.0622 7.5604 10.4031 7.38278 10.8319C7.30063 11.0302 7.27383 11.2257 7.26169 11.4032C7.25003 11.5741 7.24997 11.7791 7.24997 12.0018C7.24997 12.2245 7.25003 12.4295 7.26169 12.6005C7.27382 12.778 7.30063 12.9734 7.38278 13.1717C7.56039 13.6005 7.90129 13.9414 8.33005 14.119C8.52838 14.2012 8.72381 14.228 8.90134 14.2401C9.07224 14.2518 9.27726 14.2518 9.49997 14.2518H13.7529C13.7586 14.7824 13.7762 15.2438 13.833 15.6171C13.9135 16.1457 14.1107 16.7721 14.7461 17.0673C14.7819 17.0839 14.8186 17.099 14.8554 17.1131C15.5122 17.3658 16.116 17.0716 16.5722 16.7645C17.0329 16.4544 17.5823 15.9634 18.2359 15.3793L18.29 15.3309C19.0094 14.6881 19.6061 14.1533 20.0156 13.6678C20.4359 13.1696 20.7429 12.6285 20.75 11.9657V11.9501C20.7429 11.2872 20.4359 10.7462 20.0156 10.2479C19.6061 9.76242 19.0094 9.22767 18.29 8.58483L18.2358 8.53642C17.5823 7.95235 17.0329 7.46134 16.5722 7.15124Z","M3.24997 14.75V9.25C3.24997 7.6285 3.24742 6.31161 3.38669 5.27637C3.52987 4.21224 3.83946 3.29668 4.56931 2.56738C5.29891 1.83851 6.21406 1.52974 7.27829 1.38672C8.31409 1.24756 9.63213 1.25 11.2549 1.25H13.7685C14.206 1.25 14.5081 1.24845 14.7734 1.27832C16.8604 1.5133 18.5088 3.1593 18.7441 5.24609C18.806 5.79479 18.4109 6.28954 17.8623 6.35156C17.3135 6.41344 16.8177 6.01853 16.7558 5.46973C16.625 4.31144 15.7103 3.39634 14.5498 3.26562C14.4241 3.25148 14.2604 3.25 13.7685 3.25H11.2549C9.57566 3.25 8.41658 3.25203 7.54489 3.36914C6.70193 3.4824 6.27853 3.68651 5.98239 3.98242C5.68642 4.27824 5.4824 4.70102 5.36911 5.54297C5.25194 6.41387 5.24997 7.57187 5.24997 9.25V14.75L5.25193 15.915C5.25802 16.9893 5.28125 17.8039 5.36911 18.457C5.4824 19.299 5.68641 19.7218 5.98239 20.0176C6.27853 20.3135 6.70192 20.5176 7.54489 20.6309C8.41658 20.748 9.57566 20.75 11.2549 20.75H13.7685C14.2604 20.75 14.4241 20.7485 14.5498 20.7344C15.7103 20.6037 16.625 19.6886 16.7558 18.5303C16.8177 17.9815 17.3135 17.5866 17.8623 17.6484C18.4109 17.7105 18.806 18.2052 18.7441 18.7539C18.5088 20.8407 16.8604 22.4867 14.7734 22.7217C14.5081 22.7515 14.206 22.75 13.7685 22.75H11.2549C9.63212 22.75 8.31409 22.7524 7.27829 22.6133C6.21406 22.4703 5.29891 22.1615 4.56931 21.4326C3.83946 20.7033 3.52987 19.7878 3.38669 18.7236C3.28224 17.9472 3.25785 17.0122 3.25193 15.9092L3.24997 14.75Z"],
+  gift:["M18.527 6.25C18.9713 6.24999 19.3447 6.24998 19.6492 6.27206C19.9652 6.29497 20.2721 6.34483 20.5645 6.47989C20.8957 6.63285 21.1916 6.86234 21.4072 7.1611C21.6109 7.44339 21.687 7.7475 21.7201 8.03961C21.7501 8.30406 21.75 8.62116 21.75 8.96402V9.03598C21.75 9.37885 21.7501 9.69594 21.7201 9.96039C21.687 10.2525 21.6109 10.5566 21.4072 10.8389C21.1916 11.1377 20.8957 11.3671 20.5645 11.5201C20.2721 11.6552 19.9652 11.705 19.6492 11.7279C19.3447 11.75 18.9713 11.75 18.5269 11.75H5.47308C5.0287 11.75 4.6553 11.75 4.35082 11.7279C4.03479 11.705 3.72793 11.6552 3.43552 11.5201C3.10434 11.3671 2.80841 11.1377 2.5928 10.8389C2.38907 10.5566 2.31299 10.2525 2.27989 9.96039C2.24993 9.69594 2.24997 9.37884 2.25 9.03597V8.96403C2.24997 8.62116 2.24993 8.30406 2.27989 8.03961C2.31299 7.7475 2.38907 7.44339 2.5928 7.1611C2.80841 6.86234 3.10434 6.63285 3.43552 6.47989C3.72793 6.34483 4.03479 6.29497 4.35082 6.27206C4.65529 6.24998 5.02869 6.24999 5.47306 6.25H18.527Z","M3.78678 12.9182C3.52341 12.8739 3.39172 12.8517 3.32086 12.9116C3.25 12.9715 3.25 13.0943 3.25 13.34V15.0544C3.24998 16.657 3.24997 17.936 3.38483 18.939C3.52415 19.9753 3.81966 20.8287 4.4948 21.5039C5.16994 22.179 6.02335 22.4745 7.05961 22.6138C8.0627 22.7487 9.34166 22.7487 10.9443 22.7487C10.975 22.7487 11 22.7237 11 22.6929L11 13.3987C11 13.2101 11 13.1158 10.9414 13.0572C10.8828 12.9987 10.7886 12.9987 10.6 12.9987H5.43911C5.02245 12.9987 4.61055 12.9987 4.26041 12.9733C4.11504 12.9628 3.95558 12.9467 3.78678 12.9182Z","M13.4 12.9987C13.2114 12.9987 13.1172 12.9987 13.0586 13.0572C13 13.1158 13 13.2101 13 13.3987V22.6929C13 22.7237 13.025 22.7487 13.0557 22.7487C14.6583 22.7487 15.9373 22.7487 16.9404 22.6138C17.9767 22.4745 18.8301 22.179 19.5052 21.5039C20.1803 20.8287 20.4758 19.9753 20.6152 18.939C20.75 17.936 20.75 16.657 20.75 15.0544V13.34C20.75 13.0943 20.75 12.9715 20.6791 12.9116C20.6083 12.8517 20.4766 12.8738 20.2132 12.9182C20.0444 12.9467 19.8849 12.9628 19.7396 12.9733C19.3894 12.9987 18.9776 12.9987 18.5609 12.9987H13.4Z","M7.78571 1.25006C6.24721 1.25006 5 2.49727 5 4.03578C5 6.36326 6.8868 8.25006 9.21429 8.25006H12H14.7857C17.1132 8.25006 19 6.36326 19 4.03578C19 2.49727 17.7528 1.25006 16.2143 1.25006H15.8571C14.2852 1.25006 12.8877 1.99676 12 3.1548C11.1123 1.99676 9.71476 1.25006 8.14286 1.25006H7.78571ZM11 6.1072C11 4.52925 9.72081 3.25006 8.14286 3.25006H7.78571C7.35178 3.25006 7 3.60184 7 4.03578C7 5.25869 7.99137 6.25006 9.21429 6.25006H11V6.1072ZM13 6.25006H14.7857C16.0086 6.25006 17 5.25869 17 4.03578C17 3.60184 16.6482 3.25006 16.2143 3.25006H15.8571C14.2792 3.25006 13 4.52925 13 6.1072V6.25006Z"],
+  gear:["M8.70208 2.00968C8.41768 1.9716 8.17792 2.05387 8.01469 2.1251C7.86464 2.19058 7.69535 2.28616 7.53113 2.37889L5.28197 3.66739C5.13616 3.77054 4.93913 3.93475 4.82604 4.20047C4.70258 4.49056 4.74241 4.78294 4.77174 4.95206C4.80348 5.13505 4.86932 5.387 4.93233 5.62811C5.32857 7.14492 4.36065 8.77664 2.79378 9.19656L2.76618 9.20395C2.52912 9.26746 2.30699 9.32697 2.13327 9.3896C1.97074 9.4482 1.69912 9.55819 1.50772 9.80652C1.33182 10.0347 1.28519 10.2849 1.26684 10.4619C1.24992 10.6252 1.24996 10.8205 1.25 11.0105V12.9897C1.24996 13.1797 1.24992 13.375 1.26684 13.5383C1.28519 13.7153 1.33181 13.9654 1.5077 14.1936C1.69909 14.4419 1.97071 14.5519 2.13322 14.6105C2.30694 14.6732 2.79374 14.8036 2.79374 14.8036C4.36003 15.2235 5.32731 16.8549 4.93082 18.3719C4.93082 18.3719 4.80192 18.8649 4.77017 19.0479C4.74082 19.217 4.70097 19.5094 4.82441 19.7995C4.93749 20.0653 5.13453 20.2295 5.28035 20.3327L7.52952 21.6212L7.52962 21.6212C7.6938 21.7139 7.86312 21.8095 8.01315 21.875C8.17639 21.9462 8.41618 22.0285 8.70059 21.9904C9.00977 21.949 9.23894 21.7725 9.37072 21.6623C9.51065 21.5453 9.86249 21.1963 9.86249 21.1963C10.4459 20.6176 11.2229 20.3281 12 20.3279C12.7771 20.3281 13.5541 20.6176 14.1375 21.1963C14.1375 21.1963 14.4894 21.5453 14.6293 21.6623C14.7611 21.7725 14.9902 21.949 15.2994 21.9904C15.5838 22.0285 15.8236 21.9462 15.9869 21.875C16.1369 21.8095 16.3062 21.7139 16.4704 21.6212L16.4705 21.6212L18.7196 20.3327C18.8655 20.2295 19.0625 20.0653 19.1756 19.7995C19.299 19.5094 19.2592 19.217 19.2298 19.0479C19.1981 18.8649 19.0692 18.3719 19.0692 18.3719C18.6727 16.8549 19.64 15.2235 21.2063 14.8036C21.2063 14.8036 21.6931 14.6732 21.8668 14.6105C22.0293 14.5519 22.3009 14.4419 22.4923 14.1936C22.6682 13.9654 22.7148 13.7153 22.7332 13.5383C22.7501 13.375 22.75 13.1797 22.75 12.9897V11.0105C22.75 10.8205 22.7501 10.6252 22.7332 10.4619C22.7148 10.2849 22.6682 10.0347 22.4923 9.80652C22.3009 9.55819 22.0293 9.4482 21.8667 9.3896C21.693 9.32697 21.4709 9.26746 21.2338 9.20395L21.2062 9.19656C19.6393 8.77664 18.6714 7.14492 19.0677 5.62811C19.1307 5.387 19.1965 5.13505 19.2283 4.95206C19.2576 4.78294 19.2974 4.49056 19.174 4.20047C19.0609 3.93475 18.8638 3.77054 18.718 3.66739L16.4689 2.37889C16.3046 2.28616 16.1354 2.19058 15.9853 2.1251C15.8221 2.05387 15.5823 1.9716 15.2979 2.00968C14.9888 2.05108 14.7596 2.22753 14.6278 2.3377C14.4879 2.45467 14.136 2.80369 14.136 2.80369C13.5529 3.38184 12.7765 3.67103 12 3.67124C11.2235 3.67103 10.4471 3.38184 9.86405 2.80369C9.86405 2.80369 9.51213 2.45467 9.37221 2.3377C9.24043 2.22753 9.01124 2.05108 8.70208 2.00968ZM12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.50004 12 8.50004C10.067 8.50004 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z"],
+  x:["M17.293 5.29295C17.6835 4.90243 18.3165 4.90243 18.707 5.29295C19.0976 5.68348 19.0976 6.31649 18.707 6.70702L13.4131 12L18.7061 17.293L18.7754 17.3691C19.0954 17.7619 19.0721 18.341 18.7061 18.707C18.3399 19.0731 17.7609 19.0958 17.3682 18.7754L17.292 18.707L11.999 13.414L6.70802 18.706C6.3175 19.0966 5.68449 19.0965 5.29396 18.706C4.90344 18.3155 4.90344 17.6825 5.29396 17.292L10.585 12L5.29298 6.70799L5.22462 6.63182C4.90423 6.23907 4.92691 5.66007 5.29298 5.29393C5.65897 4.92794 6.23811 4.9046 6.63087 5.22459L6.70705 5.29393L11.999 10.5859L17.293 5.29295Z"],
+  alert:["M12 1.25C17.9371 1.25 22.75 6.06294 22.75 12C22.75 17.9371 17.9371 22.75 12 22.75C6.06294 22.75 1.25 17.9371 1.25 12C1.25 6.06294 6.06294 1.25 12 1.25ZM12 14.9883C11.4477 14.9883 11 15.436 11 15.9883V15.998C11 16.5503 11.4477 16.998 12 16.998C12.5523 16.998 13 16.5503 13 15.998V15.9883C13 15.436 12.5523 14.9883 12 14.9883ZM12 7C11.4477 7 11 7.44772 11 8V12.5C11 13.0523 11.4477 13.5 12 13.5C12.5523 13.5 13 13.0523 13 12.5V8C13 7.44772 12.5523 7 12 7Z"]
+};
+function svgIcon(name){
+  var d = ICONS[name]; if(!d) return '';
+  return '<svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd">'+d.map(function(p){return '<path d="'+p+'"/>';}).join('')+'</svg>';
+}
+
+// ---------- constants ----------
+var OFF_AMOUNT_FACTOR = 0.5;   // auto-repay off -> available amount reduced
+var OFF_FEE_FACTOR = 1.31;     // auto-repay off -> higher (un-discounted) fee
+var CA_BARS = [1,0.5,0.62,0.34,0.58,0.46,0.3,0.68,0.52,0.82,1,0.6,0.74,0.4,0.3]; // cash-advance: varied weekly-sales bars
+
+// ---------- product configs ----------
+var PRODUCTS = {
+  refinance: {
+    id:'refinance', cardTitle:'Term Loan Top-Up',
+    hdrPrefix:'Top-up an additional ', hdrSub:'Customise your top-up offer and refinance your existing balance',
+    hasRefinance:true, existingBalance:111582.12,
+    minAmount:100000, maxAmount:5888416.88, amountStep:0.01, defaultAmount:5888416.88, amountLabel:'Additional funds',
+    termMin:3, termMax:6, defaultTerm:6,
+    freq:'biweekly', feeMode:'flat', defaultFeeRate:0.04,
+    holidayTitle:'Payment holiday', holidayPromo:true, defaultHolidayDay:42,
+    holidays:[{day:14},{day:42,promo:true},{day:70},{day:98}],
+    rows:{additional:true,paysOff:true,totalNewLoan:true,fixedFee:true,totalFee:true,paymentHoliday:true,noEarlyFee:true,totalRepayable:true}
+  },
+  termloan: {
+    id:'termloan', cardTitle:'Term Loan',
+    hdrPrefix:'Your offer ', hdrSub:'Customise your term loan, then accept when you\'re ready',
+    hasRefinance:false, existingBalance:0,
+    minAmount:1000, maxAmount:10000, amountStep:100, defaultAmount:10000, amountLabel:'Loan amount',
+    termMin:3, termMax:6, defaultTerm:6,
+    freq:'daily', feeMode:'byday', defaultFeeRate:0.05,
+    holidayTitle:'Payment holiday', holidayPromo:false, defaultHolidayDay:63,
+    holidays:[{day:1,fee:0.05},{day:32,fee:0.0614},{day:63,fee:0.0736}],
+    rows:{additional:false,paysOff:false,totalNewLoan:false,fixedFee:true,totalFee:true,paymentHoliday:true,noEarlyFee:true,totalRepayable:true}
+  },
+  cashadvance: {
+    id:'cashadvance', cardTitle:'Cash Advance', isCashAdvance:true,
+    hdrPrefix:'Your offer ', hdrSub:'Pick the advance that fits your business, then accept when you\'re ready',
+    hasRefinance:false, existingBalance:0,
+    maxAmount:100000, defaultAmount:100000,
+    advances:[
+      {amount:100000, fee:15000, pct:12},
+      {amount:80000, fee:12000, pct:10},
+      {amount:50000, fee:7500, pct:7}
+    ]
+  },
+  lineofcredit: {
+    id:'lineofcredit', cardTitle:'Line of Credit', isLoC:true,
+    subtitle:'Drawn from your $400,000 revolving credit line.',
+    hdrPrefix:'Your credit line ', hdrSub:'Draw what you need, when you need it — nothing is borrowed until you draw.',
+    hasRefinance:false, existingBalance:0,
+    maxAmount:400000, available:275000, locked:125000, apr:0.11,
+    drawMin:10000, drawMax:275000, drawDefault:100000, drawStep:5000,
+    heldMin:1, heldMax:12, heldDefault:6
+  }
+};
+
+// ---------- state ----------
+var DEFAULT_OFFER = { product:'refinance', advanceIdx:0, draw:100000, held:6, additional:5888416.88, termMonths:6, holidayDay:42, autoRepay:true, refinance:true, feeRate:0.04 };
+var DEFAULT_DEMO = { showApr:true, showPerPayment:true, showStrip:true,
+  blocks:{ autoRepay:true, refinance:true, amount:true, term:true, holiday:true },
+  rows:{ additional:true, paysOff:true, totalNewLoan:true, fixedFee:true, totalFee:true, paymentHoliday:true, noEarlyFee:true, totalRepayable:true } };
+var offer = JSON.parse(JSON.stringify(DEFAULT_OFFER));
+var demo  = JSON.parse(JSON.stringify(DEFAULT_DEMO));
+function P(){ return PRODUCTS[offer.product] || PRODUCTS.refinance; }
+
+// ---------- helpers ----------
+function fmt(n){ return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:Number.isInteger(n)?0:2,maximumFractionDigits:2}).format(n); }
+function fmt2(n){ return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(n); }
+function $(id){ return document.getElementById(id); }
+function pctFill(v,mn,mx){ return ((v-mn)/(mx-mn))*100; }
+function feePctLabel(r){ var p=r*100; return (p%1===0?p.toFixed(0):p.toFixed(2))+'%'; }
+function holidayAvailable(day){ return day <= offer.termMonths*30 - 60; }
+function findHoliday(day){ var hs=P().holidays; for(var i=0;i<hs.length;i++){ if(hs[i].day===day) return hs[i]; } return hs[0]; }
+function maxAvailableDay(){ var hs=P().holidays, r=hs[0].day; hs.forEach(function(h){ if(holidayAvailable(h.day)) r=h.day; }); return r; }
+
+// Left summary card: auto-distribute divider spacing to match the right column
+// height, clamped between 24px (min) and 32px (max) per side.
+function equalizeCard(){
+  var card=document.querySelector('.card');
+  var right=document.querySelector('.rightcol');
+  if(!card||!right) return;
+  var dividers=Array.prototype.filter.call(card.querySelectorAll('.divider'), function(d){ return d.offsetParent!==null; });
+  if(!dividers.length) return;
+  dividers.forEach(function(d){ d.style.marginTop='24px'; d.style.marginBottom='24px'; });
+  card.style.alignSelf='flex-start';           // un-stretch to read the true content height
+  var content=card.offsetHeight;
+  card.style.alignSelf='';                      // restore stretch to match the panel
+  var m=Math.max(24, 24 + (right.offsetHeight - content)/(dividers.length*2));
+  dividers.forEach(function(d){ d.style.marginTop=m+'px'; d.style.marginBottom=m+'px'; });
+}
+
+function calc(){
+  var pc=P();
+  if(pc.isCashAdvance){
+    var adv=pc.advances[offer.advanceIdx]||pc.advances[0];
+    return { isCA:true, amount:adv.amount, totalFee:adv.fee, totalRepayable:adv.amount+adv.fee, pct:adv.pct, currentMax:pc.maxAmount };
+  }
+  if(pc.isLoC){
+    var draw=Math.min(Math.max(offer.draw, pc.drawMin), pc.available);
+    var held=Math.min(Math.max(offer.held, pc.heldMin), pc.heldMax);
+    var biweekly=Math.max(1, Math.round(held*26/12));
+    var interest=draw*pc.apr*(held/12);
+    var payment=draw*0.02 + interest/biweekly;
+    return { isLoC:true, draw:draw, held:held, biweekly:biweekly, interest:interest, payment:payment, totalCost:draw+interest,
+      apr:pc.apr, available:pc.available, locked:pc.locked, maxAmount:pc.maxAmount };
+  }
+  var currentMax = offer.autoRepay ? pc.maxAmount : pc.maxAmount*OFF_AMOUNT_FACTOR;
+  var amount = Math.min(offer.additional, currentMax);
+  var base = (pc.feeMode==='byday') ? findHoliday(offer.holidayDay).fee : offer.feeRate;
+  var effectiveRate = offer.autoRepay ? base : base*OFF_FEE_FACTOR;
+  var strikeRate = base*OFF_FEE_FACTOR;
+  var showStrike = (pc.feeMode==='flat') && offer.autoRepay;
+  var loanBase = amount + (pc.hasRefinance && offer.refinance ? pc.existingBalance : 0);
+  var totalFee = loanBase * effectiveRate;
+  var totalRepayable = loanBase + totalFee;
+  var payments, freqWord;
+  if(pc.freq==='daily'){
+    var totalDays = Math.round(offer.termMonths*30.6);
+    payments = Math.max(1, totalDays - (offer.holidayDay-1));
+    freqWord='daily';
+  } else {
+    var periods = Math.max(1, Math.round(offer.termMonths*26/12));
+    var skip = Math.round((offer.holidayDay-14)/14);
+    payments = Math.max(1, periods - skip);
+    freqWord='biweekly';
+  }
+  var perPayment = totalRepayable / payments;
+  var aprPct = (effectiveRate*24)/(offer.termMonths+1)*100;
+  var holidayMonths = Math.max(0, Math.round((offer.holidayDay-1)/30));
+  return {currentMax:currentMax, amount:amount, base:base, effectiveRate:effectiveRate, strikeRate:strikeRate, showStrike:showStrike,
+    loanBase:loanBase, totalFee:totalFee, totalRepayable:totalRepayable, payments:payments, freqWord:freqWord,
+    perPayment:perPayment, aprPct:aprPct, holidayMonths:holidayMonths};
+}
+
+// ---------- render ----------
+function refresh(){
+  var pc=P();
+  var currentMax;
+  if(!pc.isCashAdvance && !pc.isLoC){
+    currentMax = offer.autoRepay ? pc.maxAmount : pc.maxAmount*OFF_AMOUNT_FACTOR;
+    if(offer.additional > currentMax) offer.additional = currentMax;
+    if(offer.additional < pc.minAmount) offer.additional = pc.minAmount;
+    if(!holidayAvailable(offer.holidayDay)) offer.holidayDay = maxAvailableDay();
+  }
+  var c = calc();
+  var isCA = !!c.isCA;
+  var isLoC = !!c.isLoC;
+
+  // header + title
+  $('hdr-prefix').textContent = pc.hdrPrefix;
+  $('hdr-amount').textContent = fmt(pc.maxAmount);
+  $('hdr-sub').textContent = pc.hdrSub;
+  $('card-title').textContent = pc.cardTitle;
+  $('card-amount').textContent = fmt(isLoC ? c.draw : (isCA ? c.amount : offer.additional));
+  $('card-sub').style.display = pc.subtitle ? 'block':'none';
+  $('card-sub').textContent = pc.subtitle || '';
+
+  // strip — repayment graph (bars) for every product
+  $('strip-wrap').style.display = demo.showStrip ? 'block' : 'none';
+  $('strip').style.display = 'flex';
+  $('loc-bar').style.display = 'none';
+  var strip = $('strip'); strip.innerHTML='';
+  if(isLoC){
+    for(var lb=0; lb<c.biweekly; lb++){ var d=document.createElement('div'); d.className='full'; strip.appendChild(d); }
+  } else if(isCA){
+    CA_BARS.forEach(function(hgt){ var b=document.createElement('div'); b.className='full'; b.style.height=Math.round(hgt*28)+'px'; strip.appendChild(b); });
+  } else {
+    for(var h=0; h<c.holidayMonths; h++){ var s=document.createElement('div'); s.className='short'; strip.appendChild(s); }
+    for(var m=0; m<offer.termMonths; m++){ var f=document.createElement('div'); f.className='full'; strip.appendChild(f); }
+  }
+  $('perpay').style.display = demo.showPerPayment ? 'block' : 'none';
+  $('perpay').innerHTML = isLoC
+    ? '<b>'+fmt(c.payment)+'</b> every 14 days from day 14 · reducing as you repay'
+    : (isCA
+      ? 'We collect <b>'+c.pct+'% of your weekly sales</b> until the <b>'+fmt(c.totalRepayable)+'</b> total is repaid — strong weeks pay more, slow weeks less.'
+      : '<b>'+fmt2(c.perPayment)+'</b>/'+c.freqWord+' · equal instalments · from Amazon payouts');
+
+  // ladder group (refinance only)
+  var showAdd = !isCA && !isLoC && pc.rows.additional && demo.rows.additional;
+  var showPay = !isCA && !isLoC && pc.rows.paysOff && demo.rows.paysOff && pc.hasRefinance && offer.refinance;
+  var showTNL = !isCA && !isLoC && pc.rows.totalNewLoan && demo.rows.totalNewLoan;
+  $('row-additional').style.display = showAdd?'flex':'none';
+  $('row-paysoff').style.display = showPay?'flex':'none';
+  $('val-paysoff').textContent = fmt2(pc.existingBalance);
+  $('row-totalnewloan').style.display = showTNL?'flex':'none';
+  if(!isCA && !isLoC){ $('val-additional').textContent = fmt2(offer.additional); $('val-totalnewloan').textContent = fmt2(c.loanBase); }
+  $('grp-ladder').style.display = (showAdd||showPay||showTNL)?'block':'none';
+
+  // fee group (standard) vs cash-advance vs line-of-credit
+  $('grp-fees').style.display = (isCA||isLoC) ? 'none':'block';
+  $('grp-ca').style.display = isCA ? 'block':'none';
+  $('grp-loc').style.display = isLoC ? 'block':'none';
+  if(isCA){
+    $('ca-capital').textContent = fmt(c.amount);
+    $('ca-fee').textContent = fmt(c.totalFee);
+    $('ca-pay').textContent = c.pct+'% of sales';
+  } else if(isLoC){
+    $('loc-apr').textContent = feePctLabel(c.apr);
+    $('loc-interest').textContent = fmt(c.interest);
+  } else {
+    $('row-fixedfee').style.display = (pc.rows.fixedFee&&demo.rows.fixedFee)?'flex':'none';
+    $('val-fixedfee').innerHTML = (c.showStrike ? '<span class="strike">'+feePctLabel(c.strikeRate)+'</span>'+feePctLabel(c.base) : feePctLabel(c.effectiveRate))+(demo.showApr?' (≈ '+c.aprPct.toFixed(1)+'% APR)':'');
+    $('row-totalfee').style.display = (pc.rows.totalFee&&demo.rows.totalFee)?'flex':'none';
+    $('val-totalfee').textContent = fmt2(c.totalFee);
+    $('row-holiday').style.display = (pc.rows.paymentHoliday&&demo.rows.paymentHoliday)?'flex':'none';
+    $('val-holiday').textContent = offer.holidayDay + ' days';
+    $('row-noearly').style.display = (pc.rows.noEarlyFee&&demo.rows.noEarlyFee)?'flex':'none';
+  }
+
+  // total repayable / payable
+  $('sec-totalrep').style.display = (isCA || isLoC || (pc.rows.totalRepayable&&demo.rows.totalRepayable))?'block':'none';
+  $('totalrep-label').textContent = isLoC ? 'Total cost' : (isCA ? 'Total payable' : 'Total repayable');
+  $('val-totalrep').textContent = isLoC ? fmt(c.totalCost) : (isCA ? fmt(c.totalRepayable) : fmt2(c.totalRepayable));
+
+  // toggles
+  $('tg-autorepay').className = 'tog'+(offer.autoRepay?' on':'');
+  $('tg-refinance').className = 'tog'+(offer.refinance?' on':'');
+
+  // right panel: standard blocks vs cash-advance selector vs line-of-credit estimator
+  var std = !isCA && !isLoC;
+  $('block-autorepay').style.display = (std && demo.blocks.autoRepay) ? 'block':'none';
+  $('block-refinance').style.display = (std && pc.hasRefinance && demo.blocks.refinance) ? 'block':'none';
+  $('block-amount').style.display = (std && demo.blocks.amount) ? 'block':'none';
+  $('block-term').style.display = (std && demo.blocks.term) ? 'block':'none';
+  $('block-holiday').style.display = (std && demo.blocks.holiday) ? 'block':'none';
+  $('ca-select').style.display = isCA ? 'block':'none';
+  $('loc-select').style.display = isLoC ? 'block':'none';
+  $('accept-btn').textContent = isLoC ? ('Draw '+fmt(c.draw)+' now') : 'Accept offer';
+  $('accept-secondary').style.display = isLoC ? 'block':'none';
+
+  // hide the leading divider of the FIRST visible right-panel block
+  var seenBlock=false;
+  ['block-autorepay','block-refinance','block-amount','block-term','block-holiday'].forEach(function(bid){
+    var el=$(bid), div=el.querySelector('.divider'), vis=el.style.display!=='none';
+    if(div) div.style.display = (vis && !seenBlock) ? 'none' : '';
+    if(vis) seenBlock=true;
+  });
+
+  if(isCA){
+    var cont=$('ca-cards'); cont.innerHTML='';
+    pc.advances.forEach(function(adv,i){
+      var b=document.createElement('button');
+      b.className='adv'+(offer.advanceIdx===i?' sel':'');
+      b.innerHTML='<span class="adv-radio"></span><span class="adv-main"><span class="adv-amt">'+fmt(adv.amount)+'</span><span class="adv-fee">Fixed fee '+fmt(adv.fee)+'</span></span><span class="adv-pct"><span class="adv-pct-n">'+adv.pct+'%</span><span class="adv-pct-l">of weekly sales</span></span>';
+      b.onclick=function(){ offer.advanceIdx=i; refresh(); save(); };
+      cont.appendChild(b);
+    });
+  } else if(isLoC){
+    $('loc-fill2').style.width = (c.available/c.maxAmount*100)+'%';
+    $('loc-avail2').textContent = fmt(c.available);
+    $('loc-locked2').textContent = fmt(c.locked);
+    var sd=$('sl-draw'); sd.min=pc.drawMin; sd.max=pc.available; sd.step=pc.drawStep; sd.value=c.draw;
+    sd.style.background='linear-gradient(to right, var(--teal) '+pctFill(c.draw,pc.drawMin,pc.available)+'%, var(--border) '+pctFill(c.draw,pc.drawMin,pc.available)+'%)';
+    $('ro-draw').textContent=fmt(c.draw);
+    $('mm-draw-min').textContent=fmt(pc.drawMin);
+    $('mm-draw-max').textContent=fmt(pc.available)+' available';
+    var sh=$('sl-held'); sh.min=pc.heldMin; sh.max=pc.heldMax; sh.value=c.held;
+    sh.style.background='linear-gradient(to right, var(--teal) '+pctFill(c.held,pc.heldMin,pc.heldMax)+'%, var(--border) '+pctFill(c.held,pc.heldMin,pc.heldMax)+'%)';
+    $('ro-held').textContent=c.held+(c.held===1?' month':' months');
+  } else {
+    var sa=$('sl-additional'); sa.min=pc.minAmount; sa.max=currentMax; sa.step=pc.amountStep; sa.value=offer.additional;
+    sa.style.background='linear-gradient(to right, var(--teal) '+pctFill(offer.additional,pc.minAmount,currentMax)+'%, var(--border) '+pctFill(offer.additional,pc.minAmount,currentMax)+'%)';
+    $('lbl-amount').textContent=pc.amountLabel;
+    $('ro-additional').textContent=fmt(offer.additional);
+    $('mm-min').textContent=fmt(pc.minAmount);
+    $('mm-additional').textContent=fmt(currentMax)+' max';
+    var st=$('sl-term'); st.min=pc.termMin; st.max=pc.termMax; st.value=offer.termMonths;
+    st.style.background='linear-gradient(to right, var(--teal) '+pctFill(offer.termMonths,pc.termMin,pc.termMax)+'%, var(--border) '+pctFill(offer.termMonths,pc.termMin,pc.termMax)+'%)';
+    $('ro-term').textContent=offer.termMonths+' months';
+    $('ph-title').textContent = pc.holidayTitle;
+    $('promo').style.display = pc.holidayPromo ? 'flex':'none';
+    var days=$('days'); days.innerHTML='';
+    pc.holidays.forEach(function(hobj){
+      var d=hobj.day, avail=holidayAvailable(d);
+      var btn=document.createElement('button');
+      btn.className='day'+(offer.holidayDay===d?' active':'')+(avail?'':' dis');
+      btn.innerHTML='day '+d+(hobj.promo?' '+svgIcon('gift'):'');
+      if(avail){ btn.onclick=function(){ offer.holidayDay=d; refresh(); save(); }; }
+      days.appendChild(btn);
+    });
+  }
+
+  // demo drawer reflect
+  $('fee-control').style.display = (pc.feeMode==='flat')?'block':'none';
+  $('ro-fee').textContent=feePctLabel(offer.feeRate);
+  var sf=$('sl-fee'); sf.value=offer.feeRate*100;
+  sf.style.background='linear-gradient(to right, var(--tealBright) '+pctFill(offer.feeRate*100,1,15)+'%, rgba(255,255,255,.2) '+pctFill(offer.feeRate*100,1,15)+'%)';
+  document.querySelectorAll('[data-fee]').forEach(function(el){ el.classList.toggle('active', Number(el.getAttribute('data-fee'))===offer.feeRate); });
+  document.querySelectorAll('[data-product]').forEach(function(el){ el.classList.toggle('active', el.getAttribute('data-product')===offer.product); });
+  document.querySelectorAll('[data-show]').forEach(function(el){ el.className='tog'+(demo[el.getAttribute('data-show')]?' on':''); });
+  document.querySelectorAll('[data-block]').forEach(function(el){ el.className='tog'+(demo.blocks[el.getAttribute('data-block')]?' on':''); });
+  document.querySelectorAll('[data-row]').forEach(function(el){ el.className='tog'+(demo.rows[el.getAttribute('data-row')]?' on':''); });
+
+  equalizeCard();
+}
+
+function setProduct(id){
+  var pc=PRODUCTS[id]; if(!pc) return;
+  offer.product=id;
+  if(pc.isCashAdvance){
+    offer.advanceIdx=0;
+    offer.additional=pc.defaultAmount;
+    offer.autoRepay=true;
+    offer.refinance=false;
+  } else if(pc.isLoC){
+    offer.draw=pc.drawDefault;
+    offer.held=pc.heldDefault;
+    offer.autoRepay=true;
+    offer.refinance=false;
+  } else {
+    offer.additional=pc.defaultAmount;
+    offer.termMonths=pc.defaultTerm;
+    offer.holidayDay=pc.defaultHolidayDay;
+    offer.autoRepay=true;
+    offer.refinance=pc.hasRefinance;
+    offer.feeRate=pc.defaultFeeRate;
+    demo.blocks.refinance=pc.hasRefinance;
+  }
+  refresh(); save();
+}
+
+// ---------- persistence ----------
+function save(){
+  try{ history.replaceState(null,'','#'+encodeURIComponent(JSON.stringify({offer:offer,demo:demo}))); }
+  catch(e){ try{ location.hash=encodeURIComponent(JSON.stringify({offer:offer,demo:demo})); }catch(e2){} }
+}
+function load(){
+  try{
+    var raw=location.hash.replace(/^#/,''); if(!raw) return;
+    var p=JSON.parse(decodeURIComponent(raw));
+    if(p.offer) offer=Object.assign({},DEFAULT_OFFER,p.offer);
+    if(p.demo){ demo=Object.assign({},DEFAULT_DEMO,p.demo); demo.rows=Object.assign({},DEFAULT_DEMO.rows,p.demo.rows||{}); demo.blocks=Object.assign({},DEFAULT_DEMO.blocks,p.demo.blocks||{}); }
+  }catch(e){}
+}
+
+// ---------- events ----------
+$('sl-additional').addEventListener('input',function(e){ offer.additional=Number(e.target.value); refresh(); save(); });
+$('sl-term').addEventListener('input',function(e){ offer.termMonths=Number(e.target.value); refresh(); save(); });
+$('sl-fee').addEventListener('input',function(e){ offer.feeRate=Number(e.target.value)/100; refresh(); save(); });
+$('sl-draw').addEventListener('input',function(e){ offer.draw=Number(e.target.value); refresh(); save(); });
+$('sl-held').addEventListener('input',function(e){ offer.held=Number(e.target.value); refresh(); save(); });
+$('tg-autorepay').addEventListener('click',function(){ offer.autoRepay=!offer.autoRepay; var mx=P().maxAmount; offer.additional = offer.autoRepay ? mx : mx*OFF_AMOUNT_FACTOR; refresh(); save(); });
+$('tg-refinance').addEventListener('click',function(){ offer.refinance=!offer.refinance; refresh(); save(); });
+document.querySelectorAll('[data-fee]').forEach(function(el){ el.addEventListener('click',function(){ offer.feeRate=Number(el.getAttribute('data-fee')); refresh(); save(); }); });
+document.querySelectorAll('[data-block]').forEach(function(el){ el.addEventListener('click',function(){ var k=el.getAttribute('data-block'); demo.blocks[k]=!demo.blocks[k]; refresh(); save(); }); });
+document.querySelectorAll('[data-show]').forEach(function(el){ el.addEventListener('click',function(){ var k=el.getAttribute('data-show'); demo[k]=!demo[k]; refresh(); save(); }); });
+document.querySelectorAll('[data-row]').forEach(function(el){ el.addEventListener('click',function(){ var k=el.getAttribute('data-row'); demo.rows[k]=!demo.rows[k]; refresh(); save(); }); });
+document.querySelectorAll('[data-product]').forEach(function(el){ el.addEventListener('click',function(){ setProduct(el.getAttribute('data-product')); }); });
+function toggleDrawer(){ document.body.classList.toggle('drawer-open'); }
+$('tab').addEventListener('click',toggleDrawer);
+$('drawer-close').addEventListener('click',function(){ document.body.classList.remove('drawer-open'); });
+document.addEventListener('keydown',function(e){
+  var tag=(e.target&&e.target.tagName)||'';
+  if(tag==='INPUT'||tag==='TEXTAREA') return;
+  if(e.key&&e.key.toLowerCase()==='d') toggleDrawer();
+  if(e.key==='Escape'){ document.body.classList.remove('drawer-open'); closeModal(); }
+});
+
+// accept + friendly upsell modal (shown only when auto-repay is off)
+function closeModal(){ $('modal-overlay').classList.remove('open'); }
+$('accept-btn').addEventListener('click',function(){
+  if(!offer.autoRepay){
+    var c=calc();
+    $('modal-body').innerHTML='With <b>auto-repay</b> on, you could borrow up to <b>'+fmt(P().maxAmount)+'</b> at <b>'+feePctLabel(c.base)+'</b> — instead of <b>'+fmt(c.currentMax)+'</b> at <b>'+feePctLabel(c.effectiveRate)+'</b>. Amazon just sends the repayment straight from your payouts, so there’s nothing extra to do.';
+    $('modal-overlay').classList.add('open');
+  }
+});
+$('modal-close').addEventListener('click',closeModal);
+$('modal-continue').addEventListener('click',closeModal);
+$('modal-turnon').addEventListener('click',function(){ offer.autoRepay=true; offer.additional=P().maxAmount; closeModal(); refresh(); save(); });
+$('modal-overlay').addEventListener('click',function(e){ if(e.target===$('modal-overlay')) closeModal(); });
+
+// ---------- boot ----------
+document.querySelectorAll('[data-icon]').forEach(function(el){ el.innerHTML=svgIcon(el.getAttribute('data-icon')); });
+load();
+refresh();
+window.addEventListener('resize', equalizeCard);
+if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(equalizeCard); }
+</script>
+</body>
+</html>
