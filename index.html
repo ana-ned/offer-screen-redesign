@@ -99,8 +99,8 @@
   .slider .mm{display:flex;justify-content:space-between}
   .slider .mm span{font-size:12px;color:var(--muted)}
   .rng{-webkit-appearance:none;appearance:none;height:4px;border-radius:9999px;outline:none;cursor:pointer;width:100%;margin:12px 0}
-  .rng::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:var(--teal);box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer}
-  .rng::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:50%;background:var(--teal);box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer}
+  .rng::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;box-sizing:border-box;width:18px;height:18px;border-radius:50%;background:var(--teal);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.18);cursor:pointer}
+  .rng::-moz-range-thumb{box-sizing:border-box;width:18px;height:18px;border-radius:50%;background:var(--teal);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.18);cursor:pointer}
 
   .phlabel{font-size:14px;font-weight:700;color:var(--ink)}
   .promo{margin-top:8px;background:var(--successBg);border:1px solid var(--successBorder);border-radius:12px;padding:8px 10px;display:flex;gap:8px;align-items:flex-start}
@@ -613,7 +613,7 @@ function refresh(){
     ? '<b>'+fmt(c.payment)+'</b> every 14 days from day 14 · reducing as you repay'
     : (isCA
       ? 'We collect <b>'+c.pct+'% of your weekly sales</b> until the <b>'+fmt(c.totalRepayable)+'</b> total is repaid — strong weeks pay more, slow weeks less.'
-      : '<b>'+fmt2(c.perPayment)+'</b>/'+c.freqWord+' · equal instalments · from Amazon payouts');
+      : '<b>'+fmt2(c.perPayment)+'</b>/'+c.freqWord+' · equal instalments');
 
   // ladder group (refinance only)
   var showAdd = !isCA && !isLoC && pc.rows.additional && demo.rows.additional;
@@ -690,22 +690,22 @@ function refresh(){
     $('loc-avail2').textContent = fmt(c.available);
     $('loc-locked2').textContent = fmt(c.locked);
     var sd=$('sl-draw'); sd.min=pc.drawMin; sd.max=pc.available; sd.step=pc.drawStep; sd.value=c.draw;
-    sd.style.background='linear-gradient(to right, var(--teal) '+pctFill(c.draw,pc.drawMin,pc.available)+'%, var(--border) '+pctFill(c.draw,pc.drawMin,pc.available)+'%)';
+    sd.style.background='linear-gradient(to right, var(--tealDark) '+pctFill(c.draw,pc.drawMin,pc.available)+'%, var(--border) '+pctFill(c.draw,pc.drawMin,pc.available)+'%)';
     $('ro-draw').textContent=fmt(c.draw);
     $('mm-draw-min').textContent=fmt(pc.drawMin);
     $('mm-draw-max').textContent=fmt(pc.available)+' available';
     var sh=$('sl-held'); sh.min=pc.heldMin; sh.max=pc.heldMax; sh.value=c.held;
-    sh.style.background='linear-gradient(to right, var(--teal) '+pctFill(c.held,pc.heldMin,pc.heldMax)+'%, var(--border) '+pctFill(c.held,pc.heldMin,pc.heldMax)+'%)';
+    sh.style.background='linear-gradient(to right, var(--tealDark) '+pctFill(c.held,pc.heldMin,pc.heldMax)+'%, var(--border) '+pctFill(c.held,pc.heldMin,pc.heldMax)+'%)';
     $('ro-held').textContent=c.held+(c.held===1?' month':' months');
   } else {
     var sa=$('sl-additional'); sa.min=pc.minAmount; sa.max=currentMax; sa.step=pc.amountStep; sa.value=offer.additional;
-    sa.style.background='linear-gradient(to right, var(--teal) '+pctFill(offer.additional,pc.minAmount,currentMax)+'%, var(--border) '+pctFill(offer.additional,pc.minAmount,currentMax)+'%)';
+    sa.style.background='linear-gradient(to right, var(--tealDark) '+pctFill(offer.additional,pc.minAmount,currentMax)+'%, var(--border) '+pctFill(offer.additional,pc.minAmount,currentMax)+'%)';
     $('lbl-amount').textContent=pc.amountLabel;
     $('ro-additional').textContent=fmt(offer.additional);
     $('mm-min').textContent=fmt(pc.minAmount);
     $('mm-additional').textContent=fmt(currentMax)+' max';
     var st=$('sl-term'); st.min=pc.termMin; st.max=pc.termMax; st.value=offer.termMonths;
-    st.style.background='linear-gradient(to right, var(--teal) '+pctFill(offer.termMonths,pc.termMin,pc.termMax)+'%, var(--border) '+pctFill(offer.termMonths,pc.termMin,pc.termMax)+'%)';
+    st.style.background='linear-gradient(to right, var(--tealDark) '+pctFill(offer.termMonths,pc.termMin,pc.termMax)+'%, var(--border) '+pctFill(offer.termMonths,pc.termMin,pc.termMax)+'%)';
     $('ro-term').textContent=offer.termMonths+' months';
     $('ph-title').textContent = pc.holidayTitle;
     $('promo').style.display = pc.holidayPromo ? 'flex':'none';
