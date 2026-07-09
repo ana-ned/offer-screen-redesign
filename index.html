@@ -296,6 +296,7 @@
         <div id="grp-fees">
           <div class="divider"></div>
           <div class="rows">
+            <div class="row" id="row-firstpay"><span class="l">First repayment</span><span class="v" id="val-firstpay"></span></div>
             <div class="row" id="row-repay"><span class="l" id="lbl-repay">Repayments</span><span class="v" id="val-repay"></span></div>
             <div class="row" id="row-fixedfee"><span class="l" id="lbl-fixedfee">Fixed fee</span><span class="v" id="val-fixedfee"></span></div>
             <div class="row" id="row-totalfee"><span class="l">Total fee</span><span class="v" id="val-totalfee"></span></div>
@@ -729,12 +730,11 @@ function refresh(){
   var nbars = strip.children.length;
   strip.style.gap = nbars > 60 ? '1px' : (nbars > 30 ? '2px' : '');
 
-  // caption below the graph = the RHYTHM & HOLIDAY story (the exact count + amount live in the summary)
+  // caption below the graph — loans use summary rows instead (first repayment + repayments); CA/LoC keep the sentence
   $('perpay').classList.remove('split');
-  $('perpay').style.display = demo.showPerPayment ? 'block' : 'none';
+  $('perpay').style.display = (loanLike || !demo.showPerPayment) ? 'none' : 'block';
   if(loanLike){
-    var freqPhrase = c.freqWord==='daily' ? 'daily' : 'every 2 weeks';
-    $('perpay').innerHTML = '<b>First payment on day '+offer.holidayDay+'</b> · then '+freqPhrase;
+    /* handled by the First repayment + Repayments summary rows */
   } else if(isLoC){
     $('perpay').innerHTML = 'Biweekly from day 14 · <b>reducing</b> as you repay';
   } else { // CA
@@ -779,6 +779,7 @@ function refresh(){
       + '&repayMonths=' + offer.held
       + '&drawPct=' + locDrawPct;
   } else {
+    $('val-firstpay').textContent = 'Day '+offer.holidayDay;
     $('lbl-repay').textContent = 'Repayments ('+c.freqWord+')';
     $('val-repay').innerHTML = '<b>'+c.payments+'</b> × '+fmt2(c.perPayment);
     $('row-fixedfee').style.display = (pc.rows.fixedFee&&demo.rows.fixedFee)?'flex':'none';
