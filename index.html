@@ -85,6 +85,8 @@
   .ctrl .d{margin-top:2px;font-size:12px;color:var(--ink2);line-height:1.5}
   .link{background:none;border:none;padding:0;color:var(--teal);font-weight:700;cursor:pointer;font-size:12px}
   .link:hover{text-decoration:underline}
+  .calclink{display:inline-block;margin-top:14px;color:var(--teal);font-weight:700;font-size:13px;text-decoration:none}
+  .calclink:hover{text-decoration:underline}
   .notice-danger{margin-top:8px;background:#fdecea;border:1px solid #f5c6c2;border-radius:12px;padding:10px;display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#9e2b25;line-height:1.5}
   .notice-danger .ndicon{color:#d64a3f;flex:none;display:inline-flex}
   .notice-danger .ndicon svg{width:16px;height:16px;display:block}
@@ -307,6 +309,7 @@
             <div class="row"><span class="l">First repayment</span><span class="v" id="loc-firstpay"></span></div>
             <div class="row"><span class="l">No early repayment fee</span><span class="chip success">New</span></div>
           </div>
+          <a class="calclink" id="loc-calc-link" href="https://portal.weareuncapped.com/tools/loc-calculator?limit=200000&apr=20&start=2026-07-09&drawMonths=6&repayMonths=6&drawPct=6" target="_blank" rel="noopener">Model draw &amp; repayment in the advanced calculator ↗</a>
         </div>
 
         <div id="sec-totalrep">
