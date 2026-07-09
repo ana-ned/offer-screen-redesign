@@ -22,7 +22,7 @@
   .head-font{font-family:Commissioner,Sora,sans-serif}
   button{font-family:inherit}
 
-  .page{display:flex;align-items:flex-start;padding:40px;gap:0;min-width:1200px}
+  .page{display:flex;align-items:flex-start;padding:40px;gap:0;min-width:1200px;max-width:1520px;margin:0 auto}
   aside{width:270px;flex-shrink:0;align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;min-height:820px}
   .logo svg{height:26px;width:auto;display:block}
   nav{margin-top:32px;display:flex;flex-direction:column;gap:8px}
@@ -38,14 +38,14 @@
   .tile.indigo{background:#f0f2fe;color:#7286f6}
 
   main{flex:1;min-width:0}
-  .topbar{display:flex;justify-content:space-between;align-items:flex-start;width:100%;max-width:900px;margin:0 auto}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start}
   h1{margin:0;font-size:24px;font-weight:700;color:var(--ink)}
   .sub{margin:4px 0 0;font-size:14px;color:var(--ink2)}
   .actions{display:flex;gap:4px}
   .actbtn{display:flex;align-items:center;gap:8px;height:38px;padding:0 8px;border-radius:8px;border:none;background:transparent;cursor:pointer}
   .actbtn span.al{font-size:14px;color:var(--ink)}
 
-  .panel{margin:24px auto 0;background:var(--panel);border-radius:16px;padding:16px;display:flex;gap:16px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.04);width:fit-content;max-width:100%}
+  .panel{margin-top:24px;background:var(--panel);border-radius:16px;padding:16px;display:flex;gap:16px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.04);width:fit-content;max-width:100%}
   .card{width:426px;background:var(--surface);border-radius:12px;padding:24px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
   .rightcol{width:426px;padding:24px;background:transparent;align-self:flex-start}
 
@@ -118,17 +118,18 @@
   .accept{margin-top:24px;width:100%;height:44px;border-radius:12px;border:none;background:var(--teal);color:#fff;font-weight:600;font-size:14px;cursor:pointer}
   .accept-sec{margin-top:10px;width:100%;background:none;border:none;color:var(--teal);font-weight:700;font-size:14px;cursor:pointer;padding:6px}
   .accept-sec:hover{text-decoration:underline}
-  /* ---- Layout V2 ---- */
-  body.lay-v2 .panel{flex-direction:row-reverse;background:transparent;box-shadow:none;padding:0;gap:0}
-  body.lay-v2 .card{background:transparent;box-shadow:none;border-radius:0;width:426px;padding:4px 0 4px 28px;border-left:1px solid var(--divider)}
-  body.lay-v2 .rightcol{padding:4px 28px 4px 0;align-self:auto}
-  body.lay-v2 #card-hero{background:linear-gradient(120deg,#0d5a5c 0%,#128081 45%,#1f4b73 100%);border-radius:16px;padding:20px 22px}
-  body.lay-v2 #card-hero .name{color:#fff}
-  body.lay-v2 #card-hero .amount{color:#fff;margin-top:14px}
+  /* ---- Layout V2: swap sides (modifiers left on panel-grey, offer white right), gradient hero ---- */
+  body.lay-v2 .panel{flex-direction:row-reverse}
+  body.lay-v2 #card-hero{background:linear-gradient(120deg,#0d5a5c 0%,#128081 45%,#1f4b73 100%);border-radius:16px;padding:24px;text-align:center;margin-bottom:4px}
+  body.lay-v2 #card-hero .titlerow{justify-content:center}
+  body.lay-v2 #card-hero .tile{display:none}
+  body.lay-v2 #card-hero .chip{display:none}
+  body.lay-v2 #card-hero .name{color:#fff;flex:none}
+  body.lay-v2 #card-hero .amount{color:#fff;margin-top:8px}
   body.lay-v2 #card-hero .cardsub{color:rgba(255,255,255,.85)}
-  body.lay-v2 #card-hero .tile{background:rgba(255,255,255,.16);color:#fff}
+  body.lay-v2 #hdr-expiry{display:inline-flex}
   body.lay-v2 #strip-wrap>.divider{display:none}
-  body.lay-v2 #strip-wrap{margin-bottom:20px}
+  body.lay-v2 #strip-wrap{margin-bottom:4px}
   body.lay-v2 .strip{height:20px}
   body.lay-v2 .strip .full{height:20px}
   body.lay-v2 .strip .short{height:10px}
@@ -220,6 +221,7 @@
       <div>
         <h1 class="head-font"><span id="hdr-prefix">Top-up an additional </span><span id="hdr-amount"></span></h1>
         <p class="sub" id="hdr-sub">Customise your top-up offer and refinance your existing balance</p>
+        <span class="chip amber" id="hdr-expiry" style="display:none;margin-top:8px">Available until&nbsp;<b>9 Jul</b></span>
       </div>
       <div class="actions">
         <button class="actbtn"><span class="tile brand" data-icon="call"></span><span class="al">Book a call</span></button>
@@ -548,11 +550,12 @@ function applyLayout(){
   if(!card||!mods) return;
   var strip=$('strip-wrap'), cta=$('accept-btn'), cta2=$('accept-secondary'), hero=$('card-hero');
   if(v2){
-    if(strip.parentNode!==mods) mods.insertBefore(strip, mods.firstChild);
-    if(cta.parentNode!==card){ card.appendChild(cta); card.appendChild(cta2); }
+    var anchor=$('block-holiday');
+    if(anchor) mods.insertBefore(strip, anchor); else mods.appendChild(strip);
+    card.appendChild(cta); card.appendChild(cta2);
   } else {
-    if(strip.parentNode!==card) card.insertBefore(strip, hero.nextSibling);
-    if(cta.parentNode!==mods){ mods.appendChild(cta); mods.appendChild(cta2); }
+    card.insertBefore(strip, hero.nextSibling);
+    mods.appendChild(cta); mods.appendChild(cta2);
   }
 }
 
