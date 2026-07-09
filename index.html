@@ -707,7 +707,7 @@ function refresh(){
   } else if(isLoC){
     $('perpay').innerHTML = 'Biweekly from day 14 · <b>reducing</b> as you repay';
   } else { // CA
-    $('perpay').innerHTML = '<b>Illustrative.</b> We collect <b>'+c.pct+'% of your weekly sales</b> until '+fmt(c.totalRepayable)+' is repaid. Strong weeks pay more, slow weeks less.';
+    $('perpay').innerHTML = 'We collect <b>'+c.pct+'% of your weekly sales</b> until '+fmt(c.totalRepayable)+' is repaid. Strong weeks pay more, slow weeks less.';
   }
   // V2 summary heading + expiry notice (loan products)
   $('v2-heading').style.display = (v2 && pc.v2Summary) ? 'block':'none';
