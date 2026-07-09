@@ -281,7 +281,8 @@
           <div class="divider"></div>
           <div class="rows">
             <div class="row" id="row-repay"><span class="l" id="lbl-repay">Repayments</span><span class="v" id="val-repay"></span></div>
-            <div class="row" id="row-fixedfee"><span class="l">Fixed fee</span><span class="v" id="val-fixedfee"></span></div>
+            <div class="row" id="row-firstpay"><span class="l">First payment</span><span class="v" id="val-firstpay"></span></div>
+            <div class="row" id="row-fixedfee"><span class="l" id="lbl-fixedfee">Fixed fee</span><span class="v" id="val-fixedfee"></span></div>
             <div class="row" id="row-totalfee"><span class="l">Total fee</span><span class="v" id="val-totalfee"></span></div>
             <div class="row" id="row-holiday"><span class="l">Payment holiday</span><span class="v" id="val-holiday"></span></div>
             <div class="row" id="row-noearly"><span class="l">No early repayment fee</span><span class="chip success">New</span></div>
@@ -368,7 +369,7 @@
 
         <div id="ca-select">
           <div style="font-size:16px;font-weight:700;color:var(--ink)">Select your advance</div>
-          <div style="margin-top:4px;font-size:12px;color:var(--ink2);line-height:1.5">Cash upfront for one fixed fee. You repay it as a % of weekly sales — the fee is the total cost, the % just sets the pace.</div>
+          <div style="margin-top:4px;font-size:12px;color:var(--ink2);line-height:1.5">Cash upfront for one fixed fee. You repay it as a % of weekly sales. The fee is the total cost, the % just sets the pace.</div>
           <div id="ca-cards"></div>
         </div>
 
@@ -443,7 +444,6 @@
     <div class="dst">Offer summary card</div>
     <div class="dsub">What appears on the left summary card.</div>
     <div class="drow"><span>Instalment strip</span><button class="tog" data-show="showStrip"></button></div>
-    <div class="drow"><span>Per-payment line</span><button class="tog" data-show="showPerPayment"></button></div>
     <div class="drow"><span>APR equivalent</span><button class="tog" data-show="showApr"></button></div>
     <div class="drow"><span>Additional funds to you</span><button class="tog" data-row="additional"></button></div>
     <div class="drow"><span>Pays off existing balance</span><button class="tog" data-row="paysOff"></button></div>
@@ -455,7 +455,7 @@
     <div class="drow"><span>Total repayable</span><button class="tog" data-row="totalRepayable"></button></div>
   </div>
 
-  <div class="dnote">Numbers are illustrative and recalculate live. State is saved to the web address — copy the link to share this exact setup. Press <b>D</b> to hide/show this panel.</div>
+  <div class="dnote">Numbers are illustrative and recalculate live. State is saved to the web address, so you can copy the link to share this exact setup. Press <b>D</b> to hide/show this panel.</div>
 </div>
 
 <!-- UPSELL MODAL (auto-repay off + accept) -->
@@ -503,7 +503,7 @@ var PRODUCTS = {
     id:'refinance', cardTitle:'Term Loan Top-Up', v2Summary:'Top-up and refinance your existing balance',
     hdrPrefix:'Top-up an additional ', hdrSub:'Customise your top-up offer and refinance your existing balance',
     hasRefinance:true, existingBalance:111582.12,
-    minAmount:100000, maxAmount:5888416.88, amountStep:0.01, defaultAmount:5888416.88, amountLabel:'Additional funds',
+    minAmount:50000, maxAmount:500000, amountStep:1000, defaultAmount:250000, amountLabel:'Additional funds',
     termMin:3, termMax:6, defaultTerm:6,
     freq:'biweekly', feeMode:'flat', defaultFeeRate:0.04,
     holidayTitle:'Payment holiday', holidayPromo:true, defaultHolidayDay:42,
@@ -535,7 +535,7 @@ var PRODUCTS = {
   lineofcredit: {
     id:'lineofcredit', cardTitle:'Line of Credit', isLoC:true, v2Summary:'Draw what you need, repay as you go',
     subtitle:'Drawn from your $400,000 revolving credit line.',
-    hdrPrefix:'Your credit line ', hdrSub:'Draw what you need, when you need it — nothing is borrowed until you draw.',
+    hdrPrefix:'Your credit line ', hdrSub:'Draw what you need, when you need it. Nothing is borrowed until you draw.',
     hasRefinance:false, existingBalance:0,
     maxAmount:400000, available:275000, locked:125000, apr:0.11,
     drawMin:10000, drawMax:275000, drawDefault:100000, drawStep:5000,
@@ -544,7 +544,7 @@ var PRODUCTS = {
 };
 
 // ---------- state ----------
-var DEFAULT_OFFER = { product:'refinance', layout:'v1', advanceIdx:0, draw:100000, held:6, additional:5888416.88, termMonths:6, holidayDay:42, autoRepay:true, refinance:true, feeRate:0.04 };
+var DEFAULT_OFFER = { product:'refinance', layout:'v1', advanceIdx:0, draw:100000, held:6, additional:250000, termMonths:6, holidayDay:42, autoRepay:true, refinance:true, feeRate:0.04 };
 var DEFAULT_DEMO = { showApr:true, showPerPayment:true, showStrip:true, heroCard:true,
   blocks:{ autoRepay:true, refinance:true, amount:true, term:true, holiday:true },
   rows:{ additional:true, paysOff:true, totalNewLoan:true, fixedFee:true, totalFee:true, paymentHoliday:true, noEarlyFee:true, totalRepayable:true } };
@@ -696,15 +696,11 @@ function refresh(){
   $('perpay').style.display = demo.showPerPayment ? 'block' : 'none';
   if(loanLike){
     var freqPhrase = c.freqWord==='daily' ? 'daily' : 'every 2 weeks';
-    if(c.skip>0){
-      $('perpay').innerHTML = '<b>First '+offer.holidayDay+' days free</b> · then repayments '+freqPhrase;
-    } else {
-      $('perpay').innerHTML = 'Repayments '+freqPhrase+' over '+offer.termMonths+' months';
-    }
+    $('perpay').innerHTML = '<b>First payment on day '+offer.holidayDay+'</b> · then '+freqPhrase;
   } else if(isLoC){
     $('perpay').innerHTML = 'Biweekly from day 14 · <b>reducing</b> as you repay';
   } else { // CA
-    $('perpay').innerHTML = '<b>Illustrative</b> — we collect <b>'+c.pct+'% of your weekly sales</b> until '+fmt(c.totalRepayable)+' is repaid. Strong weeks pay more, slow weeks less.';
+    $('perpay').innerHTML = '<b>Illustrative.</b> We collect <b>'+c.pct+'% of your weekly sales</b> until '+fmt(c.totalRepayable)+' is repaid. Strong weeks pay more, slow weeks less.';
   }
   // V2 summary heading + expiry notice (loan products)
   $('v2-heading').style.display = (v2 && pc.v2Summary) ? 'block':'none';
@@ -713,11 +709,11 @@ function refresh(){
 
   // ladder group (refinance only)
   var showAdd = !isCA && !isLoC && pc.rows.additional && demo.rows.additional;
-  var showPay = !isCA && !isLoC && pc.rows.paysOff && demo.rows.paysOff && pc.hasRefinance && offer.refinance;
+  var showPay = !isCA && !isLoC && pc.rows.paysOff && demo.rows.paysOff && pc.hasRefinance;
   var showTNL = !isCA && !isLoC && pc.rows.totalNewLoan && demo.rows.totalNewLoan;
   $('row-additional').style.display = showAdd?'flex':'none';
   $('row-paysoff').style.display = showPay?'flex':'none';
-  $('val-paysoff').textContent = fmt2(pc.existingBalance);
+  $('val-paysoff').textContent = offer.refinance ? fmt2(pc.existingBalance) : fmt2(0);
   $('row-totalnewloan').style.display = showTNL?'flex':'none';
   if(!isCA && !isLoC){ $('val-additional').textContent = fmt2(offer.additional); $('val-totalnewloan').textContent = fmt2(c.loanBase); }
   $('grp-ladder').style.display = (showAdd||showPay||showTNL)?'block':'none';
@@ -737,8 +733,10 @@ function refresh(){
   } else {
     $('lbl-repay').textContent = 'Repayments ('+c.freqWord+')';
     $('val-repay').innerHTML = '<b>'+c.payments+'</b> × '+fmt2(c.perPayment);
+    $('val-firstpay').textContent = 'Day '+offer.holidayDay;
+    $('lbl-fixedfee').textContent = c.showStrike ? 'Fixed fee (auto-repay discount)' : 'Fixed fee';
     $('row-fixedfee').style.display = (pc.rows.fixedFee&&demo.rows.fixedFee)?'flex':'none';
-    $('val-fixedfee').innerHTML = (c.showStrike ? '<span class="strike">'+feePctLabel(c.strikeRate)+'</span>'+feePctLabel(c.base) : feePctLabel(c.effectiveRate))+(demo.showApr?' (≈ '+c.aprPct.toFixed(1)+'% APR)':'');
+    $('val-fixedfee').innerHTML = (c.showStrike ? '<span class="strike">'+feePctLabel(c.strikeRate)+'</span> '+feePctLabel(c.base) : feePctLabel(c.effectiveRate))+(demo.showApr?' (≈ '+c.aprPct.toFixed(1)+'% APR)':'');
     $('row-totalfee').style.display = (pc.rows.totalFee&&demo.rows.totalFee)?'flex':'none';
     $('val-totalfee').textContent = fmt2(c.totalFee);
     $('row-holiday').style.display = (pc.rows.paymentHoliday&&demo.rows.paymentHoliday)?'flex':'none';
@@ -902,7 +900,7 @@ function closeModal(){ $('modal-overlay').classList.remove('open'); }
 $('accept-btn').addEventListener('click',function(){
   if(!offer.autoRepay){
     var c=calc();
-    $('modal-body').innerHTML='With <b>auto-repay</b> on, you could borrow up to <b>'+fmt(P().maxAmount)+'</b> at <b>'+feePctLabel(c.base)+'</b> — instead of <b>'+fmt(c.currentMax)+'</b> at <b>'+feePctLabel(c.effectiveRate)+'</b>. Amazon just sends the repayment straight from your payouts, so there’s nothing extra to do.';
+    $('modal-body').innerHTML='With <b>auto-repay</b> on, you could borrow up to <b>'+fmt(P().maxAmount)+'</b> at <b>'+feePctLabel(c.base)+'</b>, instead of <b>'+fmt(c.currentMax)+'</b> at <b>'+feePctLabel(c.effectiveRate)+'</b>. Amazon just sends the repayment straight from your payouts, so there is nothing extra to do.';
     $('modal-overlay').classList.add('open');
   }
 });
