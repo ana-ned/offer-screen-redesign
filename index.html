@@ -38,14 +38,14 @@
   .tile.indigo{background:#f0f2fe;color:#7286f6}
 
   main{flex:1;min-width:0}
-  .topbar{display:flex;justify-content:space-between;align-items:flex-start}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;width:100%;max-width:900px;margin:0 auto}
   h1{margin:0;font-size:24px;font-weight:700;color:var(--ink)}
   .sub{margin:4px 0 0;font-size:14px;color:var(--ink2)}
   .actions{display:flex;gap:4px}
   .actbtn{display:flex;align-items:center;gap:8px;height:38px;padding:0 8px;border-radius:8px;border:none;background:transparent;cursor:pointer}
   .actbtn span.al{font-size:14px;color:var(--ink)}
 
-  .panel{margin-top:24px;background:var(--panel);border-radius:16px;padding:16px;display:flex;gap:16px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.04);width:fit-content;max-width:100%}
+  .panel{margin:24px auto 0;background:var(--panel);border-radius:16px;padding:16px;display:flex;gap:16px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.04);width:fit-content;max-width:100%}
   .card{width:426px;background:var(--surface);border-radius:12px;padding:24px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
   .rightcol{width:426px;padding:24px;background:transparent;align-self:flex-start}
 
@@ -118,6 +118,20 @@
   .accept{margin-top:24px;width:100%;height:44px;border-radius:12px;border:none;background:var(--teal);color:#fff;font-weight:600;font-size:14px;cursor:pointer}
   .accept-sec{margin-top:10px;width:100%;background:none;border:none;color:var(--teal);font-weight:700;font-size:14px;cursor:pointer;padding:6px}
   .accept-sec:hover{text-decoration:underline}
+  /* ---- Layout V2 ---- */
+  body.lay-v2 .panel{flex-direction:row-reverse;background:transparent;box-shadow:none;padding:0;gap:0}
+  body.lay-v2 .card{background:transparent;box-shadow:none;border-radius:0;width:426px;padding:4px 0 4px 28px;border-left:1px solid var(--divider)}
+  body.lay-v2 .rightcol{padding:4px 28px 4px 0;align-self:auto}
+  body.lay-v2 #card-hero{background:linear-gradient(120deg,#0d5a5c 0%,#128081 45%,#1f4b73 100%);border-radius:16px;padding:20px 22px}
+  body.lay-v2 #card-hero .name{color:#fff}
+  body.lay-v2 #card-hero .amount{color:#fff;margin-top:14px}
+  body.lay-v2 #card-hero .cardsub{color:rgba(255,255,255,.85)}
+  body.lay-v2 #card-hero .tile{background:rgba(255,255,255,.16);color:#fff}
+  body.lay-v2 #strip-wrap>.divider{display:none}
+  body.lay-v2 #strip-wrap{margin-bottom:20px}
+  body.lay-v2 .strip{height:20px}
+  body.lay-v2 .strip .full{height:20px}
+  body.lay-v2 .strip .short{height:10px}
   /* cash-advance selector */
   #ca-cards{display:flex;flex-direction:column;gap:12px;margin-top:16px}
   .adv{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:border-color .15s,box-shadow .15s;font-family:Sora,sans-serif}
@@ -216,14 +230,15 @@
     <div class="panel">
       <!-- LEFT: summary -->
       <section class="card">
-        <div class="titlerow">
-          <span class="tile brand" data-icon="moneybag"></span>
-          <span class="name" id="card-title">Term Loan Top-Up</span>
-          <span class="chip amber">Available until&nbsp;<b>9 Jul</b></span>
+        <div id="card-hero">
+          <div class="titlerow">
+            <span class="tile brand" data-icon="moneybag"></span>
+            <span class="name" id="card-title">Term Loan Top-Up</span>
+            <span class="chip amber">Available until&nbsp;<b>9 Jul</b></span>
+          </div>
+          <div class="amount" id="card-amount"></div>
+          <div class="cardsub" id="card-sub" style="display:none"></div>
         </div>
-
-        <div class="amount" id="card-amount"></div>
-        <div class="cardsub" id="card-sub" style="display:none"></div>
 
         <div id="strip-wrap">
           <div class="divider"></div>
@@ -378,6 +393,15 @@
   </div>
 
   <div class="dsec">
+    <div class="dst">Layout</div>
+    <div class="pills">
+      <button class="pill" data-layout="v1">Layout V1</button>
+      <button class="pill" data-layout="v2">Layout V2</button>
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:#7fa9aa">V2 tuned for Top-Up first.</div>
+  </div>
+
+  <div class="dsec">
     <div class="dst">Modifiers</div>
     <div class="dsub">Blocks on the right-hand customisation panel.</div>
     <div class="drow"><span>Auto-repay toggle</span><button class="tog" data-block="autoRepay"></button></div>
@@ -495,7 +519,7 @@ var PRODUCTS = {
 };
 
 // ---------- state ----------
-var DEFAULT_OFFER = { product:'refinance', advanceIdx:0, draw:100000, held:6, additional:5888416.88, termMonths:6, holidayDay:42, autoRepay:true, refinance:true, feeRate:0.04 };
+var DEFAULT_OFFER = { product:'refinance', layout:'v1', advanceIdx:0, draw:100000, held:6, additional:5888416.88, termMonths:6, holidayDay:42, autoRepay:true, refinance:true, feeRate:0.04 };
 var DEFAULT_DEMO = { showApr:true, showPerPayment:true, showStrip:true,
   blocks:{ autoRepay:true, refinance:true, amount:true, term:true, holiday:true },
   rows:{ additional:true, paysOff:true, totalNewLoan:true, fixedFee:true, totalFee:true, paymentHoliday:true, noEarlyFee:true, totalRepayable:true } };
@@ -515,7 +539,29 @@ function maxAvailableDay(){ var hs=P().holidays, r=hs[0].day; hs.forEach(functio
 
 // Left summary card: auto-distribute divider spacing to match the right column
 // height, clamped between 24px (min) and 32px (max) per side.
+// Layout V2: modifiers left / offer right, gradient hero, flat sections, graph in
+// modifiers, CTA under the total. Swaps by moving two nodes + a body class.
+function applyLayout(){
+  var v2 = offer.layout==='v2';
+  document.body.classList.toggle('lay-v2', v2);
+  var card=document.querySelector('.card'), mods=document.querySelector('.rightcol');
+  if(!card||!mods) return;
+  var strip=$('strip-wrap'), cta=$('accept-btn'), cta2=$('accept-secondary'), hero=$('card-hero');
+  if(v2){
+    if(strip.parentNode!==mods) mods.insertBefore(strip, mods.firstChild);
+    if(cta.parentNode!==card){ card.appendChild(cta); card.appendChild(cta2); }
+  } else {
+    if(strip.parentNode!==card) card.insertBefore(strip, hero.nextSibling);
+    if(cta.parentNode!==mods){ mods.appendChild(cta); mods.appendChild(cta2); }
+  }
+}
+
 function equalizeCard(){
+  if(document.body.classList.contains('lay-v2')){
+    var cd=document.querySelector('.card');
+    if(cd){ Array.prototype.forEach.call(cd.querySelectorAll('.divider'),function(d){ d.style.marginTop='24px'; d.style.marginBottom='24px'; }); }
+    return;
+  }
   var card=document.querySelector('.card');
   var right=document.querySelector('.rightcol');
   if(!card||!right) return;
@@ -727,6 +773,7 @@ function refresh(){
   sf.style.background='linear-gradient(to right, var(--tealBright) '+pctFill(offer.feeRate*100,1,15)+'%, rgba(255,255,255,.2) '+pctFill(offer.feeRate*100,1,15)+'%)';
   document.querySelectorAll('[data-fee]').forEach(function(el){ el.classList.toggle('active', Number(el.getAttribute('data-fee'))===offer.feeRate); });
   document.querySelectorAll('[data-product]').forEach(function(el){ el.classList.toggle('active', el.getAttribute('data-product')===offer.product); });
+  document.querySelectorAll('[data-layout]').forEach(function(el){ el.classList.toggle('active', el.getAttribute('data-layout')===offer.layout); });
   document.querySelectorAll('[data-show]').forEach(function(el){ el.className='tog'+(demo[el.getAttribute('data-show')]?' on':''); });
   document.querySelectorAll('[data-block]').forEach(function(el){ el.className='tog'+(demo.blocks[el.getAttribute('data-block')]?' on':''); });
   document.querySelectorAll('[data-row]').forEach(function(el){ el.className='tog'+(demo.rows[el.getAttribute('data-row')]?' on':''); });
@@ -786,6 +833,7 @@ document.querySelectorAll('[data-block]').forEach(function(el){ el.addEventListe
 document.querySelectorAll('[data-show]').forEach(function(el){ el.addEventListener('click',function(){ var k=el.getAttribute('data-show'); demo[k]=!demo[k]; refresh(); save(); }); });
 document.querySelectorAll('[data-row]').forEach(function(el){ el.addEventListener('click',function(){ var k=el.getAttribute('data-row'); demo.rows[k]=!demo.rows[k]; refresh(); save(); }); });
 document.querySelectorAll('[data-product]').forEach(function(el){ el.addEventListener('click',function(){ setProduct(el.getAttribute('data-product')); }); });
+document.querySelectorAll('[data-layout]').forEach(function(el){ el.addEventListener('click',function(){ offer.layout=el.getAttribute('data-layout'); applyLayout(); refresh(); save(); }); });
 function toggleDrawer(){ document.body.classList.toggle('drawer-open'); }
 $('tab').addEventListener('click',toggleDrawer);
 $('drawer-close').addEventListener('click',function(){ document.body.classList.remove('drawer-open'); });
@@ -813,6 +861,7 @@ $('modal-overlay').addEventListener('click',function(e){ if(e.target===$('modal-
 // ---------- boot ----------
 document.querySelectorAll('[data-icon]').forEach(function(el){ el.innerHTML=svgIcon(el.getAttribute('data-icon')); });
 load();
+applyLayout();
 refresh();
 window.addEventListener('resize', equalizeCard);
 if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(equalizeCard); }
