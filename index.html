@@ -518,7 +518,7 @@ var PRODUCTS = {
     rows:{additional:false,paysOff:false,totalNewLoan:false,fixedFee:true,totalFee:true,paymentHoliday:true,noEarlyFee:true,totalRepayable:true}
   },
   cashadvance: {
-    id:'cashadvance', cardTitle:'Cash Advance', isCashAdvance:true,
+    id:'cashadvance', cardTitle:'Cash Advance', isCashAdvance:true, v2Summary:'Advance now, repay from your sales',
     hdrPrefix:'Your offer ', hdrSub:'Pick the advance that fits your business, then accept when you\'re ready',
     hasRefinance:false, existingBalance:0,
     maxAmount:100000, defaultAmount:100000,
@@ -529,7 +529,7 @@ var PRODUCTS = {
     ]
   },
   lineofcredit: {
-    id:'lineofcredit', cardTitle:'Line of Credit', isLoC:true,
+    id:'lineofcredit', cardTitle:'Line of Credit', isLoC:true, v2Summary:'Draw what you need, repay as you go',
     subtitle:'Drawn from your $400,000 revolving credit line.',
     hdrPrefix:'Your credit line ', hdrSub:'Draw what you need, when you need it — nothing is borrowed until you draw.',
     hasRefinance:false, existingBalance:0,
@@ -684,9 +684,9 @@ function refresh(){
         : '<b>'+fmt2(c.perPayment)+'</b>/'+c.freqWord+' · equal instalments');
   }
   // V2 summary heading + expiry notice (loan products)
-  $('v2-heading').style.display = v2loan ? 'block':'none';
+  $('v2-heading').style.display = (v2 && pc.v2Summary) ? 'block':'none';
   $('v2-expiry').style.display = v2 ? 'flex':'none';
-  if(v2loan){ $('v2-heading').textContent = pc.v2Summary || ''; }
+  if(v2){ $('v2-heading').textContent = pc.v2Summary || ''; }
 
   // ladder group (refinance only)
   var showAdd = !isCA && !isLoC && pc.rows.additional && demo.rows.additional;
