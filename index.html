@@ -122,8 +122,10 @@
   #v2-expiry{display:none;align-items:center;gap:8px;background:var(--amberBg);border:1px solid var(--amberBorder);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--amberText);margin-bottom:16px}
   #v2-expiry b{color:var(--amberText)}
   #v2-heading{display:none;font-family:Commissioner,Sora,sans-serif;font-size:20px;font-weight:700;color:var(--ink);margin-bottom:14px}
-  /* ---- Layout V2 (Figma 2160-4517): gradient hero + controls left, summary right ---- */
-  body.lay-v2 .panel{flex-direction:row-reverse}
+  /* ---- Layout V2 (Figma 2160-4517): ONE white card, controls left | summary right, divider between ---- */
+  body.lay-v2 .panel{flex-direction:row-reverse;background:var(--surface);padding:32px;gap:0}
+  body.lay-v2 .card{background:transparent;box-shadow:none;border-radius:0;padding:0 0 0 32px;border-left:1px solid var(--divider);align-self:stretch}
+  body.lay-v2 .rightcol{padding:0 32px 0 0;align-self:stretch}
   body.lay-v2 #card-hero{background:linear-gradient(120deg,#0d5a5c 0%,#128081 45%,#1f4b73 100%);border-radius:16px;padding:24px;text-align:center;margin-bottom:20px}
   body.lay-v2 #card-hero .titlerow{justify-content:center}
   body.lay-v2 #card-hero .tile{display:none}
