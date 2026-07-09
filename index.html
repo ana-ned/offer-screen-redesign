@@ -302,7 +302,6 @@
           <div class="rows">
             <div class="row" id="row-fixedfee"><span class="l" id="lbl-fixedfee">Fixed fee</span><span class="v" id="val-fixedfee"></span></div>
             <div class="row" id="row-totalfee"><span class="l">Total fee</span><span class="v" id="val-totalfee"></span></div>
-            <div class="row" id="row-holiday"><span class="l">Payment holiday</span><span class="v" id="val-holiday"></span></div>
             <div class="row" id="row-noearly"><span class="l">No early repayment fee</span><span class="chip success">New</span></div>
           </div>
         </div>
@@ -481,7 +480,6 @@
     <div class="drow"><span>Total new loan</span><button class="tog" data-row="totalNewLoan"></button></div>
     <div class="drow"><span>Fixed fee</span><button class="tog" data-row="fixedFee"></button></div>
     <div class="drow"><span>Total fee</span><button class="tog" data-row="totalFee"></button></div>
-    <div class="drow"><span>Payment holiday</span><button class="tog" data-row="paymentHoliday"></button></div>
     <div class="drow"><span>No early repayment fee</span><button class="tog" data-row="noEarlyFee"></button></div>
     <div class="drow"><span>Total repayable</span><button class="tog" data-row="totalRepayable"></button></div>
   </div>
@@ -789,8 +787,6 @@ function refresh(){
     $('val-fixedfee').innerHTML = (c.showStrike ? '<span class="strike">'+feePctLabel(c.strikeRate)+'</span> '+feePctLabel(c.base) : feePctLabel(c.effectiveRate))+(demo.showApr?' (≈ '+c.aprPct.toFixed(1)+'% APR)':'');
     $('row-totalfee').style.display = (pc.rows.totalFee&&demo.rows.totalFee)?'flex':'none';
     $('val-totalfee').textContent = fmt2(c.totalFee);
-    $('row-holiday').style.display = (pc.rows.paymentHoliday&&demo.rows.paymentHoliday)?'flex':'none';
-    $('val-holiday').textContent = offer.holidayDay + ' days';
     $('row-noearly').style.display = (pc.rows.noEarlyFee&&demo.rows.noEarlyFee)?'flex':'none';
   }
 
