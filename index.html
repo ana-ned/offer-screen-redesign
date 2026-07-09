@@ -63,6 +63,7 @@
   .strip>div{flex:1;border-radius:3px}
   .strip>div.full{height:28px;background:var(--bar)}
   .strip>div.short{height:13px;background:var(--barFaded)}
+  .strip>div.fade{background:var(--barFaded)}
   .perpay{margin-top:12px;font-size:12px;color:var(--ink2)}
   .perpay b{color:var(--ink);font-weight:700}
   #perpay.split{justify-content:space-between;align-items:baseline;font-size:14px;margin-top:14px}
@@ -279,6 +280,7 @@
         <div id="grp-fees">
           <div class="divider"></div>
           <div class="rows">
+            <div class="row" id="row-repay"><span class="l" id="lbl-repay">Repayments</span><span class="v" id="val-repay"></span></div>
             <div class="row" id="row-fixedfee"><span class="l">Fixed fee</span><span class="v" id="val-fixedfee"></span></div>
             <div class="row" id="row-totalfee"><span class="l">Total fee</span><span class="v" id="val-totalfee"></span></div>
             <div class="row" id="row-holiday"><span class="l">Payment holiday</span><span class="v" id="val-holiday"></span></div>
@@ -302,6 +304,7 @@
             <div class="row"><span class="l">Interest charged</span><span class="v">Only on what you draw</span></div>
             <div class="row"><span class="l">Set-up fee</span><span class="v">$0 if you draw · 1% if unused</span></div>
             <div class="row"><span class="l">Estimated interest</span><span class="v" id="loc-interest"></span></div>
+            <div class="row"><span class="l">First repayment</span><span class="v" id="loc-firstpay"></span></div>
             <div class="row"><span class="l">No early repayment fee</span><span class="chip success">New</span></div>
           </div>
         </div>
@@ -616,14 +619,16 @@ function calc(){
   var loanBase = amount + (pc.hasRefinance && offer.refinance ? pc.existingBalance : 0);
   var totalFee = loanBase * effectiveRate;
   var totalRepayable = loanBase + totalFee;
-  var payments, freqWord;
+  var payments, freqWord, periods, skip;
   if(pc.freq==='daily'){
     var totalDays = Math.round(offer.termMonths*30.6);
+    periods = totalDays;
+    skip = offer.holidayDay-1;
     payments = Math.max(1, totalDays - (offer.holidayDay-1));
     freqWord='daily';
   } else {
-    var periods = Math.max(1, Math.round(offer.termMonths*26/12));
-    var skip = Math.round((offer.holidayDay-14)/14);
+    periods = Math.max(1, Math.round(offer.termMonths*26/12));
+    skip = Math.max(0, Math.round((offer.holidayDay-14)/14));
     payments = Math.max(1, periods - skip);
     freqWord='biweekly';
   }
@@ -632,7 +637,7 @@ function calc(){
   var holidayMonths = Math.max(0, Math.round((offer.holidayDay-1)/30));
   return {currentMax:currentMax, amount:amount, base:base, effectiveRate:effectiveRate, strikeRate:strikeRate, showStrike:showStrike,
     loanBase:loanBase, totalFee:totalFee, totalRepayable:totalRepayable, payments:payments, freqWord:freqWord,
-    perPayment:perPayment, aprPct:aprPct, holidayMonths:holidayMonths};
+    periods:periods, skip:skip, perPayment:perPayment, aprPct:aprPct, holidayMonths:holidayMonths};
 }
 
 // ---------- render ----------
@@ -665,26 +670,41 @@ function refresh(){
   $('strip-wrap').style.display = demo.showStrip ? 'block' : 'none';
   $('strip').style.display = 'flex';
   $('loc-bar').style.display = 'none';
-  var strip = $('strip'); strip.innerHTML='';
-  if(isLoC){
-    for(var lb=0; lb<c.biweekly; lb++){ var d=document.createElement('div'); d.className='full'; strip.appendChild(d); }
-  } else if(isCA){
-    CA_BARS.forEach(function(hgt){ var b=document.createElement('div'); b.className='full'; b.style.height=Math.round(hgt*28)+'px'; strip.appendChild(b); });
-  } else {
-    for(var h=0; h<c.holidayMonths; h++){ var s=document.createElement('div'); s.className='short'; strip.appendChild(s); }
-    for(var m=0; m<offer.termMonths; m++){ var f=document.createElement('div'); f.className='full'; strip.appendChild(f); }
-  }
   var loanLike = !isCA && !isLoC;
-  $('perpay').classList.toggle('split', loanLike);
-  $('perpay').style.display = demo.showPerPayment ? (loanLike?'flex':'block') : 'none';
-  if(loanLike){
-    $('perpay').innerHTML = '<span style="color:var(--ink2)">'+c.payments+' payments '+c.freqWord+'</span><span style="font-weight:700;color:var(--ink)">'+fmt2(c.perPayment)+'</span>';
+  var mkbar = function(cls, hgtPct){ var el=document.createElement('div'); el.className=cls; if(hgtPct!=null) el.style.height=hgtPct+'%'; strip.appendChild(el); };
+  var strip = $('strip'); strip.innerHTML='';
+  var BAR_CAP = 24;  // above this many instalments, fall back to a coarser (calendar) bar unit
+  if(isLoC){
+    // bars = scheduled biweekly payments, tapering down to show the reducing balance
+    var n=c.biweekly;
+    for(var lb=0; lb<n; lb++){ mkbar('full', Math.round(100 - (n>1 ? lb/(n-1) : 0)*62)); }
+  } else if(isCA){
+    // illustrative variable weekly collection — strong weeks pay more, slow weeks less
+    CA_BARS.forEach(function(hgt){ mkbar('full', Math.round(hgt*100)); });
+  } else if(c.payments <= BAR_CAP){
+    // loan, low frequency: 1 bar = 1 instalment; holiday-covered periods faded
+    for(var s=0; s<c.skip; s++){ mkbar('full fade'); }
+    for(var p=0; p<c.payments; p++){ mkbar('full'); }
   } else {
-    $('perpay').innerHTML = isLoC
-      ? '<b>'+fmt(c.payment)+'</b> every 14 days from day 14 · reducing as you repay'
-      : (isCA
-        ? 'We collect <b>'+c.pct+'% of your weekly sales</b> until the <b>'+fmt(c.totalRepayable)+'</b> total is repaid — strong weeks pay more, slow weeks less.'
-        : '<b>'+fmt2(c.perPayment)+'</b>/'+c.freqWord+' · equal instalments');
+    // loan, high frequency (e.g. daily ~140+): fall back to 1 bar = 1 month, holiday months faded
+    for(var h=0; h<c.holidayMonths; h++){ mkbar('full fade'); }
+    for(var m=0; m<offer.termMonths; m++){ mkbar('full'); }
+  }
+
+  // caption below the graph = the RHYTHM & HOLIDAY story (the exact count + amount live in the summary)
+  $('perpay').classList.remove('split');
+  $('perpay').style.display = demo.showPerPayment ? 'block' : 'none';
+  if(loanLike){
+    var freqPhrase = c.freqWord==='daily' ? 'daily' : 'every 2 weeks';
+    if(c.skip>0){
+      $('perpay').innerHTML = '<b>First '+offer.holidayDay+' days free</b> · then repayments '+freqPhrase;
+    } else {
+      $('perpay').innerHTML = 'Repayments '+freqPhrase+' over '+offer.termMonths+' months';
+    }
+  } else if(isLoC){
+    $('perpay').innerHTML = 'Biweekly from day 14 · <b>reducing</b> as you repay';
+  } else { // CA
+    $('perpay').innerHTML = '<b>Illustrative</b> — we collect <b>'+c.pct+'% of your weekly sales</b> until '+fmt(c.totalRepayable)+' is repaid. Strong weeks pay more, slow weeks less.';
   }
   // V2 summary heading + expiry notice (loan products)
   $('v2-heading').style.display = (v2 && pc.v2Summary) ? 'block':'none';
@@ -713,7 +733,10 @@ function refresh(){
   } else if(isLoC){
     $('loc-apr').textContent = feePctLabel(c.apr);
     $('loc-interest').textContent = fmt(c.interest);
+    $('loc-firstpay').textContent = fmt(c.payment)+' · reducing';
   } else {
+    $('lbl-repay').textContent = 'Repayments ('+c.freqWord+')';
+    $('val-repay').innerHTML = '<b>'+c.payments+'</b> × '+fmt2(c.perPayment);
     $('row-fixedfee').style.display = (pc.rows.fixedFee&&demo.rows.fixedFee)?'flex':'none';
     $('val-fixedfee').innerHTML = (c.showStrike ? '<span class="strike">'+feePctLabel(c.strikeRate)+'</span>'+feePctLabel(c.base) : feePctLabel(c.effectiveRate))+(demo.showApr?' (≈ '+c.aprPct.toFixed(1)+'% APR)':'');
     $('row-totalfee').style.display = (pc.rows.totalFee&&demo.rows.totalFee)?'flex':'none';
