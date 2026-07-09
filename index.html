@@ -121,7 +121,7 @@
   /* v2-only summary elements (hidden in V1) */
   #v2-expiry{display:none;align-items:center;gap:8px;background:var(--amberBg);border:1px solid var(--amberBorder);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--amberText);margin-bottom:16px}
   #v2-expiry b{color:var(--amberText)}
-  #v2-inst{display:none;font-size:16px;font-weight:700;color:var(--ink);margin-bottom:12px}
+  #v2-heading{display:none;font-family:Commissioner,Sora,sans-serif;font-size:20px;font-weight:700;color:var(--ink);margin-bottom:14px}
   /* ---- Layout V2 (Figma 2160-4517): gradient hero + controls left, summary right ---- */
   body.lay-v2 .panel{flex-direction:row-reverse}
   body.lay-v2 #card-hero{background:linear-gradient(120deg,#0d5a5c 0%,#128081 45%,#1f4b73 100%);border-radius:16px;padding:24px;text-align:center;margin-bottom:20px}
@@ -136,7 +136,7 @@
   body.lay-v2 .strip{height:36px}
   body.lay-v2 .strip .full{height:36px}
   body.lay-v2 .strip .short{height:18px}
-  body.lay-v2 #promo{margin:0 0 4px}
+  body.lay-v2 #perpay{display:flex;justify-content:space-between;font-size:14px;margin-top:14px}
   body.lay-v2 #accept-btn{margin-top:20px}
   /* cash-advance selector */
   #ca-cards{display:flex;flex-direction:column;gap:12px;margin-top:16px}
@@ -246,8 +246,8 @@
           <div class="cardsub" id="card-sub" style="display:none"></div>
         </div>
 
+        <div id="v2-heading"></div>
         <div id="v2-expiry">Offer available until <b>9 Jul</b></div>
-        <div id="v2-inst"></div>
 
         <div id="strip-wrap">
           <div class="divider"></div>
@@ -271,7 +271,6 @@
             <div class="row" id="row-fixedfee"><span class="l">Fixed fee</span><span class="v" id="val-fixedfee"></span></div>
             <div class="row" id="row-totalfee"><span class="l">Total fee</span><span class="v" id="val-totalfee"></span></div>
             <div class="row" id="row-holiday"><span class="l">Payment holiday</span><span class="v" id="val-holiday"></span></div>
-            <div class="row" id="row-perpay" style="display:none"><span class="l" id="perpay-label"></span><span class="v" id="val-perpay"></span></div>
             <div class="row" id="row-noearly"><span class="l">No early repayment fee</span><span class="chip success">New</span></div>
           </div>
         </div>
@@ -485,7 +484,7 @@ var CA_BARS = [1,0.5,0.62,0.34,0.58,0.46,0.3,0.68,0.52,0.82,1,0.6,0.74,0.4,0.3];
 // ---------- product configs ----------
 var PRODUCTS = {
   refinance: {
-    id:'refinance', cardTitle:'Term Loan Top-Up',
+    id:'refinance', cardTitle:'Term Loan Top-Up', v2Summary:'Top-up and refinance your existing balance',
     hdrPrefix:'Top-up an additional ', hdrSub:'Customise your top-up offer and refinance your existing balance',
     hasRefinance:true, existingBalance:111582.12,
     minAmount:100000, maxAmount:5888416.88, amountStep:0.01, defaultAmount:5888416.88, amountLabel:'Additional funds',
@@ -496,7 +495,7 @@ var PRODUCTS = {
     rows:{additional:true,paysOff:true,totalNewLoan:true,fixedFee:true,totalFee:true,paymentHoliday:true,noEarlyFee:true,totalRepayable:true}
   },
   termloan: {
-    id:'termloan', cardTitle:'Term Loan',
+    id:'termloan', cardTitle:'Term Loan', v2Summary:'Your term loan',
     hdrPrefix:'Your offer ', hdrSub:'Customise your term loan, then accept when you\'re ready',
     hasRefinance:false, existingBalance:0,
     minAmount:1000, maxAmount:10000, amountStep:100, defaultAmount:10000, amountLabel:'Loan amount',
@@ -556,14 +555,12 @@ function applyLayout(){
   document.body.classList.toggle('lay-v2', v2);
   var card=document.querySelector('.card'), mods=document.querySelector('.rightcol');
   if(!card||!mods) return;
-  var hero=$('card-hero'), promo=$('promo'), cta=$('accept-btn'), cta2=$('accept-secondary');
+  var hero=$('card-hero'), cta=$('accept-btn'), cta2=$('accept-secondary');
   if(v2){
     mods.insertBefore(hero, mods.firstChild);          // gradient hero → top of controls (left)
-    card.insertBefore(promo, $('grp-fees'));           // promo notice → summary, between ladder & fees
     card.appendChild(cta); card.appendChild(cta2);     // CTA → under the total (right)
   } else {
     card.insertBefore(hero, card.firstChild);          // hero → top of summary
-    $('block-holiday').insertBefore(promo, $('days')); // promo → back into the holiday control
     mods.appendChild(cta); mods.appendChild(cta2);     // CTA → controls column
   }
 }
@@ -667,21 +664,20 @@ function refresh(){
     for(var h=0; h<c.holidayMonths; h++){ var s=document.createElement('div'); s.className='short'; strip.appendChild(s); }
     for(var m=0; m<offer.termMonths; m++){ var f=document.createElement('div'); f.className='full'; strip.appendChild(f); }
   }
-  $('perpay').style.display = (demo.showPerPayment && !v2loan) ? 'block' : 'none';
-  $('perpay').innerHTML = isLoC
-    ? '<b>'+fmt(c.payment)+'</b> every 14 days from day 14 · reducing as you repay'
-    : (isCA
-      ? 'We collect <b>'+c.pct+'% of your weekly sales</b> until the <b>'+fmt(c.totalRepayable)+'</b> total is repaid — strong weeks pay more, slow weeks less.'
-      : '<b>'+fmt2(c.perPayment)+'</b>/'+c.freqWord+' · equal instalments');
-  // V2 summary extras (loan products): expiry notice, "N equal instalments" label, per-payment row
-  $('v2-expiry').style.display = v2loan ? 'flex':'none';
-  $('v2-inst').style.display = v2loan ? 'block':'none';
-  $('row-perpay').style.display = v2loan ? 'flex':'none';
+  $('perpay').style.display = demo.showPerPayment ? (v2loan?'flex':'block') : 'none';
   if(v2loan){
-    $('v2-inst').textContent = c.payments+' equal instalments';
-    $('perpay-label').textContent = c.payments+' payments '+c.freqWord;
-    $('val-perpay').textContent = fmt2(c.perPayment);
+    $('perpay').innerHTML = '<span style="color:var(--ink2)">'+c.payments+' payments '+c.freqWord+'</span><span style="font-weight:700;color:var(--ink)">'+fmt2(c.perPayment)+'</span>';
+  } else {
+    $('perpay').innerHTML = isLoC
+      ? '<b>'+fmt(c.payment)+'</b> every 14 days from day 14 · reducing as you repay'
+      : (isCA
+        ? 'We collect <b>'+c.pct+'% of your weekly sales</b> until the <b>'+fmt(c.totalRepayable)+'</b> total is repaid — strong weeks pay more, slow weeks less.'
+        : '<b>'+fmt2(c.perPayment)+'</b>/'+c.freqWord+' · equal instalments');
   }
+  // V2 summary heading + expiry notice (loan products)
+  $('v2-heading').style.display = v2loan ? 'block':'none';
+  $('v2-expiry').style.display = v2loan ? 'flex':'none';
+  if(v2loan){ $('v2-heading').textContent = pc.v2Summary || ''; }
 
   // ladder group (refinance only)
   var showAdd = !isCA && !isLoC && pc.rows.additional && demo.rows.additional;
