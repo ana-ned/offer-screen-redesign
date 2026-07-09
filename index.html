@@ -735,7 +735,7 @@ function refresh(){
   // caption below the graph — loans use summary rows instead (first repayment + repayments); CA/LoC keep the sentence
   $('perpay').classList.remove('split');
   $('perpay').style.display = (loanLike || !demo.showPerPayment) ? 'none' : 'block';
-  $('graph-rows').style.display = loanLike ? 'block' : 'none';
+  $('graph-rows').style.display = loanLike ? 'flex' : 'none';
   if(loanLike){
     /* handled by the First repayment + Repayments summary rows */
   } else if(isLoC){
@@ -820,12 +820,14 @@ function refresh(){
   var damt=$('demo-amount');
   if(damt){
     var aVal, aHint, aLabel;
-    if(isCA){ aVal=c.amount; aLabel='Advance amount'; aHint='Snaps to the nearest of 3 preset advances'; damt.removeAttribute('min'); damt.removeAttribute('max'); damt.removeAttribute('step'); }
-    else if(isLoC){ aVal=c.draw; aLabel='Draw amount'; aHint=fmt(pc.drawMin)+' – '+fmt(pc.available)+' available'; damt.min=pc.drawMin; damt.max=pc.available; damt.step=pc.drawStep; }
-    else { aVal=offer.additional; aLabel='Additional funds'; aHint=fmt(pc.minAmount)+' – '+fmt(pc.maxAmount); damt.min=pc.minAmount; damt.max=pc.maxAmount; damt.step=pc.amountStep; }
+    damt.removeAttribute('min'); damt.removeAttribute('max'); damt.removeAttribute('step');   // no limits — enter any amount
+    if(isCA){ aVal=c.amount; aLabel='Advance amount'; aHint='Snaps to the nearest of 3 preset advances'; }
+    else if(isLoC){ aVal=c.draw; aLabel='Draw amount'; aHint=''; }
+    else { aVal=offer.additional; aLabel='Additional funds'; aHint=''; }
     $('demo-amount-label').textContent=aLabel;
     $('demo-amount-hint').textContent=aHint;
-    if(document.activeElement!==damt){ damt.value=Math.round(aVal); }
+    $('demo-amount-hint').style.display = aHint ? 'block' : 'none';
+    if(document.activeElement!==damt){ damt.value=aVal; }
   }
 
   // hide the leading divider of the FIRST visible right-panel block
@@ -939,11 +941,11 @@ $('sl-additional').addEventListener('input',function(e){ offer.additional=Number
 $('sl-term').addEventListener('input',function(e){ offer.termMonths=Number(e.target.value); refresh(); save(); });
 $('sl-fee').addEventListener('input',function(e){ offer.feeRate=Number(e.target.value)/100; refresh(); save(); });
 $('demo-amount').addEventListener('change',function(e){
-  var v=Number(e.target.value); if(isNaN(v)) return;
+  var v=Number(e.target.value); if(isNaN(v)||v<0) return;
   var pc=P();
   if(pc.isCashAdvance){ var best=0,bd=Infinity; pc.advances.forEach(function(a,i){ var d=Math.abs(a.amount-v); if(d<bd){bd=d;best=i;} }); offer.advanceIdx=best; }
-  else if(pc.isLoC){ offer.draw=Math.min(Math.max(v,pc.drawMin),pc.available); }
-  else { offer.additional=Math.min(Math.max(v,pc.minAmount),pc.maxAmount); }
+  else if(pc.isLoC){ offer.draw=v; if(v>pc.available) pc.available=v; if(v<pc.drawMin) pc.drawMin=v; }   // grow the range so any value sticks
+  else { offer.additional=v; if(v>pc.maxAmount) pc.maxAmount=v; if(v<pc.minAmount) pc.minAmount=v; }
   refresh(); save();
 });
 $('sl-draw').addEventListener('input',function(e){ offer.draw=Number(e.target.value); refresh(); save(); });
