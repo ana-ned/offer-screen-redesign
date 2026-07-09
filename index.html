@@ -615,7 +615,7 @@ function calc(){
   var base = (pc.feeMode==='byday') ? findHoliday(offer.holidayDay).fee : offer.feeRate;
   var effectiveRate = offer.autoRepay ? base : base*OFF_FEE_FACTOR;
   var strikeRate = base*OFF_FEE_FACTOR;
-  var showStrike = (pc.feeMode==='flat') && offer.autoRepay;
+  var showStrike = (pc.feeMode==='flat') && (offer.holidayDay===42);   // discount only when the 42-day holiday is picked
   var loanBase = amount + (pc.hasRefinance && offer.refinance ? pc.existingBalance : 0);
   var totalFee = loanBase * effectiveRate;
   var totalRepayable = loanBase + totalFee;
@@ -734,7 +734,6 @@ function refresh(){
     $('lbl-repay').textContent = 'Repayments ('+c.freqWord+')';
     $('val-repay').innerHTML = '<b>'+c.payments+'</b> × '+fmt2(c.perPayment);
     $('val-firstpay').textContent = 'Day '+offer.holidayDay;
-    $('lbl-fixedfee').textContent = c.showStrike ? 'Fixed fee (auto-repay discount)' : 'Fixed fee';
     $('row-fixedfee').style.display = (pc.rows.fixedFee&&demo.rows.fixedFee)?'flex':'none';
     $('val-fixedfee').innerHTML = (c.showStrike ? '<span class="strike">'+feePctLabel(c.strikeRate)+'</span> '+feePctLabel(c.base) : feePctLabel(c.effectiveRate))+(demo.showApr?' (≈ '+c.aprPct.toFixed(1)+'% APR)':'');
     $('row-totalfee').style.display = (pc.rows.totalFee&&demo.rows.totalFee)?'flex':'none';
