@@ -639,7 +639,8 @@ function refresh(){
   var c = calc();
   var isCA = !!c.isCA;
   var isLoC = !!c.isLoC;
-  var v2loan = (offer.layout==='v2') && !isCA && !isLoC;
+  var v2 = (offer.layout==='v2');
+  var v2loan = v2 && !isCA && !isLoC;
 
   // header + title
   $('hdr-prefix').textContent = pc.hdrPrefix;
@@ -675,7 +676,7 @@ function refresh(){
   }
   // V2 summary heading + expiry notice (loan products)
   $('v2-heading').style.display = v2loan ? 'block':'none';
-  $('v2-expiry').style.display = v2loan ? 'flex':'none';
+  $('v2-expiry').style.display = v2 ? 'flex':'none';
   if(v2loan){ $('v2-heading').textContent = pc.v2Summary || ''; }
 
   // ladder group (refinance only)
