@@ -85,12 +85,12 @@
   .ctrl .d{margin-top:2px;font-size:12px;color:var(--ink2);line-height:1.5}
   .link{background:none;border:none;padding:0;color:var(--teal);font-weight:700;cursor:pointer;font-size:12px}
   .link:hover{text-decoration:underline}
-  .calccard{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px 16px;text-decoration:none;box-shadow:0 1px 2px rgba(0,0,0,.05);transition:box-shadow .15s,border-color .15s}
-  .calccard:hover{box-shadow:0 6px 18px rgba(0,0,0,.09);border-color:var(--tealBright)}
-  .calccard .cc-icon{flex:none;width:40px;height:40px;border-radius:10px;background:#eaf6f6;color:var(--tealBright);display:flex;align-items:center;justify-content:center}
-  .calccard .cc-icon svg{width:22px;height:22px}
-  .calccard .cc-title{flex:1;font-size:15px;font-weight:700;color:var(--ink);line-height:1.3}
-  .calccard .cc-chev{flex:none;color:var(--teal);display:flex}
+  .calccard{display:flex;align-items:center;gap:12px;background:#fff;border-radius:12px;padding:14px;text-decoration:none;box-shadow:0 1px 2px rgba(0,0,0,.07),0 0 6px rgba(0,0,0,.03);transition:box-shadow .15s}
+  .calccard:hover{box-shadow:0 4px 14px rgba(0,0,0,.09)}
+  .calccard .cc-icon{flex:none;width:24px;height:24px;border-radius:6px;background:#e7f8eb;border:.5px solid #c9e9d0;color:#33c655;display:flex;align-items:center;justify-content:center}
+  .calccard .cc-icon svg{width:16px;height:16px}
+  .calccard .cc-title{flex:1;min-width:0;font-size:16px;font-weight:700;color:#063844;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .calccard .cc-chev{flex:none;color:#063844;opacity:.5;display:flex}
   .calccard .cc-chev svg{width:18px;height:18px}
   .notice-danger{margin-top:8px;background:#fdecea;border:1px solid #f5c6c2;border-radius:12px;padding:10px;display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#9e2b25;line-height:1.5}
   .notice-danger .ndicon{color:#d64a3f;flex:none;display:inline-flex}
@@ -404,7 +404,7 @@
           <div class="divider"></div>
           <a class="calccard" id="loc-calc-link" href="https://portal.weareuncapped.com/tools/loc-calculator?limit=200000&apr=20&start=2026-07-09&drawMonths=6&repayMonths=6&drawPct=6" target="_blank" rel="noopener">
             <span class="cc-icon" data-icon="calculator"></span>
-            <span class="cc-title">Calculate your balance and payments over time</span>
+            <span class="cc-title">Calculate balance &amp; payments over time</span>
             <span class="cc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
           </a>
         </div>
@@ -709,9 +709,12 @@ function refresh(){
     // illustrative variable weekly collection — strong weeks pay more, slow weeks less
     CA_BARS.forEach(function(hgt){ mkbar('full', Math.round(hgt*100)); });
   } else {
-    // loan: always 1 bar = 1 instalment (holiday-covered periods faded)
-    for(var s=0; s<c.skip; s++){ mkbar('full fade'); }
-    for(var p=0; p<c.payments; p++){ mkbar('full'); }
+    // loan: 1 bar = 1 instalment; long schedules (>50 payments) group 2 instalments per bar
+    var group = c.payments > 50 ? 2 : 1;
+    var fadedBars = Math.round(c.skip/group);
+    var fullBars = Math.max(1, Math.round(c.payments/group));
+    for(var s=0; s<fadedBars; s++){ mkbar('full fade'); }
+    for(var p=0; p<fullBars; p++){ mkbar('full'); }
   }
   // keep dense schedules from overflowing: tighten the gap as bar count grows
   var nbars = strip.children.length;
