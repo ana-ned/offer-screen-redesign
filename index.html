@@ -64,6 +64,7 @@
   .strip>div.full{height:20px;background:var(--bar)}
   .strip>div.short{height:10px;background:var(--barFaded)}
   .strip>div.fade{background:var(--barFaded)}
+  .strip>div.hol{height:5px;background:#d6dad9}
   .perpay{margin-top:12px;font-size:12px;color:var(--ink2)}
   .perpay b{color:var(--ink);font-weight:700}
   #perpay.split{justify-content:space-between;align-items:baseline;font-size:14px;margin-top:14px}
@@ -160,6 +161,7 @@
   body.lay-v2 .strip{height:24px}
   body.lay-v2 .strip .full{height:24px}
   body.lay-v2 .strip .short{height:12px}
+  body.lay-v2 .strip .hol{height:6px}
   body.lay-v2 #perpay{display:flex;justify-content:space-between;font-size:14px;margin-top:14px}
   body.lay-v2 #accept-btn{margin-top:20px}
   /* cash-advance selector */
@@ -203,6 +205,8 @@
   .drng::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--tealBright);cursor:pointer}
   .drng::-moz-range-thumb{width:16px;height:16px;border:none;border-radius:50%;background:var(--tealBright);cursor:pointer}
   .dsub{font-size:11px;color:#7fa9aa;margin:2px 0 10px}
+  .damt{width:100%;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-size:14px;font-weight:600;padding:0 11px;font-family:inherit}
+  .damt:focus{outline:none;border-color:var(--tealBright)}
   /* upsell modal */
   .modal-overlay{position:fixed;inset:0;background:rgba(13,53,54,.45);display:none;align-items:center;justify-content:center;z-index:70;padding:20px}
   .modal-overlay.open{display:flex}
@@ -433,6 +437,11 @@
       <button class="pill" data-product="lineofcredit">Line of Credit</button>
     </div>
     <div style="margin-top:8px;font-size:11px;color:#7fa9aa">Other products land in v2.</div>
+    <div style="margin-top:14px">
+      <label for="demo-amount" id="demo-amount-label" style="display:block;font-size:12px;color:#e7f1f1;margin-bottom:6px;font-weight:600">Offer amount</label>
+      <input id="demo-amount" class="damt" type="number" inputmode="numeric" />
+      <div id="demo-amount-hint" style="margin-top:5px;font-size:11px;color:#7fa9aa"></div>
+    </div>
   </div>
 
   <div class="dsec">
@@ -713,7 +722,7 @@ function refresh(){
     var group = c.payments > 50 ? 2 : 1;
     var fadedBars = Math.round(c.skip/group);
     var fullBars = Math.max(1, Math.round(c.payments/group));
-    for(var s=0; s<fadedBars; s++){ mkbar('full fade'); }
+    for(var s=0; s<fadedBars; s++){ mkbar('hol'); }
     for(var p=0; p<fullBars; p++){ mkbar('full'); }
   }
   // keep dense schedules from overflowing: tighten the gap as bar count grows
@@ -802,6 +811,18 @@ function refresh(){
   $('accept-btn').textContent = isLoC ? ('Draw '+fmt(c.draw)+' now') : 'Accept offer';
   $('accept-secondary').style.display = isLoC ? 'block':'none';
   $('cta-wrap').classList.toggle('two', isLoC);
+
+  // demo panel: amount input reflects the active product's amount
+  var damt=$('demo-amount');
+  if(damt){
+    var aVal, aHint, aLabel;
+    if(isCA){ aVal=c.amount; aLabel='Advance amount'; aHint='Snaps to the nearest of 3 preset advances'; damt.removeAttribute('min'); damt.removeAttribute('max'); damt.removeAttribute('step'); }
+    else if(isLoC){ aVal=c.draw; aLabel='Draw amount'; aHint=fmt(pc.drawMin)+' – '+fmt(pc.available)+' available'; damt.min=pc.drawMin; damt.max=pc.available; damt.step=pc.drawStep; }
+    else { aVal=offer.additional; aLabel='Additional funds'; aHint=fmt(pc.minAmount)+' – '+fmt(pc.maxAmount); damt.min=pc.minAmount; damt.max=pc.maxAmount; damt.step=pc.amountStep; }
+    $('demo-amount-label').textContent=aLabel;
+    $('demo-amount-hint').textContent=aHint;
+    if(document.activeElement!==damt){ damt.value=Math.round(aVal); }
+  }
 
   // hide the leading divider of the FIRST visible right-panel block
   var seenBlock=false;
@@ -913,6 +934,14 @@ function load(){
 $('sl-additional').addEventListener('input',function(e){ offer.additional=Number(e.target.value); refresh(); save(); });
 $('sl-term').addEventListener('input',function(e){ offer.termMonths=Number(e.target.value); refresh(); save(); });
 $('sl-fee').addEventListener('input',function(e){ offer.feeRate=Number(e.target.value)/100; refresh(); save(); });
+$('demo-amount').addEventListener('change',function(e){
+  var v=Number(e.target.value); if(isNaN(v)) return;
+  var pc=P();
+  if(pc.isCashAdvance){ var best=0,bd=Infinity; pc.advances.forEach(function(a,i){ var d=Math.abs(a.amount-v); if(d<bd){bd=d;best=i;} }); offer.advanceIdx=best; }
+  else if(pc.isLoC){ offer.draw=Math.min(Math.max(v,pc.drawMin),pc.available); }
+  else { offer.additional=Math.min(Math.max(v,pc.minAmount),pc.maxAmount); }
+  refresh(); save();
+});
 $('sl-draw').addEventListener('input',function(e){ offer.draw=Number(e.target.value); refresh(); save(); });
 $('sl-held').addEventListener('input',function(e){ offer.held=Number(e.target.value); refresh(); save(); });
 $('tg-autorepay').addEventListener('click',function(){ offer.autoRepay=!offer.autoRepay; var mx=P().maxAmount; offer.additional = offer.autoRepay ? mx : mx*OFF_AMOUNT_FACTOR; refresh(); save(); });
