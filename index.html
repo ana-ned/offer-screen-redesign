@@ -65,6 +65,7 @@
   .strip>div.short{height:13px;background:var(--barFaded)}
   .perpay{margin-top:12px;font-size:12px;color:var(--ink2)}
   .perpay b{color:var(--ink);font-weight:700}
+  #perpay.split{justify-content:space-between;align-items:baseline;font-size:14px;margin-top:14px}
 
   .rows{display:flex;flex-direction:column;gap:16px}
   .row{display:flex;align-items:center;justify-content:space-between;min-height:24px}
@@ -673,8 +674,10 @@ function refresh(){
     for(var h=0; h<c.holidayMonths; h++){ var s=document.createElement('div'); s.className='short'; strip.appendChild(s); }
     for(var m=0; m<offer.termMonths; m++){ var f=document.createElement('div'); f.className='full'; strip.appendChild(f); }
   }
-  $('perpay').style.display = demo.showPerPayment ? (v2loan?'flex':'block') : 'none';
-  if(v2loan){
+  var loanLike = !isCA && !isLoC;
+  $('perpay').classList.toggle('split', loanLike);
+  $('perpay').style.display = demo.showPerPayment ? (loanLike?'flex':'block') : 'none';
+  if(loanLike){
     $('perpay').innerHTML = '<span style="color:var(--ink2)">'+c.payments+' payments '+c.freqWord+'</span><span style="font-weight:700;color:var(--ink)">'+fmt2(c.perPayment)+'</span>';
   } else {
     $('perpay').innerHTML = isLoC
