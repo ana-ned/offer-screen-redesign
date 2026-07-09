@@ -567,11 +567,6 @@ function applyLayout(){
 }
 
 function equalizeCard(){
-  if(document.body.classList.contains('lay-v2')){
-    var cd=document.querySelector('.card');
-    if(cd){ Array.prototype.forEach.call(cd.querySelectorAll('.divider'),function(d){ d.style.marginTop='24px'; d.style.marginBottom='24px'; }); }
-    return;
-  }
   var card=document.querySelector('.card');
   var right=document.querySelector('.rightcol');
   if(!card||!right) return;
