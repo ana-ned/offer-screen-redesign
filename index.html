@@ -309,7 +309,6 @@
             <div class="row"><span class="l">First repayment</span><span class="v" id="loc-firstpay"></span></div>
             <div class="row"><span class="l">No early repayment fee</span><span class="chip success">New</span></div>
           </div>
-          <a class="calclink" id="loc-calc-link" href="https://portal.weareuncapped.com/tools/loc-calculator?limit=200000&apr=20&start=2026-07-09&drawMonths=6&repayMonths=6&drawPct=6" target="_blank" rel="noopener">Model draw &amp; repayment in the advanced calculator ↗</a>
         </div>
 
         <div id="sec-totalrep">
@@ -392,6 +391,8 @@
             <input class="rng" id="sl-held" type="range" min="1" max="12" step="1" aria-label="Estimated hold" />
             <div class="mm"><span>1 mo</span><span>12 mo max</span></div>
           </div>
+          <div class="divider"></div>
+          <a class="calclink" id="loc-calc-link" href="https://portal.weareuncapped.com/tools/loc-calculator?limit=200000&apr=20&start=2026-07-09&drawMonths=6&repayMonths=6&drawPct=6" target="_blank" rel="noopener">Model draw &amp; repayment in the advanced calculator ↗</a>
         </div>
 
         <button class="accept" id="accept-btn">Accept offer</button>
@@ -740,6 +741,16 @@ function refresh(){
     $('loc-apr').textContent = feePctLabel(c.apr);
     $('loc-interest').textContent = fmt(c.interest);
     $('loc-firstpay').textContent = fmt(c.payment)+' · reducing';
+    // pass the live scenario to the advanced calculator (opens in a new tab)
+    var locStart = new Date().toISOString().slice(0,10);
+    var locDrawPct = Math.max(1, Math.round(c.draw / pc.maxAmount * 100));
+    $('loc-calc-link').href = 'https://portal.weareuncapped.com/tools/loc-calculator'
+      + '?limit=' + pc.maxAmount
+      + '&apr=' + Math.round(pc.apr*100)
+      + '&start=' + locStart
+      + '&drawMonths=' + offer.held
+      + '&repayMonths=' + offer.held
+      + '&drawPct=' + locDrawPct;
   } else {
     $('lbl-repay').textContent = 'Repayments ('+c.freqWord+')';
     $('val-repay').innerHTML = '<b>'+c.payments+'</b> × '+fmt2(c.perPayment);
