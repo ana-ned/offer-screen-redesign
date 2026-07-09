@@ -119,7 +119,7 @@
   .accept-sec{margin-top:10px;width:100%;background:none;border:none;color:var(--teal);font-weight:700;font-size:14px;cursor:pointer;padding:6px}
   .accept-sec:hover{text-decoration:underline}
   /* v2-only summary elements (hidden in V1) */
-  #v2-expiry{display:none;align-items:flex-start;gap:8px;background:var(--amberBg);border:1px solid var(--amberBorder);border-radius:12px;padding:8px;font-size:14px;line-height:1.5;color:#374d53;margin-bottom:16px}
+  #v2-expiry{display:none;align-items:center;gap:8px;background:var(--amberBg);border:1px solid var(--amberBorder);border-radius:12px;padding:8px;font-size:14px;line-height:1.5;color:#374d53;margin-bottom:16px}
   #v2-expiry .noticetile{flex:none;display:flex;align-items:center;justify-content:center;background:#fff0d6;border:.5px solid var(--amberBorder);border-radius:6px;padding:4px}
   #v2-expiry .noticetile svg{width:16px;height:16px;color:#ffac30;display:block}
   #v2-expiry b{color:#374d53;font-weight:700}
@@ -135,6 +135,13 @@
   body.lay-v2 #card-hero .name{color:#fff;flex:none}
   body.lay-v2 #card-hero .amount{color:#fff;margin-top:8px}
   body.lay-v2 #card-hero .cardsub{color:rgba(255,255,255,.85)}
+  /* V2 plain amount (no green card) — V1-style title+icon, no expiry chip */
+  body.lay-v2.hero-plain #card-hero{background:transparent;padding:0;text-align:left}
+  body.lay-v2.hero-plain #card-hero .titlerow{justify-content:flex-start}
+  body.lay-v2.hero-plain #card-hero .tile{display:inline-flex}
+  body.lay-v2.hero-plain #card-hero .name{color:var(--ink);flex:1}
+  body.lay-v2.hero-plain #card-hero .amount{color:var(--ink);margin-top:16px}
+  body.lay-v2.hero-plain #card-hero .cardsub{color:var(--ink2)}
   body.lay-v2 #strip-wrap{margin-bottom:4px}
   body.lay-v2 .strip{height:36px}
   body.lay-v2 .strip .full{height:36px}
@@ -411,6 +418,7 @@
       <button class="pill" data-layout="v2">Layout V2</button>
     </div>
     <div style="margin-top:8px;font-size:11px;color:#7fa9aa">V2 tuned for Top-Up first.</div>
+    <div class="drow" style="margin-top:10px"><span>V2 amount as green card</span><button class="tog" data-show="heroCard"></button></div>
   </div>
 
   <div class="dsec">
@@ -533,7 +541,7 @@ var PRODUCTS = {
 
 // ---------- state ----------
 var DEFAULT_OFFER = { product:'refinance', layout:'v1', advanceIdx:0, draw:100000, held:6, additional:5888416.88, termMonths:6, holidayDay:42, autoRepay:true, refinance:true, feeRate:0.04 };
-var DEFAULT_DEMO = { showApr:true, showPerPayment:true, showStrip:true,
+var DEFAULT_DEMO = { showApr:true, showPerPayment:true, showStrip:true, heroCard:true,
   blocks:{ autoRepay:true, refinance:true, amount:true, term:true, holiday:true },
   rows:{ additional:true, paysOff:true, totalNewLoan:true, fixedFee:true, totalFee:true, paymentHoliday:true, noEarlyFee:true, totalRepayable:true } };
 var offer = JSON.parse(JSON.stringify(DEFAULT_OFFER));
@@ -641,6 +649,7 @@ function refresh(){
   var isLoC = !!c.isLoC;
   var v2 = (offer.layout==='v2');
   var v2loan = v2 && !isCA && !isLoC;
+  document.body.classList.toggle('hero-plain', v2 && !demo.heroCard);
 
   // header + title
   $('hdr-prefix').textContent = pc.hdrPrefix;
