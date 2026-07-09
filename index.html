@@ -585,14 +585,22 @@ function equalizeCard(){
   var card=document.querySelector('.card');
   var right=document.querySelector('.rightcol');
   if(!card||!right) return;
-  var dividers=Array.prototype.filter.call(card.querySelectorAll('.divider'), function(d){ return d.offsetParent!==null; });
-  if(!dividers.length) return;
-  dividers.forEach(function(d){ d.style.marginTop='16px'; d.style.marginBottom='16px'; });
-  card.style.alignSelf='flex-start';           // un-stretch to read the true content height
-  var content=card.offsetHeight;
-  card.style.alignSelf='';                      // restore stretch to match the panel
-  var m=Math.max(16, 16 + (right.offsetHeight - content)/(dividers.length*2));
-  dividers.forEach(function(d){ d.style.marginTop=m+'px'; d.style.marginBottom=m+'px'; });
+  function dvs(el){ return Array.prototype.filter.call(el.querySelectorAll('.divider'), function(d){ return d.offsetParent!==null; }); }
+  var cdv=dvs(card), rdv=dvs(right);
+  // reset both columns' dividers to the base gap, then read each column's true height
+  cdv.concat(rdv).forEach(function(d){ d.style.marginTop='16px'; d.style.marginBottom='16px'; });
+  card.style.alignSelf='flex-start'; right.style.alignSelf='flex-start';
+  var ch=card.offsetHeight, rh=right.offsetHeight;
+  card.style.alignSelf=''; right.style.alignSelf='';
+  // distribute the shortfall into the SHORTER column's dividers so both bottoms line up
+  var target=Math.max(ch, rh);
+  function fill(dv, natural){
+    if(!dv.length) return;
+    var m=Math.max(16, 16 + (target - natural)/(dv.length*2));
+    dv.forEach(function(d){ d.style.marginTop=m+'px'; d.style.marginBottom=m+'px'; });
+  }
+  fill(cdv, ch);
+  fill(rdv, rh);
 }
 
 function calc(){
