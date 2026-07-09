@@ -281,7 +281,6 @@
           <div class="divider"></div>
           <div class="rows">
             <div class="row" id="row-repay"><span class="l" id="lbl-repay">Repayments</span><span class="v" id="val-repay"></span></div>
-            <div class="row" id="row-firstpay"><span class="l">First payment</span><span class="v" id="val-firstpay"></span></div>
             <div class="row" id="row-fixedfee"><span class="l" id="lbl-fixedfee">Fixed fee</span><span class="v" id="val-fixedfee"></span></div>
             <div class="row" id="row-totalfee"><span class="l">Total fee</span><span class="v" id="val-totalfee"></span></div>
             <div class="row" id="row-holiday"><span class="l">Payment holiday</span><span class="v" id="val-holiday"></span></div>
@@ -741,7 +740,6 @@ function refresh(){
   } else {
     $('lbl-repay').textContent = 'Repayments ('+c.freqWord+')';
     $('val-repay').innerHTML = '<b>'+c.payments+'</b> × '+fmt2(c.perPayment);
-    $('val-firstpay').textContent = 'Day '+offer.holidayDay;
     $('row-fixedfee').style.display = (pc.rows.fixedFee&&demo.rows.fixedFee)?'flex':'none';
     $('val-fixedfee').innerHTML = (c.showStrike ? '<span class="strike">'+feePctLabel(c.strikeRate)+'</span> '+feePctLabel(c.base) : feePctLabel(c.effectiveRate))+(demo.showApr?' (≈ '+c.aprPct.toFixed(1)+'% APR)':'');
     $('row-totalfee').style.display = (pc.rows.totalFee&&demo.rows.totalFee)?'flex':'none';
