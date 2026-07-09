@@ -282,6 +282,10 @@
           <div class="strip" id="strip"></div>
           <div class="locbar" id="loc-bar" style="display:none"><div class="fill" id="loc-fill"></div></div>
           <div class="perpay" id="perpay"></div>
+          <div class="rows" id="graph-rows" style="margin-top:16px;display:none">
+            <div class="row" id="row-firstpay"><span class="l">First repayment</span><span class="v" id="val-firstpay"></span></div>
+            <div class="row" id="row-repay"><span class="l" id="lbl-repay">Repayments</span><span class="v" id="val-repay"></span></div>
+          </div>
         </div>
 
         <div id="grp-ladder">
@@ -296,8 +300,6 @@
         <div id="grp-fees">
           <div class="divider"></div>
           <div class="rows">
-            <div class="row" id="row-firstpay"><span class="l">First repayment</span><span class="v" id="val-firstpay"></span></div>
-            <div class="row" id="row-repay"><span class="l" id="lbl-repay">Repayments</span><span class="v" id="val-repay"></span></div>
             <div class="row" id="row-fixedfee"><span class="l" id="lbl-fixedfee">Fixed fee</span><span class="v" id="val-fixedfee"></span></div>
             <div class="row" id="row-totalfee"><span class="l">Total fee</span><span class="v" id="val-totalfee"></span></div>
             <div class="row" id="row-holiday"><span class="l">Payment holiday</span><span class="v" id="val-holiday"></span></div>
@@ -733,6 +735,7 @@ function refresh(){
   // caption below the graph — loans use summary rows instead (first repayment + repayments); CA/LoC keep the sentence
   $('perpay').classList.remove('split');
   $('perpay').style.display = (loanLike || !demo.showPerPayment) ? 'none' : 'block';
+  $('graph-rows').style.display = loanLike ? 'block' : 'none';
   if(loanLike){
     /* handled by the First repayment + Repayments summary rows */
   } else if(isLoC){
