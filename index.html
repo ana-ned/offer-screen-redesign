@@ -49,7 +49,7 @@
   .card{width:426px;background:var(--surface);border-radius:12px;padding:24px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
   .rightcol{width:426px;padding:24px;background:transparent;align-self:flex-start}
 
-  .divider{height:1px;background:var(--divider);margin:20px 0}
+  .divider{height:1px;background:var(--divider);margin:14px 0}
   .titlerow{display:flex;align-items:center;gap:12px}
   .titlerow .name{font-size:16px;font-weight:700;color:var(--ink);flex:1}
   .chip{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:9999px;font-size:12px;font-weight:600;white-space:nowrap}
@@ -59,16 +59,16 @@
 
   .amount{font-family:Commissioner;font-size:36px;font-weight:700;color:var(--ink);line-height:1.1;margin-top:24px}
   .cardsub{margin-top:8px;font-size:14px;color:var(--ink2);line-height:1.5}
-  .strip{display:flex;gap:4px;height:28px;align-items:flex-end}
+  .strip{display:flex;gap:4px;height:20px;align-items:flex-end}
   .strip>div{flex:1;border-radius:3px}
-  .strip>div.full{height:28px;background:var(--bar)}
-  .strip>div.short{height:13px;background:var(--barFaded)}
+  .strip>div.full{height:20px;background:var(--bar)}
+  .strip>div.short{height:10px;background:var(--barFaded)}
   .strip>div.fade{background:var(--barFaded)}
   .perpay{margin-top:12px;font-size:12px;color:var(--ink2)}
   .perpay b{color:var(--ink);font-weight:700}
   #perpay.split{justify-content:space-between;align-items:baseline;font-size:14px;margin-top:14px}
 
-  .rows{display:flex;flex-direction:column;gap:16px}
+  .rows{display:flex;flex-direction:column;gap:12px}
   .row{display:flex;align-items:center;justify-content:space-between;min-height:24px}
   .row .l{font-size:14px;color:var(--ink2)}
   .row .l.strong{font-weight:700}
@@ -145,9 +145,9 @@
   body.lay-v2.hero-plain #card-hero .amount{color:var(--ink);margin-top:16px}
   body.lay-v2.hero-plain #card-hero .cardsub{color:var(--ink2)}
   body.lay-v2 #strip-wrap{margin-bottom:4px}
-  body.lay-v2 .strip{height:36px}
-  body.lay-v2 .strip .full{height:36px}
-  body.lay-v2 .strip .short{height:18px}
+  body.lay-v2 .strip{height:24px}
+  body.lay-v2 .strip .full{height:24px}
+  body.lay-v2 .strip .short{height:12px}
   body.lay-v2 #perpay{display:flex;justify-content:space-between;font-size:14px;margin-top:14px}
   body.lay-v2 #accept-btn{margin-top:20px}
   /* cash-advance selector */
@@ -587,11 +587,11 @@ function equalizeCard(){
   if(!card||!right) return;
   var dividers=Array.prototype.filter.call(card.querySelectorAll('.divider'), function(d){ return d.offsetParent!==null; });
   if(!dividers.length) return;
-  dividers.forEach(function(d){ d.style.marginTop='24px'; d.style.marginBottom='24px'; });
+  dividers.forEach(function(d){ d.style.marginTop='16px'; d.style.marginBottom='16px'; });
   card.style.alignSelf='flex-start';           // un-stretch to read the true content height
   var content=card.offsetHeight;
   card.style.alignSelf='';                      // restore stretch to match the panel
-  var m=Math.max(24, 24 + (right.offsetHeight - content)/(dividers.length*2));
+  var m=Math.max(16, 16 + (right.offsetHeight - content)/(dividers.length*2));
   dividers.forEach(function(d){ d.style.marginTop=m+'px'; d.style.marginBottom=m+'px'; });
 }
 
