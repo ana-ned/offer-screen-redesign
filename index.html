@@ -118,21 +118,26 @@
   .accept{margin-top:24px;width:100%;height:44px;border-radius:12px;border:none;background:var(--teal);color:#fff;font-weight:600;font-size:14px;cursor:pointer}
   .accept-sec{margin-top:10px;width:100%;background:none;border:none;color:var(--teal);font-weight:700;font-size:14px;cursor:pointer;padding:6px}
   .accept-sec:hover{text-decoration:underline}
-  /* ---- Layout V2: swap sides (modifiers left on panel-grey, offer white right), gradient hero ---- */
+  /* v2-only summary elements (hidden in V1) */
+  #v2-expiry{display:none;align-items:center;gap:8px;background:var(--amberBg);border:1px solid var(--amberBorder);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--amberText);margin-bottom:16px}
+  #v2-expiry b{color:var(--amberText)}
+  #v2-inst{display:none;font-size:16px;font-weight:700;color:var(--ink);margin-bottom:12px}
+  /* ---- Layout V2 (Figma 2160-4517): gradient hero + controls left, summary right ---- */
   body.lay-v2 .panel{flex-direction:row-reverse}
-  body.lay-v2 #card-hero{background:linear-gradient(120deg,#0d5a5c 0%,#128081 45%,#1f4b73 100%);border-radius:16px;padding:24px;text-align:center;margin-bottom:4px}
+  body.lay-v2 #card-hero{background:linear-gradient(120deg,#0d5a5c 0%,#128081 45%,#1f4b73 100%);border-radius:16px;padding:24px;text-align:center;margin-bottom:20px}
   body.lay-v2 #card-hero .titlerow{justify-content:center}
   body.lay-v2 #card-hero .tile{display:none}
   body.lay-v2 #card-hero .chip{display:none}
   body.lay-v2 #card-hero .name{color:#fff;flex:none}
   body.lay-v2 #card-hero .amount{color:#fff;margin-top:8px}
   body.lay-v2 #card-hero .cardsub{color:rgba(255,255,255,.85)}
-  body.lay-v2 #hdr-expiry{display:inline-flex}
   body.lay-v2 #strip-wrap>.divider{display:none}
   body.lay-v2 #strip-wrap{margin-bottom:4px}
-  body.lay-v2 .strip{height:20px}
-  body.lay-v2 .strip .full{height:20px}
-  body.lay-v2 .strip .short{height:10px}
+  body.lay-v2 .strip{height:36px}
+  body.lay-v2 .strip .full{height:36px}
+  body.lay-v2 .strip .short{height:18px}
+  body.lay-v2 #promo{margin:0 0 4px}
+  body.lay-v2 #accept-btn{margin-top:20px}
   /* cash-advance selector */
   #ca-cards{display:flex;flex-direction:column;gap:12px;margin-top:16px}
   .adv{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:border-color .15s,box-shadow .15s;font-family:Sora,sans-serif}
@@ -221,7 +226,6 @@
       <div>
         <h1 class="head-font"><span id="hdr-prefix">Top-up an additional </span><span id="hdr-amount"></span></h1>
         <p class="sub" id="hdr-sub">Customise your top-up offer and refinance your existing balance</p>
-        <span class="chip amber" id="hdr-expiry" style="display:none;margin-top:8px">Available until&nbsp;<b>9 Jul</b></span>
       </div>
       <div class="actions">
         <button class="actbtn"><span class="tile brand" data-icon="call"></span><span class="al">Book a call</span></button>
@@ -241,6 +245,9 @@
           <div class="amount" id="card-amount"></div>
           <div class="cardsub" id="card-sub" style="display:none"></div>
         </div>
+
+        <div id="v2-expiry">Offer available until <b>9 Jul</b></div>
+        <div id="v2-inst"></div>
 
         <div id="strip-wrap">
           <div class="divider"></div>
@@ -264,6 +271,7 @@
             <div class="row" id="row-fixedfee"><span class="l">Fixed fee</span><span class="v" id="val-fixedfee"></span></div>
             <div class="row" id="row-totalfee"><span class="l">Total fee</span><span class="v" id="val-totalfee"></span></div>
             <div class="row" id="row-holiday"><span class="l">Payment holiday</span><span class="v" id="val-holiday"></span></div>
+            <div class="row" id="row-perpay" style="display:none"><span class="l" id="perpay-label"></span><span class="v" id="val-perpay"></span></div>
             <div class="row" id="row-noearly"><span class="l">No early repayment fee</span><span class="chip success">New</span></div>
           </div>
         </div>
@@ -548,14 +556,15 @@ function applyLayout(){
   document.body.classList.toggle('lay-v2', v2);
   var card=document.querySelector('.card'), mods=document.querySelector('.rightcol');
   if(!card||!mods) return;
-  var strip=$('strip-wrap'), cta=$('accept-btn'), cta2=$('accept-secondary'), hero=$('card-hero');
+  var hero=$('card-hero'), promo=$('promo'), cta=$('accept-btn'), cta2=$('accept-secondary');
   if(v2){
-    var anchor=$('block-holiday');
-    if(anchor) mods.insertBefore(strip, anchor); else mods.appendChild(strip);
-    card.appendChild(cta); card.appendChild(cta2);
+    mods.insertBefore(hero, mods.firstChild);          // gradient hero → top of controls (left)
+    card.insertBefore(promo, $('grp-fees'));           // promo notice → summary, between ladder & fees
+    card.appendChild(cta); card.appendChild(cta2);     // CTA → under the total (right)
   } else {
-    card.insertBefore(strip, hero.nextSibling);
-    mods.appendChild(cta); mods.appendChild(cta2);
+    card.insertBefore(hero, card.firstChild);          // hero → top of summary
+    $('block-holiday').insertBefore(promo, $('days')); // promo → back into the holiday control
+    mods.appendChild(cta); mods.appendChild(cta2);     // CTA → controls column
   }
 }
 
@@ -634,6 +643,7 @@ function refresh(){
   var c = calc();
   var isCA = !!c.isCA;
   var isLoC = !!c.isLoC;
+  var v2loan = (offer.layout==='v2') && !isCA && !isLoC;
 
   // header + title
   $('hdr-prefix').textContent = pc.hdrPrefix;
@@ -657,12 +667,21 @@ function refresh(){
     for(var h=0; h<c.holidayMonths; h++){ var s=document.createElement('div'); s.className='short'; strip.appendChild(s); }
     for(var m=0; m<offer.termMonths; m++){ var f=document.createElement('div'); f.className='full'; strip.appendChild(f); }
   }
-  $('perpay').style.display = demo.showPerPayment ? 'block' : 'none';
+  $('perpay').style.display = (demo.showPerPayment && !v2loan) ? 'block' : 'none';
   $('perpay').innerHTML = isLoC
     ? '<b>'+fmt(c.payment)+'</b> every 14 days from day 14 · reducing as you repay'
     : (isCA
       ? 'We collect <b>'+c.pct+'% of your weekly sales</b> until the <b>'+fmt(c.totalRepayable)+'</b> total is repaid — strong weeks pay more, slow weeks less.'
       : '<b>'+fmt2(c.perPayment)+'</b>/'+c.freqWord+' · equal instalments');
+  // V2 summary extras (loan products): expiry notice, "N equal instalments" label, per-payment row
+  $('v2-expiry').style.display = v2loan ? 'flex':'none';
+  $('v2-inst').style.display = v2loan ? 'block':'none';
+  $('row-perpay').style.display = v2loan ? 'flex':'none';
+  if(v2loan){
+    $('v2-inst').textContent = c.payments+' equal instalments';
+    $('perpay-label').textContent = c.payments+' payments '+c.freqWord;
+    $('val-perpay').textContent = fmt2(c.perPayment);
+  }
 
   // ladder group (refinance only)
   var showAdd = !isCA && !isLoC && pc.rows.additional && demo.rows.additional;
