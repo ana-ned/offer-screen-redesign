@@ -164,6 +164,7 @@
   body.lay-v2 .strip .hol{height:6px}
   body.lay-v2 #perpay{display:flex;justify-content:space-between;font-size:14px;margin-top:14px}
   body.lay-v2 #accept-btn{margin-top:20px}
+  body.lay-v2 #calc-divider{display:none}
   /* cash-advance selector */
   #ca-cards{display:flex;flex-direction:column;gap:12px;margin-top:16px}
   .adv{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:border-color .15s,box-shadow .15s;font-family:Sora,sans-serif}
@@ -407,7 +408,7 @@
             <input class="rng" id="sl-held" type="range" min="1" max="12" step="1" aria-label="Estimated hold" />
             <div class="mm"><span>1 mo</span><span>12 mo max</span></div>
           </div>
-          <div class="divider"></div>
+          <div class="divider" id="calc-divider"></div>
           <a class="calccard" id="loc-calc-link" href="https://portal.weareuncapped.com/tools/loc-calculator?limit=200000&apr=20&start=2026-07-09&drawMonths=6&repayMonths=6&drawPct=6" target="_blank" rel="noopener">
             <span class="cc-icon" data-icon="calculator"></span>
             <span class="cc-title">Calculate balance &amp; payments over time</span>
