@@ -163,6 +163,9 @@
   #v2-expiry .noticetile svg{width:16px;height:16px;color:#ffac30;display:block}
   #v2-expiry b{color:#374d53;font-weight:700}
   #v2-heading{display:none;font-size:16px;font-weight:700;color:var(--ink);margin-bottom:14px}
+  #v2-receive{display:none;align-items:baseline;justify-content:space-between;margin-bottom:16px}
+  #v2-receive .l{font-size:15px;font-weight:700;color:var(--ink)}
+  #v2-receive .v{font-family:Commissioner;font-size:22px;font-weight:700;color:var(--teal)}
   /* ---- Layout V2 (Figma 2160-5009): white controls (left) | grey summary (right), flush; panel clips the outer edges so only the white card's RIGHTWARD shadow shows on the grey ---- */
   body.lay-v2 .panel{flex-direction:row-reverse;background:transparent;padding:0;gap:0;border-radius:16px;overflow:hidden}
   body.lay-v2 .rightcol{background:var(--surface);box-shadow:8px 0 22px -2px rgba(0,0,0,.06);position:relative;z-index:1;border-radius:0;width:450px;padding:32px;align-self:stretch}
@@ -343,6 +346,7 @@
         </div>
 
         <div id="v2-heading"></div>
+        <div id="v2-receive"><span class="l">You receive</span><span class="v" id="v2-receive-amt"></span></div>
         <div id="v2-expiry"><span class="noticetile" data-icon="calendar"></span><span>Offer expires in 7 days on <b>24 Nov 2025</b></span></div>
 
         <div id="strip-wrap">
@@ -889,6 +893,8 @@ function refresh(){
   $('v2-expiry').style.display = 'none';   // expiry now shown as a pill on the hero in both layouts
   $('hero-expiry').classList.toggle('soon', !!demo.nearExpiry);
   if(v2){ $('v2-heading').textContent = pc.v2Summary || ''; }
+  $('v2-receive').style.display = v2 ? 'flex':'none';
+  $('v2-receive-amt').innerHTML = smallCents(fmt(isLoC ? c.draw : (isCA ? c.amount : offer.additional)));
 
   // ladder group (refinance only)
   var showAdd = !isCA && !isLoC && pc.rows.additional && demo.rows.additional;
