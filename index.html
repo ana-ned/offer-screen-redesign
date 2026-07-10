@@ -58,6 +58,7 @@
   .chip.success{background:var(--successBg);border:1px solid var(--successBorder);color:var(--teal)}
 
   .amount{font-family:Commissioner;font-size:36px;font-weight:700;color:var(--ink);line-height:1.1;margin-top:24px}
+  .cents{font-size:.6em;font-weight:700;opacity:.7}
   .cardsub{margin-top:8px;font-size:14px;color:var(--ink2);line-height:1.5}
   .strip{display:flex;gap:4px;height:20px;align-items:flex-end}
   .strip>div{flex:1;border-radius:3px}
@@ -366,6 +367,7 @@
           <div class="rows">
             <div class="row" id="row-fixedfee"><span class="l" id="lbl-fixedfee">Fixed fee</span><span class="v" id="val-fixedfee"></span></div>
             <div class="row" id="row-totalfee"><span class="l">Total fee</span><span class="v" id="val-totalfee"></span></div>
+            <div class="row" id="row-apr"><span class="l">APR equivalent</span><span class="v" id="val-apr"></span></div>
             <div class="row" id="row-noearly"><span class="l">No early repayment fee</span><span class="chip success">New</span></div>
           </div>
         </div>
@@ -695,6 +697,7 @@ function P(){ return PRODUCTS[offer.product] || PRODUCTS.refinance; }
 // ---------- helpers ----------
 function fmt(n){ return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:Number.isInteger(n)?0:2,maximumFractionDigits:2}).format(n); }
 function fmt2(n){ return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(n); }
+function smallCents(s){ return s.replace(/(\.\d{2})(?!\d)/, '<span class="cents">$1</span>'); }   // render trailing .dd smaller
 function $(id){ return document.getElementById(id); }
 function pctFill(v,mn,mx){ return ((v-mn)/(mx-mn))*100; }
 function feePctLabel(r){ var p=r*100; return (p%1===0?p.toFixed(0):p.toFixed(2))+'%'; }
@@ -810,7 +813,7 @@ function refresh(){
   $('hdr-amount').textContent = fmt(pc.maxAmount);
   $('hdr-sub').textContent = pc.hdrSub;
   $('card-title').textContent = pc.cardTitle;
-  $('card-amount').textContent = fmt(isLoC ? c.draw : (isCA ? c.amount : offer.additional));
+  $('card-amount').innerHTML = smallCents(fmt(isLoC ? c.draw : (isCA ? c.amount : offer.additional)));
   $('card-sub').style.display = pc.subtitle ? 'block':'none';
   $('card-sub').textContent = pc.subtitle || '';
 
@@ -894,7 +897,9 @@ function refresh(){
     $('lbl-repay').textContent = 'Repayments ('+c.freqWord+')';
     $('val-repay').innerHTML = '<b>'+c.payments+'</b> × '+fmt2(c.perPayment);
     $('row-fixedfee').style.display = (pc.rows.fixedFee&&demo.rows.fixedFee)?'flex':'none';
-    $('val-fixedfee').innerHTML = (c.showStrike ? '<span class="strike">'+feePctLabel(c.strikeRate)+'</span> '+feePctLabel(c.base) : feePctLabel(c.effectiveRate))+(demo.showApr?' (≈ '+c.aprPct.toFixed(1)+'% APR)':'');
+    $('val-fixedfee').innerHTML = (c.showStrike ? '<span class="strike">'+feePctLabel(c.strikeRate)+'</span> '+feePctLabel(c.base) : feePctLabel(c.effectiveRate));
+    $('row-apr').style.display = demo.showApr ? 'flex':'none';
+    $('val-apr').textContent = '≈ '+c.aprPct.toFixed(1)+'%';
     $('row-totalfee').style.display = (pc.rows.totalFee&&demo.rows.totalFee)?'flex':'none';
     $('val-totalfee').textContent = fmt2(c.totalFee);
     $('row-noearly').style.display = (pc.rows.noEarlyFee&&demo.rows.noEarlyFee)?'flex':'none';
@@ -903,7 +908,7 @@ function refresh(){
   // total repayable / payable
   $('sec-totalrep').style.display = (isCA || isLoC || (pc.rows.totalRepayable&&demo.rows.totalRepayable))?'block':'none';
   $('totalrep-label').textContent = isLoC ? 'Total cost' : (isCA ? 'Total payable' : 'Total repayable');
-  $('val-totalrep').textContent = isLoC ? fmt(c.totalCost) : (isCA ? fmt(c.totalRepayable) : fmt2(c.totalRepayable));
+  $('val-totalrep').innerHTML = smallCents(isLoC ? fmt(c.totalCost) : (isCA ? fmt(c.totalRepayable) : fmt2(c.totalRepayable)));
 
   // toggles
   $('tg-autorepay').className = 'tog'+(offer.autoRepay?' on':'');
