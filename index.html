@@ -876,7 +876,8 @@ function refresh(){
   // graph title + legend (so the frequency and holiday are self-explaining)
   var freqWord2 = c.freqWord==='daily' ? 'daily' : 'every 2 weeks';
   $('graph-head').textContent = isCA ? 'Weekly collection' : 'Repayments';
-  $('graph-divider').style.display = loanLike ? 'none' : '';   // loans: graph flows under the day tabs, no divider
+  $('graph-divider').style.display = loanLike ? 'none' : '';   // loans: graph flows under the day tabs, no divider line
+  $('strip-wrap').style.marginTop = loanLike ? '24px' : '';    // ...but keep the breathing room
   if(loanLike){
     $('graph-legend').innerHTML = c.skip>0
       ? '<span class="lg-dot"></span>Grey = payment holiday, then <b>'+c.payments+' payments</b> '+freqWord2
