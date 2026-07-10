@@ -367,7 +367,7 @@
 
         <div id="grp-repay">
           <div class="divider"></div>
-          <div class="row rm-row"><span class="l">Repayment method</span><span class="v rm-val">Amazon Automated Repayment <button class="infoi" id="repay-info" aria-label="How Amazon Automated Repayment works">i</button></span></div>
+          <div class="row rm-row"><span class="l">Repayment method</span><span class="v rm-val">Amazon auto-repay <button class="infoi" id="repay-info" aria-label="How Amazon Automated Repayment works">i</button></span></div>
           <div class="accordion" id="repay-acc">
             <div class="acc-in">
               <div class="rm-toggle"><span>Amazon Automated Repayment</span><button class="tog on" id="tg-autorepay" aria-label="Amazon Automated Repayment"></button></div>
@@ -390,7 +390,6 @@
           <div class="rows">
             <div class="row" id="row-fixedfee"><span class="l" id="lbl-fixedfee">Fixed fee</span><span class="v" id="val-fixedfee"></span></div>
             <div class="row" id="row-totalfee"><span class="l">Total fee</span><span class="v" id="val-totalfee"></span></div>
-            <div class="row" id="row-apr"><span class="l">APR equivalent</span><span class="v" id="val-apr"></span></div>
             <div class="row" id="row-noearly"><span class="l">No early repayment fee</span><span class="chip success">New</span></div>
           </div>
         </div>
@@ -408,7 +407,7 @@
           <div class="divider"></div>
           <div class="rows">
             <div class="row"><span class="l">Annual interest (APR)</span><span class="v" id="loc-apr"></span></div>
-            <div class="row"><span class="l">Interest charged</span><span class="v">Only on what you draw</span></div>
+            <div class="row"><span class="l">Interest charged</span><span class="v">Only on draw</span></div>
             <div class="row"><span class="l">Set-up fee</span><span class="v">$0 if you draw · 1% if unused</span></div>
             <div class="row"><span class="l">Estimated interest</span><span class="v" id="loc-interest"></span></div>
             <div class="row"><span class="l">First repayment</span><span class="v" id="loc-firstpay"></span></div>
@@ -490,14 +489,14 @@
           <div class="divider" id="calc-divider"></div>
           <a class="calccard" id="loc-calc-link" href="https://portal.weareuncapped.com/tools/loc-calculator?limit=200000&apr=20&start=2026-07-09&drawMonths=6&repayMonths=6&drawPct=6" target="_blank" rel="noopener">
             <span class="cc-icon" data-icon="calculator"></span>
-            <span class="cc-title">Calculate balance &amp; payments over time</span>
+            <span class="cc-title">Calculate repayments</span>
             <span class="cc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
           </a>
         </div>
 
         <div id="cta-wrap">
           <button class="accept" id="accept-btn">Accept offer</button>
-          <button class="accept-sec" id="accept-secondary" style="display:none">Set up line, draw later</button>
+          <button class="accept-sec" id="accept-secondary" style="display:none">Draw later</button>
         </div>
       </section>
     </div>
@@ -555,7 +554,6 @@
     <div class="dst">Offer summary card</div>
     <div class="dsub">What appears on the left summary card.</div>
     <div class="drow"><span>Instalment strip</span><button class="tog" data-show="showStrip"></button></div>
-    <div class="drow"><span>APR equivalent</span><button class="tog" data-show="showApr"></button></div>
     <div class="drow"><span>Additional funds to you</span><button class="tog" data-row="additional"></button></div>
     <div class="drow"><span>Pays off existing balance</span><button class="tog" data-row="paysOff"></button></div>
     <div class="drow"><span>Total new loan</span><button class="tog" data-row="totalNewLoan"></button></div>
@@ -745,15 +743,15 @@ function applyLayout(){
   if(v2){
     mods.insertBefore(hero, mods.firstChild);          // gradient hero → top of controls (left)
     hero.insertBefore(expiry, amount.nextSibling);     // expiry pill → centered under the amount
-    card.insertBefore(strip, grpRepay);                // graph → in the summary
     card.appendChild(ctaWrap);                         // CTA → under the total (right)
   } else {
     card.insertBefore(hero, card.firstChild);          // hero → top of summary
     titlerow.appendChild(expiry);                      // expiry pill → inline in the title row
-    if(isLoan){ mods.insertBefore(strip, holiday.nextSibling); }  // V1 loans: graph below payment holiday
-    else { card.insertBefore(strip, grpRepay); }                  // CA/LoC: graph stays in summary
     mods.appendChild(ctaWrap);                         // CTA → controls column
   }
+  // loans: graph sits below the payment holiday in the controls column (both layouts); CA/LoC keep it in the summary
+  if(isLoan){ mods.insertBefore(strip, holiday.nextSibling); }
+  else { card.insertBefore(strip, grpRepay); }
 }
 
 function equalizeCard(){
@@ -883,7 +881,7 @@ function refresh(){
       ? '<span class="lg-dot"></span>Grey = payment holiday, then <b>'+c.payments+' payments</b> '+freqWord2
       : 'Each bar is one payment · <b>'+c.payments+'</b> in total, '+freqWord2;
   } else if(isLoC){
-    $('graph-legend').innerHTML = 'Each bar is a payment, <b>every 2 weeks</b> · reducing over time';
+    $('graph-legend').innerHTML = '';
   } else {
     $('graph-legend').innerHTML = 'Illustrative — each bar is one week; <b>taller = stronger sales</b>';
   }
@@ -946,8 +944,6 @@ function refresh(){
     $('val-repay').innerHTML = '<b>'+c.payments+'</b> × '+fmt2(c.perPayment);
     $('row-fixedfee').style.display = (pc.rows.fixedFee&&demo.rows.fixedFee)?'flex':'none';
     $('val-fixedfee').innerHTML = (c.showStrike ? '<span class="strike">'+feePctLabel(c.strikeRate)+'</span> '+feePctLabel(c.base) : feePctLabel(c.effectiveRate));
-    $('row-apr').style.display = demo.showApr ? 'flex':'none';
-    $('val-apr').textContent = '≈ '+c.aprPct.toFixed(1)+'%';
     $('row-totalfee').style.display = (pc.rows.totalFee&&demo.rows.totalFee)?'flex':'none';
     $('val-totalfee').textContent = fmt2(c.totalFee);
     $('row-noearly').style.display = (pc.rows.noEarlyFee&&demo.rows.noEarlyFee)?'flex':'none';
@@ -971,7 +967,7 @@ function refresh(){
   $('block-holiday').style.display = (std && demo.blocks.holiday) ? 'block':'none';
   $('ca-select').style.display = isCA ? 'block':'none';
   $('loc-select').style.display = isLoC ? 'block':'none';
-  $('accept-btn').textContent = isLoC ? ('Draw '+fmt(c.draw)+' now') : 'Accept offer';
+  $('accept-btn').textContent = isLoC ? 'Draw now' : 'Accept offer';
   $('accept-secondary').style.display = isLoC ? 'block':'none';
   $('cta-wrap').classList.toggle('two', isLoC);
 
@@ -1119,7 +1115,6 @@ function syncMobile(){
     s+=mrow('Total repayable', fmt2(c.totalRepayable), true);
     s+=mrow('Repayments ('+c.freqWord+')', '<b>'+c.payments+'</b> × '+fmt2(c.perPayment));
     s+=mrow('Total fee', fmt2(c.totalFee));
-    s+=mrow('APR equivalent (approx.)', c.aprPct.toFixed(2)+'%');
     s+=mrow('No early repayment fee', '<span class="chip success">New</span>');
   } else if(isLoC){
     s+=mrow('Total cost', fmt(c.totalCost), true);
@@ -1133,7 +1128,7 @@ function syncMobile(){
     s+=mrow('Weekly collection', c.pct+'% of sales');
   }
   $('m-summary').innerHTML=s;
-  $('m-accept').textContent = isLoC?('Draw '+fmt(c.draw)+' now'):'Accept offer';
+  $('m-accept').textContent = isLoC?'Draw now':'Accept offer';
 }
 function openMobile(){ document.body.classList.add('mobile-view'); $('m-header').classList.remove('scrolled'); syncMobile(); $('m-scroll').scrollTop=0; }
 function closeMobile(){ document.body.classList.remove('mobile-view'); }
