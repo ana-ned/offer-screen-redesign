@@ -353,7 +353,7 @@
         <div id="v2-expiry"><span class="noticetile" data-icon="calendar"></span><span>Offer expires in 7 days on <b>24 Nov 2025</b></span></div>
 
         <div id="strip-wrap">
-          <div class="divider"></div>
+          <div class="divider" id="graph-divider"></div>
           <div class="graph-head" id="graph-head">Repayments</div>
           <div class="strip" id="strip"></div>
           <div class="locbar" id="loc-bar" style="display:none"><div class="fill" id="loc-fill"></div></div>
@@ -366,12 +366,8 @@
           <div class="rows" id="graph-rows">
             <div class="row" id="row-firstpay"><span class="l">First repayment</span><span class="v" id="val-firstpay"></span></div>
             <div class="row" id="row-repay"><span class="l" id="lbl-repay">Repayments</span><span class="v" id="val-repay"></span></div>
+            <div class="row rm-row" id="row-rmethod"><span class="l">Repayment method</span><span class="v rm-val">Amazon auto-repay <button class="infoi" id="repay-info" aria-label="How Amazon Automated Repayment works">i</button></span></div>
           </div>
-        </div>
-
-        <div id="grp-repay">
-          <div class="divider"></div>
-          <div class="row rm-row"><span class="l">Repayment method</span><span class="v rm-val">Amazon auto-repay <button class="infoi" id="repay-info" aria-label="How Amazon Automated Repayment works">i</button></span></div>
           <div class="accordion" id="repay-acc">
             <div class="acc-in">
               <div class="rm-toggle"><span>Amazon Automated Repayment</span><button class="tog on" id="tg-autorepay" aria-label="Amazon Automated Repayment"></button></div>
@@ -742,7 +738,7 @@ function applyLayout(){
   if(!card||!mods) return;
   var pc = PRODUCTS[offer.product] || PRODUCTS.refinance;
   var isLoan = !pc.isCashAdvance && !pc.isLoC;
-  var hero=$('card-hero'), ctaWrap=$('cta-wrap'), strip=$('strip-wrap'), grpRepay=$('grp-repay'), holiday=$('block-holiday');
+  var hero=$('card-hero'), ctaWrap=$('cta-wrap'), strip=$('strip-wrap'), grpRepay=$('grp-schedule'), holiday=$('block-holiday');
   var expiry=$('hero-expiry'), titlerow=hero.querySelector('.titlerow'), amount=$('card-amount');
   if(v2){
     mods.insertBefore(hero, mods.firstChild);          // gradient hero → top of controls (left)
@@ -880,6 +876,7 @@ function refresh(){
   // graph title + legend (so the frequency and holiday are self-explaining)
   var freqWord2 = c.freqWord==='daily' ? 'daily' : 'every 2 weeks';
   $('graph-head').textContent = isCA ? 'Weekly collection' : 'Repayments';
+  $('graph-divider').style.display = loanLike ? 'none' : '';   // loans: graph flows under the day tabs, no divider
   if(loanLike){
     $('graph-legend').innerHTML = c.skip>0
       ? '<span class="lg-dot"></span>Grey = payment holiday, then <b>'+c.payments+' payments</b> '+freqWord2
@@ -964,7 +961,8 @@ function refresh(){
 
   // right panel: standard blocks vs cash-advance selector vs line-of-credit estimator
   var std = !isCA && !isLoC;
-  $('grp-repay').style.display = (std && demo.blocks.autoRepay) ? 'block':'none';
+  $('row-rmethod').style.display = (std && demo.blocks.autoRepay) ? 'flex':'none';
+  if(!demo.blocks.autoRepay){ $('repay-acc').classList.remove('open'); $('repay-info').classList.remove('on'); }
   $('block-refinance').style.display = (std && pc.hasRefinance && demo.blocks.refinance) ? 'block':'none';
   $('block-amount').style.display = (std && demo.blocks.amount) ? 'block':'none';
   $('block-term').style.display = (std && demo.blocks.term) ? 'block':'none';
