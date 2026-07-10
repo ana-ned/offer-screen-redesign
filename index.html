@@ -56,6 +56,16 @@
   .chip.amber{background:var(--amberBg);border:1px solid var(--amberBorder);color:var(--amberText)}
   .chip.amber b{color:var(--amberText)}
   .chip.success{background:var(--successBg);border:1px solid var(--successBorder);color:var(--teal)}
+  .chip.expiry{background:var(--amberBg);border:1px solid var(--amberBorder);color:var(--amberText);gap:5px}
+  .chip.expiry .edot{width:6px;height:6px;border-radius:50%;background:#ffac30;flex:none}
+  .chip.expiry.soon{background:#fdecea;border-color:#f5c6c2;color:#b23b30}
+  .chip.expiry.soon .edot{background:#e5484d}
+  /* V2 green card: nicer white pill top-right, yellow dot (red when near expiry) */
+  body.lay-v2 #card-hero{position:relative}
+  body.lay-v2 #card-hero .chip.expiry{display:inline-flex;position:absolute;top:14px;right:14px;background:#fff;border-color:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.18)}
+  body.lay-v2 #card-hero .chip.expiry .edot{background:#ffc531}
+  body.lay-v2 #card-hero .chip.expiry.soon{background:#fff;color:var(--ink)}
+  body.lay-v2 #card-hero .chip.expiry.soon .edot{background:#e5484d}
 
   .amount{font-family:Commissioner;font-size:36px;font-weight:700;color:var(--ink);line-height:1.1;margin-top:24px}
   .cents{font-size:.6em;font-weight:700;opacity:.7}
@@ -322,7 +332,7 @@
           <div class="titlerow">
             <span class="tile brand" data-icon="moneybag"></span>
             <span class="name" id="card-title">Term Loan Top-Up</span>
-            <span class="chip amber">Available until&nbsp;<b>9 Jul</b></span>
+            <span class="chip expiry" id="hero-expiry"><span class="edot"></span>Available until&nbsp;<b>9 Jul</b></span>
           </div>
           <div class="amount" id="card-amount"></div>
           <div class="cardsub" id="card-sub" style="display:none"></div>
@@ -506,6 +516,7 @@
     </div>
     <div style="margin-top:8px;font-size:11px;color:#7fa9aa">V2 tuned for Top-Up first.</div>
     <div class="drow" style="margin-top:10px"><span>V2 amount as green card</span><button class="tog" data-show="heroCard"></button></div>
+    <div class="drow"><span>Expiry near (red dot)</span><button class="tog" data-show="nearExpiry"></button></div>
     <div style="margin-top:16px">
       <label for="demo-amount" id="demo-amount-label" style="display:block;font-size:12px;color:#e7f1f1;margin-bottom:6px;font-weight:600">Offer amount</label>
       <input id="demo-amount" class="damt" type="number" inputmode="numeric" />
@@ -687,7 +698,7 @@ var PRODUCTS = {
 
 // ---------- state ----------
 var DEFAULT_OFFER = { product:'refinance', layout:'v1', advanceIdx:0, draw:100000, held:6, additional:5888416.88, termMonths:6, holidayDay:42, autoRepay:true, refinance:true, feeRate:0.04 };
-var DEFAULT_DEMO = { showApr:true, showPerPayment:true, showStrip:true, heroCard:true,
+var DEFAULT_DEMO = { showApr:true, showPerPayment:true, showStrip:true, heroCard:true, nearExpiry:false,
   blocks:{ autoRepay:true, refinance:true, amount:true, term:true, holiday:true },
   rows:{ additional:true, paysOff:true, totalNewLoan:true, fixedFee:true, totalFee:true, paymentHoliday:true, noEarlyFee:true, totalRepayable:true } };
 var offer = JSON.parse(JSON.stringify(DEFAULT_OFFER));
@@ -856,7 +867,8 @@ function refresh(){
   }
   // V2 summary heading + expiry notice (loan products)
   $('v2-heading').style.display = (v2 && pc.v2Summary) ? 'block':'none';
-  $('v2-expiry').style.display = v2 ? 'flex':'none';
+  $('v2-expiry').style.display = 'none';   // expiry now shown as a pill on the hero in both layouts
+  $('hero-expiry').classList.toggle('soon', !!demo.nearExpiry);
   if(v2){ $('v2-heading').textContent = pc.v2Summary || ''; }
 
   // ladder group (refinance only)
