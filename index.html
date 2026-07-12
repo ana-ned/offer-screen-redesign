@@ -187,7 +187,6 @@
   body.lay-v2.hero-plain #card-hero .amount{color:var(--ink);margin-top:16px}
   body.lay-v2.hero-plain #card-hero .cardsub{color:var(--ink2)}
   body.lay-v2 #strip-wrap{margin-bottom:4px}
-  body.lay-v2 #grp-schedule{margin-top:16px}
   body.lay-v2 .strip{height:24px}
   body.lay-v2 .strip .full{height:24px}
   body.lay-v2 .strip .short{height:12px}
@@ -553,7 +552,7 @@
   <div class="dsec">
     <div class="dst">Offer summary card</div>
     <div class="dsub">What appears on the left summary card.</div>
-    <div class="drow"><span>Instalment strip</span><button class="tog" data-show="showStrip"></button></div>
+    <div class="drow"><span>Repayment graph</span><button class="tog" data-show="showStrip"></button></div>
     <div class="drow"><span>Additional funds to you</span><button class="tog" data-row="additional"></button></div>
     <div class="drow"><span>Pays off existing balance</span><button class="tog" data-row="paysOff"></button></div>
     <div class="drow"><span>Total new loan</span><button class="tog" data-row="totalNewLoan"></button></div>
@@ -710,7 +709,7 @@ var PRODUCTS = {
 
 // ---------- state ----------
 var DEFAULT_OFFER = { product:'refinance', layout:'v1', advanceIdx:0, draw:100000, held:6, additional:5888416.88, termMonths:6, holidayDay:42, autoRepay:true, refinance:true, feeRate:0.04 };
-var DEFAULT_DEMO = { showApr:true, showPerPayment:true, showStrip:true, heroCard:true, nearExpiry:false, editPencil:true,
+var DEFAULT_DEMO = { showApr:true, showPerPayment:true, showStrip:false, heroCard:true, nearExpiry:false, editPencil:true,
   blocks:{ autoRepay:true, refinance:true, amount:true, term:true, holiday:true },
   rows:{ additional:true, paysOff:true, totalNewLoan:true, fixedFee:true, totalFee:true, paymentHoliday:true, noEarlyFee:true, totalRepayable:true } };
 var offer = JSON.parse(JSON.stringify(DEFAULT_OFFER));
@@ -885,7 +884,9 @@ function refresh(){
   $('graph-divider').style.display = graphInControls ? 'none' : '';
   $('strip-wrap').style.marginTop = graphInControls ? '24px' : '';
   $('ladder-divider').style.display = isV2 ? 'none' : '';       // V2: ladder is the first section, no top line
-  $('schedule-divider').style.display = isV2 ? 'none' : '';     // V2: schedule sits right under the graph, no line
+  var graphOnV2 = isV2 && demo.showStrip;
+  $('schedule-divider').style.display = graphOnV2 ? 'none' : ''; // V2: only drop the line when the graph sits right above
+  $('grp-schedule').style.marginTop = graphOnV2 ? '16px' : '';  // ...and add the graph→schedule gap
   if(loanLike){
     $('graph-legend').innerHTML = c.skip>0
       ? '<span class="lg-dot"></span>Grey = payment holiday, then <b>'+c.payments+' payments</b> '+freqWord2
@@ -893,7 +894,7 @@ function refresh(){
   } else if(isLoC){
     $('graph-legend').innerHTML = '';
   } else {
-    $('graph-legend').innerHTML = 'Illustrative — each bar is one week; <b>taller = stronger sales</b>';
+    $('graph-legend').innerHTML = '';
   }
 
   // caption below the graph — loans use summary rows instead (first repayment + repayments); CA/LoC keep the sentence
