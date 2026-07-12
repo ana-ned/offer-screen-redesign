@@ -853,7 +853,7 @@ function refresh(){
   $('card-sub').textContent = pc.subtitle || '';
 
   // strip — repayment graph (bars) for every product
-  $('strip-wrap').style.display = demo.showStrip ? 'block' : 'none';
+  $('strip-wrap').style.display = (demo.showStrip || isCA) ? 'block' : 'none';   // Cash Advance: graph always on (self-explanatory)
   $('strip').style.display = 'flex';
   $('loc-bar').style.display = 'none';
   var loanLike = !isCA && !isLoC;
@@ -886,7 +886,7 @@ function refresh(){
   $('graph-divider').style.display = graphInControls ? 'none' : '';
   $('strip-wrap').style.marginTop = graphInControls ? '24px' : '';
   $('ladder-divider').style.display = isV2 ? 'none' : '';       // V2: ladder is the first section, no top line
-  var graphOnV2 = isV2 && demo.showStrip;
+  var graphOnV2 = isV2 && (demo.showStrip || isCA);
   $('schedule-divider').style.display = graphOnV2 ? 'none' : ''; // V2: only drop the line when the graph sits right above
   $('grp-schedule').style.marginTop = graphOnV2 ? '16px' : '';  // ...and add the graph→schedule gap
   if(loanLike){
