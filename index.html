@@ -187,6 +187,7 @@
   body.lay-v2.hero-plain #card-hero .amount{color:var(--ink);margin-top:16px}
   body.lay-v2.hero-plain #card-hero .cardsub{color:var(--ink2)}
   body.lay-v2 #strip-wrap{margin-bottom:4px}
+  body.lay-v2 #grp-schedule{margin-top:16px}
   body.lay-v2 .strip{height:24px}
   body.lay-v2 .strip .full{height:24px}
   body.lay-v2 .strip .short{height:12px}
@@ -360,7 +361,7 @@
         </div>
 
         <div id="grp-schedule">
-          <div class="divider"></div>
+          <div class="divider" id="schedule-divider"></div>
           <div class="rows" id="graph-rows">
             <div class="row" id="row-firstpay"><span class="l">First repayment</span><span class="v" id="val-firstpay"></span></div>
             <div class="row" id="row-repay"><span class="l" id="lbl-repay">Repayments</span><span class="v" id="val-repay"></span></div>
@@ -375,7 +376,7 @@
         </div>
 
         <div id="grp-ladder">
-          <div class="divider"></div>
+          <div class="divider" id="ladder-divider"></div>
           <div class="rows">
             <div class="row" id="row-additional"><span class="l">Additional funds to you</span><span class="v" id="val-additional"></span></div>
             <div class="row" id="row-paysoff"><span class="l">Pays off existing balance</span><span class="v" id="val-paysoff"></span></div>
@@ -738,20 +739,23 @@ function applyLayout(){
   if(!card||!mods) return;
   var pc = PRODUCTS[offer.product] || PRODUCTS.refinance;
   var isLoan = !pc.isCashAdvance && !pc.isLoC;
-  var hero=$('card-hero'), ctaWrap=$('cta-wrap'), strip=$('strip-wrap'), grpRepay=$('grp-schedule'), holiday=$('block-holiday');
+  var hero=$('card-hero'), ctaWrap=$('cta-wrap'), strip=$('strip-wrap'), holiday=$('block-holiday');
+  var grpSched=$('grp-schedule'), grpLadder=$('grp-ladder'), grpFees=$('grp-fees'), grpCa=$('grp-ca'), grpLoc=$('grp-loc'), secTotal=$('sec-totalrep');
   var expiry=$('hero-expiry'), titlerow=hero.querySelector('.titlerow'), amount=$('card-amount');
   if(v2){
     mods.insertBefore(hero, mods.firstChild);          // gradient hero → top of controls (left)
     hero.insertBefore(expiry, amount.nextSibling);     // expiry pill → centered under the amount
-    card.appendChild(ctaWrap);                         // CTA → under the total (right)
+    // summary order: ladder → graph → repayment schedule → fees → total → CTA
+    [grpLadder, strip, grpSched, grpFees, grpCa, grpLoc, secTotal, ctaWrap].forEach(function(el){ card.appendChild(el); });
   } else {
     card.insertBefore(hero, card.firstChild);          // hero → top of summary
     titlerow.appendChild(expiry);                      // expiry pill → inline in the title row
-    mods.appendChild(ctaWrap);                         // CTA → controls column
+    // summary order: hero → ladder → schedule → fees → total ; graph + CTA go to the controls
+    [grpLadder, grpSched, grpFees, grpCa, grpLoc, secTotal].forEach(function(el){ card.appendChild(el); });
+    if(isLoan){ mods.insertBefore(strip, holiday.nextSibling); }
+    else { card.insertBefore(strip, grpLadder); }
+    mods.appendChild(ctaWrap);
   }
-  // V1 loans: graph sits in the controls under the payment holiday; V2 (and CA/LoC): graph in the summary
-  if(!v2 && isLoan){ mods.insertBefore(strip, holiday.nextSibling); }
-  else { card.insertBefore(strip, grpRepay); }
 }
 
 function equalizeCard(){
@@ -876,9 +880,12 @@ function refresh(){
   // graph title + legend (so the frequency and holiday are self-explaining)
   var freqWord2 = c.freqWord==='daily' ? 'daily' : 'every 2 weeks';
   $('graph-head').textContent = isCA ? 'Weekly collection' : 'Repayments';
-  var graphInControls = (offer.layout!=='v2') && loanLike;   // V1 loans: graph under the day tabs
+  var isV2 = offer.layout==='v2';
+  var graphInControls = !isV2 && loanLike;   // V1 loans: graph under the day tabs
   $('graph-divider').style.display = graphInControls ? 'none' : '';
   $('strip-wrap').style.marginTop = graphInControls ? '24px' : '';
+  $('ladder-divider').style.display = isV2 ? 'none' : '';       // V2: ladder is the first section, no top line
+  $('schedule-divider').style.display = isV2 ? 'none' : '';     // V2: schedule sits right under the graph, no line
   if(loanLike){
     $('graph-legend').innerHTML = c.skip>0
       ? '<span class="lg-dot"></span>Grey = payment holiday, then <b>'+c.payments+' payments</b> '+freqWord2
