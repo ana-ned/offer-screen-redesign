@@ -78,6 +78,18 @@
   .strip>div.fade{background:var(--barFaded)}
   .strip>div.hol{height:5px;background:#d6dad9}
   .graph-head{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px}
+  /* advanced repayment timeline */
+  #timeline{margin-top:4px}
+  .tl-track{position:relative;height:12px;border-radius:6px;overflow:hidden;display:flex;background:#eef0ef}
+  .tl-free{background:repeating-linear-gradient(45deg,#dfe3e2,#dfe3e2 3px,#eef0ef 3px,#eef0ef 7px)}
+  .tl-pay{background:var(--bar)}
+  .tl-dot{position:absolute;top:-2px;width:4px;height:16px;border-radius:2px;background:var(--teal);transform:translateX(-50%)}
+  .tl-axis{position:relative;height:15px;margin-top:9px;font-size:11px;color:var(--muted)}
+  .tl-axis .tl-l{position:absolute;left:0}
+  .tl-axis .tl-r{position:absolute;right:0}
+  .tl-axis .tl-m{position:absolute;transform:translateX(-50%);font-weight:700;color:var(--ink2);white-space:nowrap}
+  .tl-cap{margin-top:10px;font-size:11.5px;color:var(--muted);line-height:1.45}
+  .tl-cap b{color:var(--ink2)}
   .graph-legend{font-size:11.5px;color:var(--muted);margin-top:9px;display:flex;align-items:center;gap:6px;line-height:1.4}
   .graph-legend .lg-dot{width:9px;height:9px;border-radius:2px;background:#d6dad9;flex:none}
   .graph-legend b{color:var(--ink2);font-weight:700}
@@ -355,6 +367,7 @@
           <div class="divider" id="graph-divider"></div>
           <div class="graph-head" id="graph-head">Repayments</div>
           <div class="strip" id="strip"></div>
+          <div id="timeline" style="display:none"></div>
           <div class="locbar" id="loc-bar" style="display:none"><div class="fill" id="loc-fill"></div></div>
           <div class="graph-legend" id="graph-legend"></div>
           <div class="perpay" id="perpay"></div>
@@ -555,6 +568,7 @@
     <div class="dst">Offer summary card</div>
     <div class="dsub">What appears on the left summary card.</div>
     <div class="drow"><span>Repayment graph</span><button class="tog" data-show="showStrip"></button></div>
+    <div class="drow"><span>Advanced graph (timeline)</span><button class="tog" data-show="advGraph"></button></div>
     <div class="drow"><span>Additional funds to you</span><button class="tog" data-row="additional"></button></div>
     <div class="drow"><span>Pays off existing balance</span><button class="tog" data-row="paysOff"></button></div>
     <div class="drow"><span>Total new loan</span><button class="tog" data-row="totalNewLoan"></button></div>
@@ -711,7 +725,7 @@ var PRODUCTS = {
 
 // ---------- state ----------
 var DEFAULT_OFFER = { product:'refinance', layout:'v1', advanceIdx:0, draw:100000, held:6, additional:5888416.88, termMonths:6, holidayDay:42, autoRepay:true, refinance:true, feeRate:0.04 };
-var DEFAULT_DEMO = { showApr:true, showPerPayment:true, showStrip:false, heroCard:true, nearExpiry:false, editPencil:true,
+var DEFAULT_DEMO = { showApr:true, showPerPayment:true, showStrip:false, advGraph:false, heroCard:true, nearExpiry:false, editPencil:true,
   blocks:{ autoRepay:true, refinance:true, amount:true, term:true, holiday:true },
   rows:{ additional:true, paysOff:true, totalNewLoan:true, fixedFee:true, totalFee:true, paymentHoliday:true, noEarlyFee:true, totalRepayable:true } };
 var offer = JSON.parse(JSON.stringify(DEFAULT_OFFER));
@@ -751,11 +765,10 @@ function applyLayout(){
   } else {
     card.insertBefore(hero, card.firstChild);          // hero → top of summary
     titlerow.appendChild(expiry);                      // expiry pill → inline in the title row
-    // summary order: hero → ladder → schedule → fees → total ; graph + CTA go to the controls
-    [grpLadder, grpSched, grpFees, grpCa, grpLoc, secTotal].forEach(function(el){ card.appendChild(el); });
+    // summary order: hero → ladder → schedule → fees → total → CTA (experiment: CTA under the total, left) ; graph to controls
+    [grpLadder, grpSched, grpFees, grpCa, grpLoc, secTotal, ctaWrap].forEach(function(el){ card.appendChild(el); });
     if(isLoan){ mods.insertBefore(strip, holiday.nextSibling); }
     else { card.insertBefore(strip, grpLadder); }
-    mods.appendChild(ctaWrap);
   }
 }
 
@@ -827,6 +840,18 @@ function calc(){
 }
 
 // ---------- render ----------
+function buildTimeline(c){
+  var freq = c.freqWord==='daily' ? 1 : 14;
+  var firstDay = offer.holidayDay;
+  var lastDay = firstDay + Math.max(0, c.payments-1)*freq;
+  if(lastDay < firstDay+1) lastDay = firstDay+1;
+  var freePct = Math.max(4, Math.min(64, firstDay/lastDay*100));
+  var freqPhrase = c.freqWord==='daily' ? 'daily' : 'every 2 weeks';
+  $('timeline').innerHTML =
+    '<div class="tl-track"><div class="tl-free" style="width:'+freePct+'%"></div><div class="tl-pay" style="width:'+(100-freePct)+'%"></div><div class="tl-dot" style="left:'+freePct+'%"></div></div>'
+    + '<div class="tl-axis"><span class="tl-l">Today</span><span class="tl-m" style="left:'+freePct+'%">Day '+firstDay+'</span><span class="tl-r">Day '+lastDay+'</span></div>'
+    + '<div class="tl-cap"><b>No repayments for '+firstDay+' days</b> · then '+c.payments+' payments '+freqPhrase+'</div>';
+}
 function refresh(){
   var pc=P();
   var currentMax;
@@ -852,31 +877,34 @@ function refresh(){
   $('card-sub').style.display = pc.subtitle ? 'block':'none';
   $('card-sub').textContent = pc.subtitle || '';
 
-  // strip — repayment graph (bars) for every product
-  $('strip-wrap').style.display = (demo.showStrip || isCA) ? 'block' : 'none';   // Cash Advance: graph always on (self-explanatory)
-  $('strip').style.display = 'flex';
-  $('loc-bar').style.display = 'none';
+  // repayment graph: bars (default), or the advanced timeline
   var loanLike = !isCA && !isLoC;
-  var mkbar = function(cls, hgtPct){ var el=document.createElement('div'); el.className=cls; if(hgtPct!=null) el.style.height=hgtPct+'%'; strip.appendChild(el); };
+  var barsOn = demo.showStrip || isCA;             // Cash Advance: bars always on
+  var tlOn = !!demo.advGraph && loanLike;          // advanced timeline (loans)
+  var graphShown = barsOn || tlOn;
+  $('strip-wrap').style.display = graphShown ? 'block' : 'none';
+  $('strip').style.display = barsOn ? 'flex' : 'none';
+  $('timeline').style.display = tlOn ? 'block' : 'none';
+  $('loc-bar').style.display = 'none';
   var strip = $('strip'); strip.innerHTML='';
-  if(isLoC){
-    // bars = scheduled biweekly payments, tapering down to show the reducing balance
-    var n=c.biweekly;
-    for(var lb=0; lb<n; lb++){ mkbar('full', Math.round(100 - (n>1 ? lb/(n-1) : 0)*62)); }
-  } else if(isCA){
-    // illustrative variable weekly collection — strong weeks pay more, slow weeks less
-    CA_BARS.forEach(function(hgt){ mkbar('full', Math.round(hgt*100)); });
-  } else {
-    // loan: 1 bar = 1 instalment; long schedules (>50 payments) group 2 instalments per bar
-    var group = c.payments > 50 ? 2 : 1;
-    var fadedBars = Math.round(c.skip/group);
-    var fullBars = Math.max(1, Math.round(c.payments/group));
-    for(var s=0; s<fadedBars; s++){ mkbar('hol'); }
-    for(var p=0; p<fullBars; p++){ mkbar('full'); }
+  var mkbar = function(cls, hgtPct){ var el=document.createElement('div'); el.className=cls; if(hgtPct!=null) el.style.height=hgtPct+'%'; strip.appendChild(el); };
+  if(barsOn){
+    if(isLoC){
+      var n=c.biweekly;
+      for(var lb=0; lb<n; lb++){ mkbar('full', Math.round(100 - (n>1 ? lb/(n-1) : 0)*62)); }
+    } else if(isCA){
+      CA_BARS.forEach(function(hgt){ mkbar('full', Math.round(hgt*100)); });
+    } else {
+      var group = c.payments > 50 ? 2 : 1;
+      var fadedBars = Math.round(c.skip/group);
+      var fullBars = Math.max(1, Math.round(c.payments/group));
+      for(var s=0; s<fadedBars; s++){ mkbar('hol'); }
+      for(var p=0; p<fullBars; p++){ mkbar('full'); }
+    }
+    var nbars = strip.children.length;
+    strip.style.gap = nbars > 60 ? '1px' : (nbars > 30 ? '2px' : '');
   }
-  // keep dense schedules from overflowing: tighten the gap as bar count grows
-  var nbars = strip.children.length;
-  strip.style.gap = nbars > 60 ? '1px' : (nbars > 30 ? '2px' : '');
+  if(tlOn) buildTimeline(c);
 
   // graph title + legend (so the frequency and holiday are self-explaining)
   var freqWord2 = c.freqWord==='daily' ? 'daily' : 'every 2 weeks';
@@ -886,9 +914,10 @@ function refresh(){
   $('graph-divider').style.display = graphInControls ? 'none' : '';
   $('strip-wrap').style.marginTop = graphInControls ? '24px' : '';
   $('ladder-divider').style.display = isV2 ? 'none' : '';       // V2: ladder is the first section, no top line
-  var graphOnV2 = isV2 && (demo.showStrip || isCA);
+  var graphOnV2 = isV2 && graphShown;
   $('schedule-divider').style.display = graphOnV2 ? 'none' : ''; // V2: only drop the line when the graph sits right above
   $('grp-schedule').style.marginTop = graphOnV2 ? '16px' : '';  // ...and add the graph→schedule gap
+  $('graph-legend').style.display = tlOn ? 'none' : '';         // timeline has its own caption
   if(loanLike){
     $('graph-legend').innerHTML = c.skip>0
       ? '<span class="lg-dot"></span>Grey = payment holiday, then <b>'+c.payments+' payments</b> '+freqWord2
