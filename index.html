@@ -421,6 +421,9 @@
             <div class="row"><span class="l">Annual interest (APR)</span><span class="v" id="loc-apr"></span></div>
             <div class="row"><span class="l">Interest charged</span><span class="v">Only on draw</span></div>
             <div class="row"><span class="l">Set-up fee</span><span class="v">$0 if you draw · 1% if unused</span></div>
+          </div>
+          <div class="divider"></div>
+          <div class="rows">
             <div class="row"><span class="l">Estimated interest</span><span class="v" id="loc-interest"></span></div>
             <div class="row"><span class="l">First repayment</span><span class="v" id="loc-firstpay"></span></div>
             <div class="row"><span class="l">No early repayment fee</span><span class="chip success">New</span></div>
@@ -435,7 +438,6 @@
 
       <!-- RIGHT: customisation -->
       <section class="rightcol">
-        <div class="ctrl-title" id="controls-title">Customise your offer</div>
 
         <div id="block-refinance">
           <div class="divider"></div>
@@ -914,14 +916,10 @@ function refresh(){
   var freqWord2 = c.freqWord==='daily' ? 'daily' : 'every 2 weeks';
   $('graph-head').textContent = isCA ? 'Weekly collection' : 'Repayments';
   var isV2 = offer.layout==='v2';
-  var graphInControls = !isV2 && loanLike;   // V1 loans: graph under the day tabs
-  $('graph-divider').style.display = graphInControls ? 'none' : '';
+  var graphInControls = !isV2 && loanLike;   // V1 loans: graph under the day tabs (in controls)
   $('strip-wrap').style.marginTop = graphInControls ? '24px' : '';
-  $('ladder-divider').style.display = isV2 ? 'none' : '';       // V2: ladder is the first section, no top line
-  var graphOnV2 = isV2 && graphShown;
-  $('schedule-divider').style.display = graphOnV2 ? 'none' : ''; // V2: only drop the line when the graph sits right above
-  $('grp-schedule').style.marginTop = graphOnV2 ? '16px' : '';  // ...and add the graph→schedule gap
   $('graph-legend').style.display = tlOn ? 'none' : '';         // timeline has its own caption
+  // dividers are tidied at the end of refresh (see tidySummaryDividers)
   if(loanLike){
     $('graph-legend').innerHTML = c.skip>0
       ? '<span class="lg-dot"></span>Grey = payment holiday, then <b>'+c.payments+' payments</b> '+freqWord2
@@ -1096,8 +1094,28 @@ function refresh(){
   document.querySelectorAll('[data-block]').forEach(function(el){ el.className='tog'+(demo.blocks[el.getAttribute('data-block')]?' on':''); });
   document.querySelectorAll('[data-row]').forEach(function(el){ el.className='tog'+(demo.rows[el.getAttribute('data-row')]?' on':''); });
 
+  // tidy summary dividers: no line at the very top of the summary; no line where the graph sits directly above the schedule
+  tidySummaryDividers();
+  if(graphInControls) $('graph-divider').style.display='none';
+  if(graphShown && !graphInControls){ $('schedule-divider').style.display='none'; $('grp-schedule').style.marginTop='16px'; }
+  else { $('grp-schedule').style.marginTop=''; }
+
   equalizeCard();
   if(document.body.classList.contains('mobile-view')) syncMobile();
+}
+// hide the first visible group's top divider in the summary (the useless one), show the rest
+function tidySummaryDividers(){
+  var card=document.querySelector('.card'); if(!card) return;
+  var kids=card.children, firstHidden=false;
+  for(var i=0;i<kids.length;i++){
+    var g=kids[i];
+    if(getComputedStyle(g).display==='none') continue;
+    var d=g.firstElementChild;
+    if(d && d.classList && d.classList.contains('divider')){
+      d.style.display = firstHidden ? '' : 'none';
+      firstHidden = true;
+    }
+  }
 }
 
 // ---------- mobile preview ----------
