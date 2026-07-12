@@ -95,10 +95,10 @@
   .rm-row{align-items:center;gap:12px}
   .rm-row .l{white-space:nowrap;flex:none}
   .rm-val{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
-  .infoi{width:20px;height:20px;border-radius:50%;border:1px solid var(--border);background:#fff;color:var(--ink2);font-size:11px;font-weight:700;font-style:italic;font-family:Georgia,'Times New Roman',serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;flex:none}
-  .infoi:hover,.infoi.on{border-color:var(--teal);color:var(--teal)}
-  .infoi.pencil{border-color:var(--teal);color:var(--teal)}
-  .infoi svg{width:13px;height:13px;display:block}
+  .infoi{border:none;background:none;padding:0 0 0 6px;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:none}
+  .infoi:hover{color:var(--teal)}
+  .infoi.pencil{color:var(--teal)}
+  .infoi svg{width:16px;height:16px;display:block}
   .accordion{max-height:0;overflow:hidden;transition:max-height .3s ease}
   .accordion.open{max-height:220px}
   .acc-in{margin-top:12px;padding:14px;background:var(--panel);border:1px solid var(--divider);border-radius:12px}
@@ -964,7 +964,7 @@ function refresh(){
   $('row-rmethod').style.display = (std && demo.blocks.autoRepay) ? 'flex':'none';
   $('repay-info').innerHTML = demo.editPencil
     ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>'
-    : 'i';
+    : svgIcon('alert');
   $('repay-info').classList.toggle('pencil', !!demo.editPencil);
   if(!demo.blocks.autoRepay){ $('repay-acc').classList.remove('open'); $('repay-info').classList.remove('on'); }
   $('block-refinance').style.display = (std && pc.hasRefinance && demo.blocks.refinance) ? 'block':'none';
