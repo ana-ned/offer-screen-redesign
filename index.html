@@ -48,6 +48,7 @@
   .panel{margin-top:24px;background:var(--panel);border-radius:16px;padding:16px;display:flex;gap:16px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.04);width:fit-content;max-width:100%}
   .card{width:426px;background:var(--surface);border-radius:12px;padding:24px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
   .rightcol{width:426px;padding:24px;background:transparent;align-self:flex-start}
+  .rc-title{font-size:20px;font-weight:700;color:var(--ink);margin:0 0 4px}
 
   .divider{height:1px;background:var(--divider);margin:14px 0}
   .titlerow{display:flex;align-items:center;gap:12px}
@@ -439,6 +440,8 @@
       <!-- RIGHT: customisation -->
       <section class="rightcol">
 
+        <div id="rc-title" class="rc-title" style="display:none">Customise</div>
+
         <div id="block-refinance">
           <div class="divider"></div>
           <div class="ctrl">
@@ -716,7 +719,7 @@ var PRODUCTS = {
   },
   lineofcredit: {
     id:'lineofcredit', cardTitle:'Line of Credit', isLoC:true, v2Summary:'Draw what you need, repay as you go',
-    subtitle:'of your $400,000 credit line',
+    subtitle:'',
     hdrPrefix:'Your credit line ', hdrSub:'A revolving line of credit. Draw what you need, repay as you go, and nothing is borrowed until you draw.',
     hasRefinance:false, existingBalance:0,
     maxAmount:400000, available:275000, locked:125000, apr:0.11,
@@ -778,7 +781,7 @@ function equalizeCard(){
   var card=document.querySelector('.card');
   var right=document.querySelector('.rightcol');
   if(!card||!right) return;
-  function dvs(el){ return Array.prototype.filter.call(el.querySelectorAll('.divider'), function(d){ return d.offsetParent!==null; }); }
+  function dvs(el){ return Array.prototype.filter.call(el.querySelectorAll('.divider'), function(d){ return d.offsetParent!==null && d.id!=='calc-divider'; }); }
   var cdv=dvs(card), rdv=dvs(right);
   // reset both columns' dividers to the base gap, then read each column's true height
   cdv.concat(rdv).forEach(function(d){ d.style.marginTop='16px'; d.style.marginBottom='16px'; });
@@ -879,7 +882,7 @@ function refresh(){
   $('hdr-amount').textContent = '';
   $('hdr-sub').textContent = pc.hdrSub;
   $('card-title').textContent = pc.cardTitle;
-  $('card-amount').innerHTML = smallCents(fmt(isLoC ? c.draw : (isCA ? c.amount : offer.additional)));
+  $('card-amount').innerHTML = smallCents(fmt(isLoC ? pc.maxAmount : (isCA ? c.amount : offer.additional)));   // LoC hero: the full credit limit
   $('card-sub').style.display = pc.subtitle ? 'block':'none';
   $('card-sub').textContent = pc.subtitle || '';
 
@@ -1010,6 +1013,7 @@ function refresh(){
   $('block-amount').style.display = (std && demo.blocks.amount) ? 'block':'none';
   $('block-term').style.display = (std && demo.blocks.term) ? 'block':'none';
   $('block-holiday').style.display = (std && demo.blocks.holiday) ? 'block':'none';
+  $('rc-title').style.display = (!v2 && std) ? 'block':'none';   // "Customise" title — V1, loan products (Top-Up + Term Loan) only
   $('ca-select').style.display = isCA ? 'block':'none';
   $('loc-select').style.display = isLoC ? 'block':'none';
   $('accept-btn').textContent = isLoC ? 'Draw now' : 'Accept offer';
@@ -1106,15 +1110,15 @@ function refresh(){
 // hide the first visible group's top divider in the summary (the useless one), show the rest
 function tidySummaryDividers(){
   var card=document.querySelector('.card'); if(!card) return;
-  var kids=card.children, firstHidden=false;
+  var kids=card.children, contentBefore=false;
   for(var i=0;i<kids.length;i++){
     var g=kids[i];
     if(getComputedStyle(g).display==='none') continue;
     var d=g.firstElementChild;
     if(d && d.classList && d.classList.contains('divider')){
-      d.style.display = firstHidden ? '' : 'none';
-      firstHidden = true;
+      d.style.display = contentBefore ? '' : 'none';   // hide only when it's genuinely the top of the summary (nothing above)
     }
+    contentBefore = true;   // any visible block (e.g. the hero) counts as content above the next divider
   }
 }
 
