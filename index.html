@@ -85,7 +85,8 @@
   .perpay b{color:var(--ink);font-weight:700}
   #perpay.split{justify-content:space-between;align-items:baseline;font-size:14px;margin-top:14px}
 
-  .rows{display:flex;flex-direction:column;gap:12px}
+  .rows{display:flex;flex-direction:column;gap:15px}
+  .ctrl-title{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:18px}
   .row{display:flex;align-items:center;justify-content:space-between;min-height:24px}
   .row .l{font-size:14px;color:var(--ink2)}
   .row .l.strong{font-weight:700}
@@ -94,7 +95,7 @@
   .strike{text-decoration:line-through;color:var(--muted);font-weight:600;margin-right:6px}
   .rm-row{align-items:center;gap:12px}
   .rm-row .l{white-space:nowrap;flex:none}
-  .rm-val{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+  .rm-val{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
   .infoi{border:none;background:none;padding:0 0 0 6px;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:none}
   .infoi:hover{color:var(--teal)}
   .infoi.pencil{color:var(--teal)}
@@ -421,6 +422,7 @@
 
       <!-- RIGHT: customisation -->
       <section class="rightcol">
+        <div class="ctrl-title" id="controls-title">Customise your offer</div>
 
         <div id="block-refinance">
           <div class="divider"></div>
@@ -665,7 +667,7 @@ var CA_BARS = [1,0.5,0.62,0.34,0.58,0.46,0.3,0.68,0.52,0.82,1,0.6,0.74,0.4,0.3];
 var PRODUCTS = {
   refinance: {
     id:'refinance', cardTitle:'Term Loan Top-Up', v2Summary:'Top-up and refinance your existing balance',
-    hdrPrefix:'Top-up an additional ', hdrSub:'Customise your top-up offer and refinance your existing balance',
+    hdrPrefix:'Top-up an additional ', hdrSub:'A term-loan top-up that folds your existing balance and new funds into one loan.',
     hasRefinance:true, existingBalance:111582.12,
     minAmount:100000, maxAmount:5888416.88, amountStep:0.01, defaultAmount:5888416.88, amountLabel:'Additional funds',
     termMin:3, termMax:6, defaultTerm:6,
@@ -687,7 +689,7 @@ var PRODUCTS = {
   },
   cashadvance: {
     id:'cashadvance', cardTitle:'Cash Advance', isCashAdvance:true, v2Summary:'Advance now, repay from your sales',
-    hdrPrefix:'Your offer ', hdrSub:'Pick the advance that fits your business, then accept when you\'re ready',
+    hdrPrefix:'Your offer ', hdrSub:'A cash advance — funds upfront for one fixed fee, repaid as a share of your weekly sales.',
     hasRefinance:false, existingBalance:0,
     maxAmount:100000, defaultAmount:100000,
     advances:[
@@ -699,7 +701,7 @@ var PRODUCTS = {
   lineofcredit: {
     id:'lineofcredit', cardTitle:'Line of Credit', isLoC:true, v2Summary:'Draw what you need, repay as you go',
     subtitle:'of your $400,000 credit line',
-    hdrPrefix:'Your credit line ', hdrSub:'Draw what you need, when you need it. Nothing is borrowed until you draw.',
+    hdrPrefix:'Your credit line ', hdrSub:'A revolving line of credit. Draw what you need, repay as you go, and nothing is borrowed until you draw.',
     hasRefinance:false, existingBalance:0,
     maxAmount:400000, available:275000, locked:125000, apr:0.11,
     drawMin:10000, drawMax:275000, drawDefault:100000, drawStep:5000,
@@ -842,8 +844,8 @@ function refresh(){
   document.body.classList.toggle('hero-plain', v2 && !demo.heroCard);
 
   // header + title
-  $('hdr-prefix').textContent = pc.hdrPrefix;
-  $('hdr-amount').textContent = fmt(pc.maxAmount);
+  $('hdr-prefix').textContent = 'Your offer is ready';
+  $('hdr-amount').textContent = '';
   $('hdr-sub').textContent = pc.hdrSub;
   $('card-title').textContent = pc.cardTitle;
   $('card-amount').innerHTML = smallCents(fmt(isLoC ? c.draw : (isCA ? c.amount : offer.additional)));
@@ -970,7 +972,7 @@ function refresh(){
   // right panel: standard blocks vs cash-advance selector vs line-of-credit estimator
   var std = !isCA && !isLoC;
   $('row-rmethod').style.display = (std && demo.blocks.autoRepay) ? 'flex':'none';
-  $('repay-info').innerHTML = demo.editPencil ? svgIcon('pen') : svgIcon('alert');
+  $('repay-info').innerHTML = demo.editPencil ? svgIcon('pen') : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4.5"/><path d="M12 8v.01"/></svg>';
   $('repay-info').classList.toggle('pencil', !!demo.editPencil);
   if(!demo.blocks.autoRepay){ $('repay-acc').classList.remove('open'); $('repay-info').classList.remove('on'); }
   $('block-refinance').style.display = (std && pc.hasRefinance && demo.blocks.refinance) ? 'block':'none';
