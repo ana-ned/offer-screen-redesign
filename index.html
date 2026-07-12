@@ -847,9 +847,10 @@ function buildTimeline(c){
   if(lastDay < firstDay+1) lastDay = firstDay+1;
   var freePct = Math.max(4, Math.min(64, firstDay/lastDay*100));
   var freqPhrase = c.freqWord==='daily' ? 'daily' : 'every 2 weeks';
+  var mid = (freePct>16 && freePct<84) ? '<span class="tl-m" style="left:'+freePct+'%">Day '+firstDay+'</span>' : '';
   $('timeline').innerHTML =
     '<div class="tl-track"><div class="tl-free" style="width:'+freePct+'%"></div><div class="tl-pay" style="width:'+(100-freePct)+'%"></div><div class="tl-dot" style="left:'+freePct+'%"></div></div>'
-    + '<div class="tl-axis"><span class="tl-l">Today</span><span class="tl-m" style="left:'+freePct+'%">Day '+firstDay+'</span><span class="tl-r">Day '+lastDay+'</span></div>'
+    + '<div class="tl-axis"><span class="tl-l">Today</span>'+mid+'<span class="tl-r">Day '+lastDay+'</span></div>'
     + '<div class="tl-cap"><b>No repayments for '+firstDay+' days</b> · then '+c.payments+' payments '+freqPhrase+'</div>';
 }
 function refresh(){
