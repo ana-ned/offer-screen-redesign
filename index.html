@@ -788,11 +788,18 @@ function equalizeCard(){
   card.style.alignSelf='flex-start'; right.style.alignSelf='flex-start';
   var ch=card.offsetHeight, rh=right.offsetHeight;
   card.style.alignSelf=''; right.style.alignSelf='';
-  // distribute the shortfall into the SHORTER column's dividers so both bottoms line up
+  // gently distribute the shortfall into the SHORTER column's dividers so both bottoms line up —
+  // but ONLY when it can be absorbed within a sane cap. If the columns are too far apart
+  // (e.g. Line of Credit, Term Loan V1), balancing would blow the gaps out, so we keep uniform
+  // 16px spacing and simply let the shorter column top-align. Tidy-but-unequal beats huge gaps.
   var target=Math.max(ch, rh);
+  var MAXM=38;   // hard cap on divider margin; above this we fall back to uniform spacing.
+                 // Calibrated: near-balanced columns (raw≤34) stay balanced; far-apart ones
+                 // (LoC, Term Loan V1, Cash Advance V2, raw≥43) fall back to tidy uniform spacing.
   function fill(dv, natural){
     if(!dv.length) return;
-    var m=Math.max(16, 16 + (target - natural)/(dv.length*2));
+    var m=16 + (target - natural)/(dv.length*2);
+    if(m>MAXM) m=16;
     dv.forEach(function(d){ d.style.marginTop=m+'px'; d.style.marginBottom=m+'px'; });
   }
   fill(cdv, ch);
