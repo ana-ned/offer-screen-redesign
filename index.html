@@ -864,7 +864,11 @@ function equalizeCard(){
     dv.forEach(function(d){ d.style.marginTop=m+'px'; d.style.marginBottom=m+'px'; });
   }
   fill(cdv, ch);
-  fill(rdv, rh);
+  // Line of Credit's right column has many sections — stretching them to balance blows the gaps
+  // out. Use even, moderate spacing (Figma uses ~24px) and let the grey card fill any leftover height.
+  var pcNow = PRODUCTS[offer.product] || {};
+  if(pcNow.isLoC){ rdv.forEach(function(d){ d.style.marginTop='28px'; d.style.marginBottom='28px'; }); }
+  else { fill(rdv, rh); }
 }
 
 function calc(){
@@ -1176,6 +1180,13 @@ function refresh(){
   if(graphInControls || isCA) $('graph-divider').style.display='none';   // CA: green card flows straight into the Weekly collection chart
   if(graphShown && !graphInControls){ $('schedule-divider').style.display='none'; $('grp-schedule').style.marginTop='16px'; }
   else { $('grp-schedule').style.marginTop=''; }
+  // Loans: the divider directly above "Fixed fee" is redundant — merge it up into the schedule group (keep the one before Total repayable).
+  // Hiding the divider removes its gap, so add a matching row-gap on the group to keep the rhythm.
+  var feeDiv=$('grp-fees').firstElementChild;
+  if(feeDiv && feeDiv.classList.contains('divider')){
+    feeDiv.style.display = loanLike ? 'none' : '';
+    $('grp-fees').style.marginTop = loanLike ? '19px' : '';
+  }
 
   equalizeCard();
   if(document.body.classList.contains('mobile-view')) syncMobile();
