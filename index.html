@@ -519,20 +519,24 @@
 
         <div id="loc-select">
           <div style="font-size:16px;font-weight:700;color:var(--ink)">Choose your draw</div>
-          <div style="margin-top:4px;font-size:12px;color:var(--ink2);line-height:1.5">Nothing's borrowed until you draw.</div>
-          <div class="locbar" id="loc-bar2" style="margin-top:14px"><div class="fill" id="loc-fill2"></div></div>
-          <div style="margin-top:8px;font-size:12px;color:var(--ink2)"><b id="loc-avail2"></b> available · <span id="loc-locked2"></span> unlocks as sales grow</div>
+          <div style="margin-top:4px;font-size:12px;color:var(--ink2);line-height:1.5">You're not borrowing anything yet — this is just an estimate to explore your line.</div>
           <div class="divider"></div>
           <div class="slider">
-            <div class="top"><span class="st">Draw amount</span><span class="sv" id="ro-draw"></span></div>
+            <div class="top"><span class="st">Draw amount</span><span class="sv sv-box" id="ro-draw"></span></div>
             <input class="rng" id="sl-draw" type="range" min="10000" max="275000" step="5000" aria-label="Draw amount" />
-            <div class="mm"><span id="mm-draw-min">$10,000</span><span id="mm-draw-max">$275,000 available</span></div>
+            <div class="mm"><span id="mm-draw-min">$10,000</span><span id="mm-draw-max">$275,000 max</span></div>
           </div>
           <div class="divider"></div>
           <div class="slider">
-            <div class="top"><span class="st">Estimated hold</span><span class="sv" id="ro-held"></span></div>
-            <input class="rng" id="sl-held" type="range" min="1" max="12" step="1" aria-label="Estimated hold" />
+            <div class="top"><span class="st">Held for</span><span class="sv sv-box" id="ro-held"></span></div>
+            <input class="rng" id="sl-held" type="range" min="1" max="12" step="1" aria-label="Held for" />
             <div class="mm"><span>1 mo</span><span>12 mo</span></div>
+          </div>
+          <div class="divider"></div>
+          <div>
+            <div class="graph-head" style="margin-bottom:8px">Your credit line</div>
+            <div class="locbar" id="loc-bar2"><div class="fill" id="loc-fill2"></div></div>
+            <div style="margin-top:8px;font-size:12px;color:var(--ink2)"><b id="loc-avail2"></b> available · <span id="loc-locked2"></span> unlocks as sales grow</div>
           </div>
           <div class="divider" id="calc-divider"></div>
           <a class="calccard" id="loc-calc-link" href="https://portal.weareuncapped.com/tools/loc-calculator?limit=200000&apr=20&start=2026-07-09&drawMonths=6&repayMonths=6&drawPct=6" target="_blank" rel="noopener">
@@ -1128,7 +1132,7 @@ function refresh(){
     sd.style.background='linear-gradient(to right, var(--tealDark) '+pctFill(c.draw,pc.drawMin,pc.available)+'%, var(--border) '+pctFill(c.draw,pc.drawMin,pc.available)+'%)';
     $('ro-draw').textContent=fmt(c.draw);
     $('mm-draw-min').textContent=fmt(pc.drawMin);
-    $('mm-draw-max').textContent=fmt(pc.available)+' available';
+    $('mm-draw-max').textContent=fmt(pc.available)+' max';
     var sh=$('sl-held'); sh.min=pc.heldMin; sh.max=pc.heldMax; sh.value=c.held;
     sh.style.background='linear-gradient(to right, var(--tealDark) '+pctFill(c.held,pc.heldMin,pc.heldMax)+'%, var(--border) '+pctFill(c.held,pc.heldMin,pc.heldMax)+'%)';
     $('ro-held').textContent=c.held+(c.held===1?' month':' months');
