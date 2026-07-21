@@ -105,6 +105,7 @@
   #perpay.split{justify-content:space-between;align-items:baseline;font-size:14px;margin-top:14px}
 
   .rows{display:flex;flex-direction:column;gap:15px}
+  #grp-loc .rows{gap:22px}   /* LoC has few rows — give them more breathing room */
   .ctrl-title{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:18px}
   .row{display:flex;align-items:center;justify-content:space-between;min-height:24px}
   .row .l{font-size:14px;color:var(--ink2)}
@@ -226,16 +227,16 @@
   body.lay-v2 #accept-btn{margin-top:20px}
   body.lay-v2 #calc-divider{background:transparent}
   /* cash-advance selector */
-  #ca-cards{display:flex;flex-direction:column;gap:12px;margin-top:16px}
-  .adv{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:border-color .15s,box-shadow .15s;font-family:Sora,sans-serif}
+  #ca-cards{display:flex;flex-direction:column;gap:16px;margin-top:16px;flex:1}
+  .adv{display:flex;align-items:center;gap:12px;width:100%;flex:1;min-height:96px;text-align:left;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:20px 22px;cursor:pointer;transition:border-color .15s,box-shadow .15s;font-family:Sora,sans-serif}
   .adv.sel{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
-  .adv-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex:none;position:relative}
+  .adv-radio{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex:none;position:relative}
   .adv.sel .adv-radio{border-color:var(--teal)}
   .adv.sel .adv-radio::after{content:'';position:absolute;top:3px;left:3px;right:3px;bottom:3px;border-radius:50%;background:var(--teal)}
   .adv-main{flex:1;display:flex;flex-direction:column;gap:2px;align-items:flex-start}
-  .adv-amt{font-size:20px;font-weight:800;color:var(--ink);font-family:Commissioner,Sora,sans-serif}
-  .adv-fee{font-size:13px;color:var(--ink2)}
-  .adv-chip{margin-top:8px;padding:2px 10px;border-radius:9999px;background:var(--successBg);border:1px solid var(--successBorder);color:var(--teal);font-size:12px;font-weight:600}
+  .adv-amt{font-size:24px;font-weight:800;color:var(--ink);font-family:Commissioner,Sora,sans-serif}
+  .adv-fee{font-size:14px;color:var(--ink2)}
+  .adv-chip{margin-top:10px;padding:3px 12px;border-radius:9999px;background:var(--successBg);border:1px solid var(--successBorder);color:var(--teal);font-size:13px;font-weight:600}
   /* line-of-credit progress bar */
   .locbar{height:12px;border-radius:9999px;margin-top:2px;background:repeating-linear-gradient(45deg,#d3e9e9,#d3e9e9 3px,#eaf6f6 3px,#eaf6f6 7px)}
   .locbar .fill{height:100%;border-radius:9999px;background:var(--teal)}
@@ -1178,6 +1179,7 @@ function refresh(){
 // hide the first visible group's top divider in the summary (the useless one), show the rest
 function tidySummaryDividers(){
   var card=document.querySelector('.card'); if(!card) return;
+  var greenHero=document.body.classList.contains('green-hero');
   var kids=card.children, contentBefore=false;
   for(var i=0;i<kids.length;i++){
     var g=kids[i];
@@ -1186,7 +1188,8 @@ function tidySummaryDividers(){
     if(d && d.classList && d.classList.contains('divider')){
       d.style.display = contentBefore ? '' : 'none';   // hide only when it's genuinely the top of the summary (nothing above)
     }
-    contentBefore = true;   // any visible block (e.g. the hero) counts as content above the next divider
+    // the green amount card is a self-contained block — it shouldn't force a divider directly beneath it
+    if(!(greenHero && g.id==='card-hero')) contentBefore = true;
   }
 }
 
