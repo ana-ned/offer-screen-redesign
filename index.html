@@ -49,6 +49,10 @@
   .card{width:426px;background:var(--surface);border-radius:12px;padding:24px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
   .rightcol{width:426px;padding:24px;background:transparent;align-self:flex-start}
   .rc-title{font-size:16px;font-weight:600;color:var(--ink);line-height:1.5;margin:0 0 20px}
+  /* ---- Layout V1: two equal, flush cards — the white summary (left) casts a rightward shadow onto the grey customize (right), same approach as V2 (Figma 2211-4462) ---- */
+  body:not(.lay-v2) .panel{background:transparent;padding:0;gap:0;border-radius:16px;overflow:hidden}
+  body:not(.lay-v2) .card{box-shadow:8px 0 22px -2px rgba(0,0,0,.06);position:relative;z-index:1;border-radius:0;width:450px;padding:32px;align-self:stretch}
+  body:not(.lay-v2) .rightcol{background:var(--panel);position:relative;z-index:0;border-radius:0;width:450px;padding:32px;align-self:stretch}
 
   .divider{height:1px;background:var(--divider);margin:14px 0}
   .titlerow{display:flex;align-items:center;gap:12px}
@@ -61,15 +65,17 @@
   .chip.expiry .edot{width:6px;height:6px;border-radius:50%;background:#ffac30;flex:none}
   .chip.expiry.soon{background:#fdecea;border-color:#f5c6c2;color:#b23b30}
   .chip.expiry.soon .edot{background:#e5484d}
-  /* V2 green card: nicer white pill centered under the amount, yellow dot (red when near expiry) */
-  body.lay-v2 #card-hero{position:relative}
-  body.lay-v2 #card-hero .chip.expiry{display:inline-flex;margin-top:14px;background:#fff;border-color:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.18)}
-  body.lay-v2 #card-hero .cents{color:#fff}
-  body.lay-v2 #card-hero .chip.expiry .edot{background:#ffc531}
-  body.lay-v2 #card-hero .chip.expiry.soon{background:#fff;color:var(--ink)}
-  body.lay-v2 #card-hero .chip.expiry.soon .edot{background:#e5484d}
+  /* Green card: nicer white pill centered under the amount, yellow dot (red when near expiry) — works in either layout via .green-hero */
+  body.green-hero #card-hero{position:relative}
+  body.green-hero #card-hero .chip.expiry{display:inline-flex;margin-top:14px;background:#fff;border-color:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.18)}
+  body.green-hero #card-hero .cents{color:#fff}
+  body.green-hero #card-hero .chip.expiry .edot{background:#ffc531}
+  body.green-hero #card-hero .chip.expiry.soon{background:#fff;color:var(--ink)}
+  body.green-hero #card-hero .chip.expiry.soon .edot{background:#e5484d}
 
   .amount{font-family:Commissioner;font-size:36px;font-weight:700;color:var(--ink);line-height:1.1;margin-top:24px}
+  body:not(.lay-v2) #card-hero .amount{font-size:44px}
+  body:not(.lay-v2) #card-hero .amount .cents{font-size:.62em;opacity:1;color:var(--ink2)}
   .cents{font-size:.6em;opacity:.6}
   .cardsub{margin-top:8px;font-size:14px;color:var(--ink2);line-height:1.5}
   .strip{display:flex;gap:4px;height:20px;align-items:flex-end}
@@ -109,10 +115,15 @@
   .rm-row{align-items:center;gap:12px}
   .rm-row .l{white-space:nowrap;flex:none}
   .rm-val{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
-  .infoi{border:none;background:none;padding:0 0 0 6px;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:none}
-  .infoi:hover{color:var(--teal)}
+  .infoi{border:none;background:none;padding:0 0 0 6px;color:var(--teal);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:none}
+  .infoi:hover{opacity:.8}
   .infoi.pencil{color:var(--teal)}
   .infoi svg{width:16px;height:16px;display:block}
+  .ar-banner{display:none;align-items:center;gap:8px;margin-top:12px;background:#fff6e5;border:1px solid var(--amberBorder);border-radius:10px;padding:8px 10px}
+  .ar-banner .ar-bicon{flex:none;display:inline-flex;color:#ffac30}
+  .ar-banner .ar-bicon svg{width:16px;height:16px;display:block}
+  .ar-banner .ar-btext{flex:1;font-size:13px;font-weight:600;color:#9e5700;line-height:1.35}
+  .ar-banner .tog{flex:none}
   .accordion{max-height:0;overflow:hidden;transition:max-height .3s ease}
   .accordion.open{max-height:220px}
   .acc-in{margin-top:12px;padding:14px;background:var(--panel);border:1px solid var(--divider);border-radius:12px}
@@ -151,6 +162,7 @@
   .slider .sv{font-size:14px;font-weight:700;color:var(--ink)}
   .slider .mm{display:flex;justify-content:space-between}
   .slider .mm span{font-size:12px;color:var(--muted)}
+  .slider .sv.sv-box{border:1px solid var(--border);border-radius:8px;padding:5px 10px;background:#fff}
   .rng{-webkit-appearance:none;appearance:none;height:4px;border-radius:9999px;outline:none;cursor:pointer;width:100%;margin:12px 0}
   .rng::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;box-sizing:border-box;width:18px;height:18px;border-radius:50%;background:var(--teal);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.18);cursor:pointer}
   .rng::-moz-range-thumb{box-sizing:border-box;width:18px;height:18px;border-radius:50%;background:var(--teal);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.18);cursor:pointer}
@@ -186,13 +198,15 @@
   body.lay-v2 .panel{flex-direction:row-reverse;background:transparent;padding:0;gap:0;border-radius:16px;overflow:hidden}
   body.lay-v2 .rightcol{background:var(--surface);box-shadow:8px 0 22px -2px rgba(0,0,0,.06);position:relative;z-index:1;border-radius:0;width:450px;padding:32px;align-self:stretch}
   body.lay-v2 .card{background:var(--panel);box-shadow:none;border-radius:0;position:relative;z-index:0;width:450px;padding:32px;align-self:stretch}
-  body.lay-v2 #card-hero{background:linear-gradient(120deg,#0d5a5c 0%,#128081 45%,#1f4b73 100%);border-radius:16px;padding:24px;text-align:center;margin-bottom:20px}
-  body.lay-v2 #card-hero .titlerow{justify-content:center}
-  body.lay-v2 #card-hero .tile{display:none}
-  body.lay-v2 #card-hero .chip{display:none}
-  body.lay-v2 #card-hero .name{color:#fff;flex:none}
-  body.lay-v2 #card-hero .amount{color:#fff;margin-top:8px}
-  body.lay-v2 #card-hero .cardsub{color:rgba(255,255,255,.85)}
+  /* Green amount card (either layout) */
+  body.green-hero #card-hero{background:linear-gradient(120deg,#0d5a5c 0%,#128081 45%,#1f4b73 100%);border-radius:16px;padding:24px;text-align:center;margin-bottom:20px}
+  body.green-hero #card-hero .titlerow{justify-content:center}
+  body.green-hero #card-hero .tile{display:none}
+  body.green-hero #card-hero .chip{display:none}
+  body.green-hero #card-hero .name{color:#fff;flex:none}
+  body.green-hero #card-hero .amount{color:#fff;margin-top:8px;font-size:36px}
+  body.green-hero #card-hero .amount .cents{color:#fff;opacity:1;font-size:.6em}
+  body.green-hero #card-hero .cardsub{color:rgba(255,255,255,.85)}
   /* V2 plain amount (no green card) — V1-style title+icon, no expiry chip */
   body.lay-v2.hero-plain #card-hero{background:transparent;padding:0 0 20px;text-align:left;border-bottom:1px solid var(--divider)}
   body.lay-v2.hero-plain #card-hero .titlerow{justify-content:flex-start}
@@ -265,6 +279,11 @@
   .modal-actions{display:flex;flex-direction:column;gap:10px}
   .btn-primary{height:44px;border-radius:12px;border:none;background:var(--teal);color:#fff;font-weight:600;font-size:14px;cursor:pointer}
   .btn-ghost{height:44px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--ink);font-weight:600;font-size:14px;cursor:pointer}
+  .ar-modal{border-top:4px solid var(--teal)}
+  .ar-modal-icon{background:var(--successBg);color:var(--teal)}
+  .ar-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:var(--panel);border:1px solid var(--divider);border-radius:12px;margin-bottom:20px}
+  .ar-toggle-row .art-t{font-size:14px;font-weight:700;color:var(--ink)}
+  .ar-toggle-row .art-d{font-size:12px;color:var(--muted);margin-top:2px}
   #confirm-modal{border-top-color:#d64a3f;max-width:392px}
   #confirm-icon{background:#fdecea;color:#d64a3f}
 
@@ -379,13 +398,8 @@
           <div class="rows" id="graph-rows">
             <div class="row" id="row-firstpay"><span class="l">First repayment</span><span class="v" id="val-firstpay"></span></div>
             <div class="row" id="row-repay"><span class="l" id="lbl-repay">Repayments</span><span class="v" id="val-repay"></span></div>
-            <div class="row rm-row" id="row-rmethod"><span class="l">Repayment method</span><span class="v rm-val">Amazon auto-repay <button class="infoi" id="repay-info" aria-label="How Amazon Automated Repayment works">i</button></span></div>
-          </div>
-          <div class="accordion" id="repay-acc">
-            <div class="acc-in">
-              <div class="rm-toggle"><span>Amazon Automated Repayment</span><button class="tog on" id="tg-autorepay" aria-label="Amazon Automated Repayment"></button></div>
-              <div class="rm-desc">Amazon will automatically send the repayment amount to us. Any remaining balance from your payout will be disbursed into your bank account. <button class="link">Learn how it works</button></div>
-            </div>
+            <div class="row rm-row" id="row-rmethod"><span class="l">Repayment method</span><span class="v rm-val"><span id="rm-method-name">Amazon auto-repay</span> <button class="infoi" id="repay-info" aria-label="How Amazon auto-repay works">i</button></span></div>
+            <div class="ar-banner" id="ar-banner"><span class="ar-bicon" data-icon="alert"></span><span class="ar-btext">Turn on Auto-repay from your payouts</span><button class="tog" id="tg-ar-on" aria-label="Turn on Auto-repay"></button></div>
           </div>
         </div>
 
@@ -440,7 +454,7 @@
       <!-- RIGHT: customisation -->
       <section class="rightcol">
 
-        <div id="rc-title" class="rc-title" style="display:none">Customise</div>
+        <div id="rc-title" class="rc-title" style="display:none">Customize your offer</div>
 
         <div id="block-refinance">
           <div class="divider"></div>
@@ -456,7 +470,7 @@
         <div id="block-amount">
           <div class="divider"></div>
           <div class="slider">
-            <div class="top"><span class="st" id="lbl-amount">Additional funds</span><span class="sv" id="ro-additional"></span></div>
+            <div class="top"><span class="st" id="lbl-amount">Additional funds</span><span class="sv sv-box" id="ro-additional"></span></div>
             <input class="rng" id="sl-additional" type="range" min="100000" max="5888416.88" step="0.01" aria-label="Additional funds" />
             <div class="mm"><span id="mm-min">$100,000</span><span id="mm-additional"></span></div>
           </div>
@@ -467,7 +481,7 @@
           <div class="slider">
             <div class="top"><span class="st">Repayment term</span><span class="sv" id="ro-term"></span></div>
             <input class="rng" id="sl-term" type="range" min="3" max="6" step="1" aria-label="Repayment term" />
-            <div class="mm"><span>3 mo</span><span>6 mo</span></div>
+            <div class="mm"><span>3 mo</span><span>6 mo max</span></div>
           </div>
         </div>
 
@@ -545,7 +559,7 @@
       <button class="pill" data-layout="v2">Layout V2</button>
     </div>
     <div style="margin-top:8px;font-size:11px;color:#7fa9aa">V2 tuned for Top-Up first.</div>
-    <div class="drow" style="margin-top:10px"><span>V2 amount as green card</span><button class="tog" data-show="heroCard"></button></div>
+    <div class="drow" style="margin-top:10px"><span>Amount as green card</span><button class="tog" data-show="heroCard"></button></div>
     <div class="drow"><span>Expiry near (red dot)</span><button class="tog" data-show="nearExpiry"></button></div>
     <div class="drow"><span>Edit icon: pencil (vs info)</span><button class="tog" data-show="editPencil"></button></div>
     <div style="margin-top:16px">
@@ -602,6 +616,18 @@
       <button class="btn-primary" id="modal-turnon">Turn on auto-repay</button>
       <button class="btn-ghost" id="modal-continue">Continue without it</button>
     </div>
+  </div>
+</div>
+
+<!-- INFO POPUP: Amazon auto-repay (opened by the (i) icon) -->
+<div class="modal-overlay" id="ar-popup">
+  <div class="modal ar-modal">
+    <button class="modal-close" id="ar-close" aria-label="Close"><span data-icon="x"></span></button>
+    <div class="modal-icon ar-modal-icon"><span data-icon="info"></span></div>
+    <div class="modal-title">Amazon auto-repay</div>
+    <div class="modal-body">Amazon automatically sends each repayment to us from your Amazon payouts. Any remaining balance from your payout is disbursed straight to your bank account.</div>
+    <div class="ar-toggle-row"><div><div class="art-t">Automated repayment</div><div class="art-d">On — repayments come from your payouts</div></div><button class="tog on" id="tg-autorepay" aria-label="Amazon auto-repay"></button></div>
+    <div class="modal-actions"><button class="btn-primary" id="ar-got">Got it</button></div>
   </div>
 </div>
 
@@ -670,7 +696,8 @@ var ICONS = {
   calendar:["M7 13.2734C7 12.7212 7.44772 12.2734 8 12.2734H8.00897C8.56126 12.2734 9.00897 12.7212 9.00897 13.2734C9.00897 13.8257 8.56126 14.2734 8.00897 14.2734H8C7.44772 14.2734 7 13.8257 7 13.2734ZM10.9955 13.2734C10.9955 12.7212 11.4432 12.2734 11.9955 12.2734H12.0045C12.5568 12.2734 13.0045 12.7212 13.0045 13.2734C13.0045 13.8257 12.5568 14.2734 12.0045 14.2734H11.9955C11.4432 14.2734 10.9955 13.8257 10.9955 13.2734ZM14.991 13.2734C14.991 12.7212 15.4387 12.2734 15.991 12.2734H16C16.5523 12.2734 17 12.7212 17 13.2734C17 13.8257 16.5523 14.2734 16 14.2734H15.991C15.4387 14.2734 14.991 13.8257 14.991 13.2734ZM7 17.2734C7 16.7212 7.44772 16.2734 8 16.2734H8.00897C8.56126 16.2734 9.00897 16.7212 9.00897 17.2734C9.00897 17.8257 8.56126 18.2734 8.00897 18.2734H8C7.44772 18.2734 7 17.8257 7 17.2734ZM10.9955 17.2734C10.9955 16.7212 11.4432 16.2734 11.9955 16.2734H12.0045C12.5568 16.2734 13.0045 16.7212 13.0045 17.2734C13.0045 17.8257 12.5568 18.2734 12.0045 18.2734H11.9955C11.4432 18.2734 10.9955 17.8257 10.9955 17.2734Z","M7.6125 1.25C8.15098 1.25 8.5875 1.68754 8.5875 2.22727V3.20455H15.4125V2.22727C15.4125 1.68754 15.849 1.25 16.3875 1.25C16.926 1.25 17.3625 1.68754 17.3625 2.22727V3.20455H18.825C20.4404 3.20455 21.75 4.51717 21.75 6.13636V19.8182C21.75 21.4374 20.4404 22.75 18.825 22.75H5.175C3.55957 22.75 2.25 21.4374 2.25 19.8182V6.13636C2.25 4.51717 3.55957 3.20455 5.175 3.20455H6.6375V2.22727C6.6375 1.68754 7.07403 1.25 7.6125 1.25ZM19.7999 9.75H4.19995V19.8182C4.19995 20.3579 4.63647 20.7955 5.17495 20.7955H18.8249C19.3634 20.7955 19.7999 20.3579 19.7999 19.8182V9.75Z"],
   calculator:["M17 6.5L15 6.5C14.4477 6.5 14 6.05229 14 5.5C14 4.94772 14.4477 4.5 15 4.5L17 4.5C17.5523 4.5 18 4.94772 18 5.5C18 6.05229 17.5523 6.5 17 6.5Z","M5 1C3.34315 1 2 2.34315 2 4V19C2 20.6569 3.34315 22 5 22H18C19.6569 22 21 20.6569 21 19V4C21 2.34315 19.6569 1 18 1H5ZM4 4C4 3.44772 4.44772 3 5 3H18C18.5523 3 19 3.44772 19 4V8.25H4V4ZM5.5 13C5.5 12.4477 5.94772 12 6.5 12H7.5C8.05228 12 8.5 12.4477 8.5 13C8.5 13.5523 8.05228 14 7.5 14H6.5C5.94772 14 5.5 13.5523 5.5 13ZM10 13C10 12.4477 10.4477 12 11 12H12C12.5523 12 13 12.4477 13 13C13 13.5523 12.5523 14 12 14H11C10.4477 14 10 13.5523 10 13ZM14.5 13C14.5 12.4477 14.9477 12 15.5 12H16.5C17.0523 12 17.5 12.4477 17.5 13C17.5 13.5523 17.0523 14 16.5 14H15.5C14.9477 14 14.5 13.5523 14.5 13ZM6.5 16C5.94772 16 5.5 16.4477 5.5 17C5.5 17.5523 5.94772 18 6.5 18H7.5C8.05228 18 8.5 17.5523 8.5 17C8.5 16.4477 8.05228 16 7.5 16H6.5ZM11 16C10.4477 16 10 16.4477 10 17C10 17.5523 10.4477 18 11 18H12C12.5523 18 13 17.5523 13 17C13 16.4477 12.5523 16 12 16H11ZM15.5 16C14.9477 16 14.5 16.4477 14.5 17C14.5 17.5523 14.9477 18 15.5 18H16.5C17.0523 18 17.5 17.5523 17.5 17C17.5 16.4477 17.0523 16 16.5 16H15.5Z"],
   phone:["M8 2C6.34315 2 5 3.34315 5 5V19C5 20.6569 6.34315 22 8 22H16C17.6569 22 19 20.6569 19 19V5C19 3.34315 17.6569 2 16 2H8ZM7 6.5C7 5.94772 7.44772 5.5 8 5.5H16C16.5523 5.5 17 5.94772 17 6.5V15.5C17 16.0523 16.5523 16.5 16 16.5H8C7.44772 16.5 7 16.0523 7 15.5V6.5ZM12 18.5C12.6904 18.5 13.25 19.0596 13.25 19.75C13.25 20.4404 12.6904 21 12 21C11.3096 21 10.75 20.4404 10.75 19.75C10.75 19.0596 11.3096 18.5 12 18.5Z"],
-  pen:["M17.323 2.75907C17.1887 2.74698 17.0535 2.74698 16.9192 2.75907C16.4453 2.80176 16.0633 3.01869 15.7181 3.29014C15.3943 3.54479 15.0365 3.90259 14.6215 4.31766L14.6214 4.31768L13.4997 5.43938L18.5604 10.5L19.6821 9.37835C20.0972 8.9633 20.455 8.60554 20.7096 8.2817C20.9811 7.9365 21.198 7.55443 21.2407 7.08053C21.2528 6.94624 21.2528 6.81112 21.2407 6.67682C21.198 6.20292 20.9811 5.82086 20.7096 5.47566C20.455 5.15182 20.0972 4.79405 19.6821 4.37901C19.2671 3.96393 18.848 3.5448 18.5241 3.29014C18.1789 3.01869 17.7969 2.80176 17.323 2.75907ZM17.4997 11.5607L12.4391 6.50004L4.62594 14.3131C3.8564 15.0819 3.32161 15.6162 3.03524 16.3076C2.74886 16.999 2.74922 17.7549 2.74974 18.8427L2.74978 20.5C2.74978 20.9142 3.08557 21.25 3.49978 21.25L5.1571 21.25C6.24488 21.2506 7.00083 21.2509 7.69221 20.9645C8.38358 20.6782 8.91786 20.1434 9.68666 19.3738L9.68667 19.3738L9.68668 19.3738L17.4997 11.5607Z"]
+  pen:["M17.323 2.75907C17.1887 2.74698 17.0535 2.74698 16.9192 2.75907C16.4453 2.80176 16.0633 3.01869 15.7181 3.29014C15.3943 3.54479 15.0365 3.90259 14.6215 4.31766L14.6214 4.31768L13.4997 5.43938L18.5604 10.5L19.6821 9.37835C20.0972 8.9633 20.455 8.60554 20.7096 8.2817C20.9811 7.9365 21.198 7.55443 21.2407 7.08053C21.2528 6.94624 21.2528 6.81112 21.2407 6.67682C21.198 6.20292 20.9811 5.82086 20.7096 5.47566C20.455 5.15182 20.0972 4.79405 19.6821 4.37901C19.2671 3.96393 18.848 3.5448 18.5241 3.29014C18.1789 3.01869 17.7969 2.80176 17.323 2.75907ZM17.4997 11.5607L12.4391 6.50004L4.62594 14.3131C3.8564 15.0819 3.32161 15.6162 3.03524 16.3076C2.74886 16.999 2.74922 17.7549 2.74974 18.8427L2.74978 20.5C2.74978 20.9142 3.08557 21.25 3.49978 21.25L5.1571 21.25C6.24488 21.2506 7.00083 21.2509 7.69221 20.9645C8.38358 20.6782 8.91786 20.1434 9.68666 19.3738L9.68667 19.3738L9.68668 19.3738L17.4997 11.5607Z"],
+  info:["M12 1.25C17.9371 1.25 22.75 6.06294 22.75 12C22.75 17.9371 17.9371 22.75 12 22.75C6.06294 22.75 1.25 17.9371 1.25 12C1.25 6.06294 6.06294 1.25 12 1.25ZM12 10.5C11.4477 10.5 11 10.9477 11 11.5V16C11 16.5523 11.4477 17 12 17C12.5523 17 13 16.5523 13 16V11.5C13 10.9477 12.5523 10.5 12 10.5ZM12 7C11.4477 7 11 7.44772 11 8V8.01C11 8.56229 11.4477 9.01 12 9.01C12.5523 9.01 13 8.56229 13 8.01V8C13 7.44772 12.5523 7 12 7Z"]
 };
 function svgIcon(name){
   var d = ICONS[name]; if(!d) return '';
@@ -730,7 +757,7 @@ var PRODUCTS = {
 
 // ---------- state ----------
 var DEFAULT_OFFER = { product:'refinance', layout:'v1', advanceIdx:0, draw:100000, held:6, additional:5888416.88, termMonths:6, holidayDay:42, autoRepay:true, refinance:true, feeRate:0.04 };
-var DEFAULT_DEMO = { showApr:true, showPerPayment:true, showStrip:false, advGraph:false, heroCard:true, nearExpiry:false, editPencil:true,
+var DEFAULT_DEMO = { showApr:true, showPerPayment:true, showStrip:false, advGraph:true, heroCard:true, nearExpiry:false, editPencil:false,
   blocks:{ autoRepay:true, refinance:true, amount:true, term:true, holiday:true },
   rows:{ additional:true, paysOff:true, totalNewLoan:true, fixedFee:true, totalFee:true, paymentHoliday:true, noEarlyFee:true, totalRepayable:true } };
 var offer = JSON.parse(JSON.stringify(DEFAULT_OFFER));
@@ -769,7 +796,8 @@ function applyLayout(){
     [grpLadder, strip, grpSched, grpFees, grpCa, grpLoc, secTotal, ctaWrap].forEach(function(el){ card.appendChild(el); });
   } else {
     card.insertBefore(hero, card.firstChild);          // hero → top of summary
-    titlerow.appendChild(expiry);                      // expiry pill → inline in the title row
+    if(demo.heroCard){ hero.insertBefore(expiry, amount.nextSibling); }   // green card → pill centered under the amount
+    else { titlerow.appendChild(expiry); }                                // plain amount → pill inline in the title row
     // summary order: hero → ladder → schedule → fees → total → CTA (experiment: CTA under the total, left) ; graph to controls
     [grpLadder, grpSched, grpFees, grpCa, grpLoc, secTotal, ctaWrap].forEach(function(el){ card.appendChild(el); });
     if(isLoan){ mods.insertBefore(strip, holiday.nextSibling); }
@@ -882,7 +910,8 @@ function refresh(){
   var isLoC = !!c.isLoC;
   var v2 = (offer.layout==='v2');
   var v2loan = v2 && !isCA && !isLoC;
-  document.body.classList.toggle('hero-plain', v2 && !demo.heroCard);
+  document.body.classList.toggle('hero-plain', v2 && !demo.heroCard);       // V2 plain fallback (keeps the V2 divider under the amount)
+  document.body.classList.toggle('green-hero', !!demo.heroCard);            // green amount card — now available in BOTH layouts
 
   // header + title
   $('hdr-prefix').textContent = 'Your offer is ready';
@@ -1013,9 +1042,14 @@ function refresh(){
   // right panel: standard blocks vs cash-advance selector vs line-of-credit estimator
   var std = !isCA && !isLoC;
   $('row-rmethod').style.display = (std && demo.blocks.autoRepay) ? 'flex':'none';
-  $('repay-info').innerHTML = demo.editPencil ? svgIcon('pen') : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4.5"/><path d="M12 8v.01"/></svg>';
+  // (i) icon is the default; pencil only if the demo explicitly asks for it
+  $('repay-info').innerHTML = demo.editPencil ? svgIcon('pen') : svgIcon('info');
   $('repay-info').classList.toggle('pencil', !!demo.editPencil);
-  if(!demo.blocks.autoRepay){ $('repay-acc').classList.remove('open'); $('repay-info').classList.remove('on'); }
+  // auto-repay ON → "Amazon auto-repay" + (i); OFF → "ACH bank debit" + warning banner with a re-enable toggle
+  $('rm-method-name').textContent = offer.autoRepay ? 'Amazon auto-repay' : 'ACH bank debit';
+  $('repay-info').style.display = offer.autoRepay ? 'inline-flex' : 'none';
+  $('ar-banner').style.display = (std && demo.blocks.autoRepay && !offer.autoRepay) ? 'flex' : 'none';
+  var artd=document.querySelector('#ar-popup .art-d'); if(artd) artd.textContent = offer.autoRepay ? 'On — repayments come from your payouts' : 'Off — repayments come from your bank';
   $('block-refinance').style.display = (std && pc.hasRefinance && demo.blocks.refinance) ? 'block':'none';
   $('block-amount').style.display = (std && demo.blocks.amount) ? 'block':'none';
   $('block-term').style.display = (std && demo.blocks.term) ? 'block':'none';
@@ -1076,7 +1110,7 @@ function refresh(){
     $('lbl-amount').textContent=pc.amountLabel;
     $('ro-additional').innerHTML=smallCents(fmt(offer.additional));
     $('mm-min').textContent=fmt(pc.minAmount);
-    $('mm-additional').innerHTML=smallCents(fmt(currentMax));
+    $('mm-additional').innerHTML=smallCents(fmt(currentMax))+' max';
     var st=$('sl-term'); st.min=pc.termMin; st.max=pc.termMax; st.value=offer.termMonths;
     st.style.background='linear-gradient(to right, var(--tealDark) '+pctFill(offer.termMonths,pc.termMin,pc.termMax)+'%, var(--border) '+pctFill(offer.termMonths,pc.termMin,pc.termMax)+'%)';
     $('ro-term').textContent=offer.termMonths+' months';
@@ -1266,15 +1300,19 @@ $('tg-autorepay').addEventListener('click',function(){
   if(offer.autoRepay){ $('confirm-overlay').classList.add('open'); }   // turning OFF → confirm first
   else { offer.autoRepay=true; offer.additional=P().maxAmount; refresh(); save(); }
 });
-$('repay-info').addEventListener('click',function(){ $('repay-acc').classList.toggle('open'); this.classList.toggle('on'); });
+$('repay-info').addEventListener('click',function(){ $('ar-popup').classList.add('open'); });   // (i) opens the info popup
+$('ar-close').addEventListener('click',function(){ $('ar-popup').classList.remove('open'); });
+$('ar-got').addEventListener('click',function(){ $('ar-popup').classList.remove('open'); });
+$('ar-popup').addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); });
+$('tg-ar-on').addEventListener('click',function(){ offer.autoRepay=true; offer.additional=P().maxAmount; refresh(); save(); });   // banner toggle re-enables directly
 $('confirm-keep').addEventListener('click',function(){ $('confirm-overlay').classList.remove('open'); });
 $('confirm-close').addEventListener('click',function(){ $('confirm-overlay').classList.remove('open'); });
-$('confirm-off').addEventListener('click',function(){ offer.autoRepay=false; offer.additional=P().maxAmount*OFF_AMOUNT_FACTOR; $('confirm-overlay').classList.remove('open'); refresh(); save(); });
+$('confirm-off').addEventListener('click',function(){ offer.autoRepay=false; offer.additional=P().maxAmount*OFF_AMOUNT_FACTOR; $('confirm-overlay').classList.remove('open'); $('ar-popup').classList.remove('open'); refresh(); save(); });
 $('confirm-overlay').addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); });
 $('tg-refinance').addEventListener('click',function(){ offer.refinance=!offer.refinance; refresh(); save(); });
 document.querySelectorAll('[data-fee]').forEach(function(el){ el.addEventListener('click',function(){ offer.feeRate=Number(el.getAttribute('data-fee')); refresh(); save(); }); });
 document.querySelectorAll('[data-block]').forEach(function(el){ el.addEventListener('click',function(){ var k=el.getAttribute('data-block'); demo.blocks[k]=!demo.blocks[k]; refresh(); save(); }); });
-document.querySelectorAll('[data-show]').forEach(function(el){ el.addEventListener('click',function(){ var k=el.getAttribute('data-show'); demo[k]=!demo[k]; refresh(); save(); }); });
+document.querySelectorAll('[data-show]').forEach(function(el){ el.addEventListener('click',function(){ var k=el.getAttribute('data-show'); demo[k]=!demo[k]; if(k==='heroCard') applyLayout(); refresh(); save(); }); });
 document.querySelectorAll('[data-row]').forEach(function(el){ el.addEventListener('click',function(){ var k=el.getAttribute('data-row'); demo.rows[k]=!demo.rows[k]; refresh(); save(); }); });
 document.querySelectorAll('[data-product]').forEach(function(el){ el.addEventListener('click',function(){ setProduct(el.getAttribute('data-product')); }); });
 document.querySelectorAll('[data-layout]').forEach(function(el){ el.addEventListener('click',function(){ offer.layout=el.getAttribute('data-layout'); applyLayout(); refresh(); save(); }); });
@@ -1287,7 +1325,7 @@ document.addEventListener('keydown',function(e){
   var tag=(e.target&&e.target.tagName)||'';
   if(tag==='INPUT'||tag==='TEXTAREA') return;
   if(e.key&&e.key.toLowerCase()==='d') toggleDrawer();
-  if(e.key==='Escape'){ document.body.classList.remove('drawer-open'); closeModal(); closeMobile(); $('confirm-overlay').classList.remove('open'); }
+  if(e.key==='Escape'){ document.body.classList.remove('drawer-open'); closeModal(); closeMobile(); $('confirm-overlay').classList.remove('open'); $('ar-popup').classList.remove('open'); }
 });
 
 // accept + friendly upsell modal (shown only when auto-repay is off)
