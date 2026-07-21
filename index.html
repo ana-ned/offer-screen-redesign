@@ -1168,7 +1168,7 @@ function refresh(){
 
   // tidy summary dividers: no line at the very top of the summary; no line where the graph sits directly above the schedule
   tidySummaryDividers();
-  if(graphInControls) $('graph-divider').style.display='none';
+  if(graphInControls || isCA) $('graph-divider').style.display='none';   // CA: green card flows straight into the Weekly collection chart
   if(graphShown && !graphInControls){ $('schedule-divider').style.display='none'; $('grp-schedule').style.marginTop='16px'; }
   else { $('grp-schedule').style.marginTop=''; }
 
