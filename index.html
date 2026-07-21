@@ -232,12 +232,10 @@
   .adv-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex:none;position:relative}
   .adv.sel .adv-radio{border-color:var(--teal)}
   .adv.sel .adv-radio::after{content:'';position:absolute;top:3px;left:3px;right:3px;bottom:3px;border-radius:50%;background:var(--teal)}
-  .adv-main{flex:1;display:flex;flex-direction:column;gap:2px}
-  .adv-amt{font-size:18px;font-weight:800;color:var(--ink);font-family:Commissioner,Sora,sans-serif}
+  .adv-main{flex:1;display:flex;flex-direction:column;gap:2px;align-items:flex-start}
+  .adv-amt{font-size:20px;font-weight:800;color:var(--ink);font-family:Commissioner,Sora,sans-serif}
   .adv-fee{font-size:13px;color:var(--ink2)}
-  .adv-pct{text-align:right}
-  .adv-pct-n{font-size:16px;font-weight:800;color:var(--ink);display:block}
-  .adv-pct-l{display:block;font-size:12px;color:var(--ink2)}
+  .adv-chip{margin-top:8px;padding:2px 10px;border-radius:9999px;background:var(--successBg);border:1px solid var(--successBorder);color:var(--teal);font-size:12px;font-weight:600}
   /* line-of-credit progress bar */
   .locbar{height:12px;border-radius:9999px;margin-top:2px;background:repeating-linear-gradient(45deg,#d3e9e9,#d3e9e9 3px,#eaf6f6 3px,#eaf6f6 7px)}
   .locbar .fill{height:100%;border-radius:9999px;background:var(--teal)}
@@ -514,6 +512,7 @@
         <div id="ca-select">
           <div style="font-size:16px;font-weight:700;color:var(--ink)">Select your advance</div>
           <div style="margin-top:4px;font-size:12px;color:var(--ink2);line-height:1.5">Cash upfront for one fixed fee. You repay it as a % of weekly sales. The fee is the total cost, the % just sets the pace.</div>
+          <div class="divider" style="margin:16px 0 0"></div>
           <div id="ca-cards"></div>
         </div>
 
@@ -1061,7 +1060,7 @@ function refresh(){
 
   // total repayable / payable
   $('sec-totalrep').style.display = (isCA || isLoC || (pc.rows.totalRepayable&&demo.rows.totalRepayable))?'block':'none';
-  $('totalrep-label').textContent = isLoC ? 'Total cost' : (isCA ? 'Total payable' : 'Total repayable');
+  $('totalrep-label').textContent = isLoC ? 'Total cost' : 'Total repayable';
   $('val-totalrep').innerHTML = smallCents(isLoC ? fmt(c.totalCost) : (isCA ? fmt(c.totalRepayable) : fmt2(c.totalRepayable)));
 
   // toggles
@@ -1116,7 +1115,7 @@ function refresh(){
     pc.advances.forEach(function(adv,i){
       var b=document.createElement('button');
       b.className='adv'+(offer.advanceIdx===i?' sel':'');
-      b.innerHTML='<span class="adv-radio"></span><span class="adv-main"><span class="adv-amt">'+fmt(adv.amount)+'</span><span class="adv-fee">Fixed fee '+fmt(adv.fee)+'</span></span><span class="adv-pct"><span class="adv-pct-n">'+adv.pct+'%</span><span class="adv-pct-l">of weekly sales</span></span>';
+      b.innerHTML='<span class="adv-main"><span class="adv-amt">'+fmt(adv.amount)+'</span><span class="adv-fee">Fixed fee '+fmt(adv.fee)+'</span><span class="adv-chip">'+adv.pct+'% weekly sales</span></span><span class="adv-radio"></span>';
       b.onclick=function(){ offer.advanceIdx=i; refresh(); save(); };
       cont.appendChild(b);
     });
