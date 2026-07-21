@@ -51,8 +51,8 @@
   .rc-title{font-size:16px;font-weight:600;color:var(--ink);line-height:1.5;margin:0 0 20px}
   /* ---- Layout V1: two equal, flush cards — the white summary (left) casts a rightward shadow onto the grey customize (right), same approach as V2 (Figma 2211-4462) ---- */
   body:not(.lay-v2) .panel{background:transparent;padding:0;gap:0;border-radius:16px;overflow:hidden}
-  body:not(.lay-v2) .card{box-shadow:8px 0 22px -2px rgba(0,0,0,.06);position:relative;z-index:1;border-radius:0;width:450px;padding:32px;align-self:stretch}
-  body:not(.lay-v2) .rightcol{background:var(--panel);position:relative;z-index:0;border-radius:0;width:450px;padding:32px;align-self:stretch}
+  body:not(.lay-v2) .card{box-shadow:8px 0 22px -2px rgba(0,0,0,.06);position:relative;z-index:1;border-radius:0;width:450px;padding:24px;align-self:stretch}
+  body:not(.lay-v2) .rightcol{background:var(--panel);position:relative;z-index:0;border-radius:0;width:450px;padding:24px;align-self:stretch}
 
   .divider{height:1px;background:var(--divider);margin:14px 0}
   .titlerow{display:flex;align-items:center;gap:12px}
@@ -196,8 +196,8 @@
   #v2-heading{display:none;font-size:16px;font-weight:700;color:var(--ink);margin-bottom:14px}
   /* ---- Layout V2 (Figma 2160-5009): white controls (left) | grey summary (right), flush; panel clips the outer edges so only the white card's RIGHTWARD shadow shows on the grey ---- */
   body.lay-v2 .panel{flex-direction:row-reverse;background:transparent;padding:0;gap:0;border-radius:16px;overflow:hidden}
-  body.lay-v2 .rightcol{background:var(--surface);box-shadow:8px 0 22px -2px rgba(0,0,0,.06);position:relative;z-index:1;border-radius:0;width:450px;padding:32px;align-self:stretch}
-  body.lay-v2 .card{background:var(--panel);box-shadow:none;border-radius:0;position:relative;z-index:0;width:450px;padding:32px;align-self:stretch}
+  body.lay-v2 .rightcol{background:var(--surface);box-shadow:8px 0 22px -2px rgba(0,0,0,.06);position:relative;z-index:1;border-radius:0;width:450px;padding:24px;align-self:stretch}
+  body.lay-v2 .card{background:var(--panel);box-shadow:none;border-radius:0;position:relative;z-index:0;width:450px;padding:24px;align-self:stretch}
   /* Green amount card (either layout) */
   body.green-hero #card-hero{background:linear-gradient(120deg,#0d5a5c 0%,#128081 45%,#1f4b73 100%);border-radius:16px;padding:24px;text-align:center;margin-bottom:20px}
   body.green-hero #card-hero .titlerow{justify-content:center}
