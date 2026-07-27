@@ -211,6 +211,12 @@
   body.green-hero #card-hero .amount{color:#fff;margin-top:8px;font-size:36px}
   body.green-hero #card-hero .amount .cents{color:#fff;opacity:1;font-size:.6em}
   body.green-hero #card-hero .cardsub{color:rgba(255,255,255,.85)}
+  /* green-card key stats row: fee · term · per-payment */
+  .hero-stats{display:none;justify-content:space-between;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.22);text-align:center}
+  .hstat{flex:1}
+  .hstat-top{font-size:13px;color:rgba(255,255,255,.82);line-height:1.35}
+  .hstat-top b{color:#fff;font-weight:700}
+  .hstat-val{margin-top:2px;font-size:16px;font-weight:700;color:#fff}
   /* V2 plain amount (no green card) — V1-style title+icon, no expiry chip */
   body.lay-v2.hero-plain #card-hero{background:transparent;padding:0 0 20px;text-align:left;border-bottom:1px solid var(--divider)}
   body.lay-v2.hero-plain #card-hero .titlerow{justify-content:flex-start}
@@ -394,6 +400,11 @@
           </div>
           <div class="amount" id="card-amount"></div>
           <div class="cardsub" id="card-sub" style="display:none"></div>
+          <div class="hero-stats" id="hero-stats">
+            <div class="hstat"><div class="hstat-top" id="hs1-top"></div><div class="hstat-val" id="hs1-val"></div></div>
+            <div class="hstat"><div class="hstat-top" id="hs2-top"></div><div class="hstat-val" id="hs2-val"></div></div>
+            <div class="hstat"><div class="hstat-top" id="hs3-top"></div><div class="hstat-val" id="hs3-val"></div></div>
+          </div>
         </div>
 
         <div id="v2-heading"></div>
@@ -961,6 +972,16 @@ function refresh(){
 
   // repayment graph: bars (default), or the advanced timeline
   var loanLike = !isCA && !isLoC;
+  // green-card key stats (loans, green mode only): flat fee · fixed term · per-payment
+  if(loanLike && demo.heroCard){
+    $('hero-stats').style.display='flex';
+    $('hs1-top').innerHTML='<b>'+feePctLabel(c.effectiveRate)+'</b> flat fee';
+    $('hs1-val').textContent=fmt2(c.totalFee);
+    $('hs2-top').textContent='fixed term';
+    $('hs2-val').textContent=offer.termMonths+' mo';
+    $('hs3-top').textContent='×'+c.payments+' '+c.freqWord;
+    $('hs3-val').textContent=fmt(Math.round(c.perPayment));
+  } else { $('hero-stats').style.display='none'; }
   var barsOn = demo.showStrip || isCA;             // Cash Advance: bars always on
   var tlOn = !!demo.advGraph && loanLike;          // advanced timeline (loans)
   var graphShown = barsOn || tlOn;
