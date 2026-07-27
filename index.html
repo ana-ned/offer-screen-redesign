@@ -217,6 +217,24 @@
   .hstat-top{font-size:13px;color:rgba(255,255,255,.82);line-height:1.35}
   .hstat-top b{color:#fff;font-weight:700}
   .hstat-val{margin-top:2px;font-size:16px;font-weight:700;color:#fff}
+  /* new sectioned layout — bordered sub-cards inside the summary */
+  .sec-card{background:#fff;border:1px solid var(--divider);border-radius:12px;padding:16px;margin-top:16px}
+  .sec-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+  .sec-head>span:first-child{font-size:14px;font-weight:700;color:var(--ink)}
+  .sec-head-r{font-size:13px;font-weight:600;color:var(--teal);display:inline-flex;align-items:center;gap:6px}
+  .sec-chk{width:18px;height:18px;border-radius:50%;background:var(--teal);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px}
+  #ns-det .drow2{display:flex;align-items:center;justify-content:space-between;min-height:24px}
+  #ns-det .drow2+.drow2{margin-top:14px}
+  #ns-det .drow2 .l{font-size:14px;color:var(--ink2)}
+  #ns-det .drow2 .v{font-size:14px;font-weight:700;color:var(--ink)}
+  #ns-det .drow2 .v.teal{color:var(--teal)}
+  .fb-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;font-size:14px;color:var(--ink2)}
+  .fb-exp{display:inline-flex;align-items:center;gap:4px;color:var(--teal);font-weight:700}
+  .fb-chev{transition:transform .2s}
+  .fb-toggle.open .fb-chev{transform:rotate(180deg)}
+  .fb-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .fb-body.open{max-height:520px;margin-top:16px}
+  #fb-body .divider:first-child{display:none}
   /* V2 plain amount (no green card) — V1-style title+icon, no expiry chip */
   body.lay-v2.hero-plain #card-hero{background:transparent;padding:0 0 20px;text-align:left;border-bottom:1px solid var(--divider)}
   body.lay-v2.hero-plain #card-hero .titlerow{justify-content:flex-start}
@@ -405,6 +423,19 @@
             <div class="hstat"><div class="hstat-top" id="hs2-top"></div><div class="hstat-val" id="hs2-val"></div></div>
             <div class="hstat"><div class="hstat-top" id="hs3-top"></div><div class="hstat-val" id="hs3-val"></div></div>
           </div>
+        </div>
+
+        <!-- NEW sectioned layout (loan green): Repayment schedule card + Details card w/ Full breakdown -->
+        <div id="ns-rep" class="sec-card" style="display:none">
+          <div class="sec-head"><span>Repayment schedule</span><span class="sec-head-r" id="ns-noearly">No early repayment fee <span class="sec-chk">✓</span></span></div>
+          <div id="ns-graph-slot"></div>
+        </div>
+        <div id="ns-det" class="sec-card" style="display:none">
+          <div class="drow2"><span class="l">Total new loan</span><span class="v teal" id="ns-totalnewloan"></span></div>
+          <div class="drow2"><span class="l">Method</span><span class="v rm-val"><span id="ns-method">Automated Repayment</span> <button class="infoi" id="ns-method-info" aria-label="How Automated Repayment works">i</button></span></div>
+          <div class="divider"></div>
+          <button class="fb-toggle" id="fb-toggle"><span>Full breakdown</span><span class="fb-exp"><span id="fb-exp-label">Expand</span> <span class="fb-chev" id="fb-chev">⌄</span></span></button>
+          <div class="fb-body" id="fb-body"></div>
         </div>
 
         <div id="v2-heading"></div>
@@ -1196,6 +1227,21 @@ function refresh(){
   document.querySelectorAll('[data-block]').forEach(function(el){ el.className='tog'+(demo.blocks[el.getAttribute('data-block')]?' on':''); });
   document.querySelectorAll('[data-row]').forEach(function(el){ el.className='tog'+(demo.rows[el.getAttribute('data-row')]?' on':''); });
 
+  // NEW sectioned layout (V1 loan + green card): Repayment-schedule card + Details card; detail rows go into a Full-breakdown accordion
+  var newSec = loanLike && demo.heroCard && offer.layout!=='v2';
+  $('ns-rep').style.display = newSec ? 'block' : 'none';
+  $('ns-det').style.display = newSec ? 'block' : 'none';
+  $('graph-head').style.display = newSec ? 'none' : '';
+  if(newSec){
+    if($('strip-wrap').parentNode!==$('ns-graph-slot')) $('ns-graph-slot').appendChild($('strip-wrap'));
+    $('strip-wrap').style.display='block'; $('strip-wrap').style.marginTop='0';
+    ['grp-ladder','grp-schedule','grp-fees'].forEach(function(id){ if($(id).parentNode!==$('fb-body')) $('fb-body').appendChild($(id)); });
+    $('ns-totalnewloan').innerHTML = smallCents(fmt2(c.loanBase));
+    $('ns-method').textContent = offer.autoRepay ? 'Automated Repayment' : 'ACH bank debit';
+    $('ns-method-info').style.display = offer.autoRepay ? 'inline-flex' : 'none';
+    $('ns-noearly').style.display = offer.autoRepay ? '' : 'none';
+  }
+
   // tidy summary dividers: no line at the very top of the summary; no line where the graph sits directly above the schedule
   tidySummaryDividers();
   if(graphInControls || isCA) $('graph-divider').style.display='none';   // CA: green card flows straight into the Weekly collection chart
@@ -1377,6 +1423,8 @@ function arSyncWarn(){
   }
 }
 $('repay-info').addEventListener('click',function(){ $('tg-autorepay').className='tog on'; arSyncWarn(); $('ar-popup').classList.add('open'); });   // (i) opens the info popup (starts in the ON state)
+$('ns-method-info').addEventListener('click',function(){ $('tg-autorepay').className='tog on'; arSyncWarn(); $('ar-popup').classList.add('open'); });   // Details-card (i) opens the same popup
+$('fb-toggle').addEventListener('click',function(){ var open=$('fb-body').classList.toggle('open'); this.classList.toggle('open', open); $('fb-exp-label').textContent = open ? 'Collapse' : 'Expand'; });
 $('tg-autorepay').addEventListener('click',function(){ this.classList.toggle('on'); arSyncWarn(); });   // pending only — no offer change yet
 $('ar-got').addEventListener('click',function(){ $('ar-popup').classList.remove('open'); });
 $('ar-cancel').addEventListener('click',function(){ $('tg-autorepay').className='tog on'; arSyncWarn(); $('ar-popup').classList.remove('open'); });
