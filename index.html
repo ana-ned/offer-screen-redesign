@@ -85,10 +85,9 @@
   .strip>div.fade{background:var(--barFaded)}
   .strip>div.hol{height:5px;background:#d6dad9}
   .graph-head{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px}
-  .strip-axis{position:relative;height:16px;margin-top:12px;font-size:11px;color:var(--muted)}
-  .strip-axis #sa-l{position:absolute;left:0}
+  .strip-axis{position:relative;height:18px;margin-top:12px;font-size:12px;color:var(--muted)}
+  .strip-axis #sa-l{position:absolute;left:0;font-weight:700;color:var(--teal)}
   .strip-axis #sa-r{position:absolute;right:0}
-  .strip-axis #sa-m{position:absolute;font-weight:700;color:var(--teal);white-space:nowrap;transform:translateX(-50%)}
   /* advanced repayment timeline */
   #timeline{margin-top:4px}
   .tl-track{position:relative;height:10px;border-radius:6px;overflow:hidden;display:flex;background:var(--barFaded)}
@@ -904,17 +903,19 @@ function equalizeCard(){
   var MAXM=38;   // hard cap on divider margin; above this we fall back to uniform spacing.
                  // Calibrated: near-balanced columns (raw≤34) stay balanced; far-apart ones
                  // (LoC, Term Loan V1, Cash Advance V2, raw≥43) fall back to tidy uniform spacing.
-  function fill(dv, natural){
+  function fill(dv, natural, nocap){
     if(!dv.length) return;
     var m=16 + (target - natural)/(dv.length*2);
-    if(m>MAXM) m=16;
+    if(m>MAXM && !nocap) m=16;
     dv.forEach(function(d){ d.style.marginTop=m+'px'; d.style.marginBottom=m+'px'; });
   }
   fill(cdv, ch);
   // Line of Credit's right column has many sections — stretching them to balance blows the gaps
   // out. Use even, moderate spacing (Figma uses ~24px) and let the grey card fill any leftover height.
   var pcNow = PRODUCTS[offer.product] || {};
+  var secLayout = document.body.classList.contains('sec-layout');
   if(pcNow.isLoC){ rdv.forEach(function(d){ d.style.marginTop='28px'; d.style.marginBottom='28px'; }); }
+  else if(secLayout){ fill(rdv, rh, true); }   // new sectioned layout: fill the customize column to match the tall left card
   else { fill(rdv, rh); }
 }
 
@@ -1036,7 +1037,7 @@ function refresh(){
       CA_BARS.forEach(function(hgt){ mkbar('full', Math.round(hgt*100)); });
     } else {
       var group = c.payments > 50 ? 2 : 1;
-      var fadedBars = Math.round(c.skip/group);
+      var fadedBars = newSec ? 0 : Math.round(c.skip/group);   // new sectioned layout: only the payment bars, no holiday bars
       var fullBars = Math.max(1, Math.round(c.payments/group));
       for(var s=0; s<fadedBars; s++){ mkbar('hol'); }
       for(var p=0; p<fullBars; p++){ mkbar('full'); }
@@ -1057,13 +1058,11 @@ function refresh(){
   if(newSec){
     $('graph-legend').style.display='none';
     $('strip-axis').style.display='block';
-    var nbAll=$('strip').children.length, faded=$('strip').querySelectorAll('.hol').length;
     var freq2 = c.freqWord==='daily' ? 1 : 14;
     var paidOff = offer.holidayDay + Math.max(0, c.payments-1)*freq2;
-    $('sa-l').textContent='Holiday';
-    $('sa-m').textContent='Day '+offer.holidayDay;
+    $('sa-l').textContent='Day '+offer.holidayDay;   // first payment — sits under the first bar
+    $('sa-m').style.display='none';
     $('sa-r').textContent='Paid off on '+paidOff;
-    $('sa-m').style.left = (nbAll ? Math.max(15, Math.min(78, faded/nbAll*100 + 3)) : 15)+'%';
   } else { $('strip-axis').style.display='none'; }
   // dividers are tidied at the end of refresh (see tidySummaryDividers)
   if(loanLike){
@@ -1246,6 +1245,7 @@ function refresh(){
   document.querySelectorAll('[data-row]').forEach(function(el){ el.className='tog'+(demo.rows[el.getAttribute('data-row')]?' on':''); });
 
   // NEW sectioned layout (V1 loan + green card): Repayment-schedule card + Details card; detail rows go into a Full-breakdown accordion
+  document.body.classList.toggle('sec-layout', newSec);
   $('ns-rep').style.display = newSec ? 'block' : 'none';
   $('ns-det').style.display = newSec ? 'block' : 'none';
   $('graph-head').style.display = newSec ? 'none' : '';
