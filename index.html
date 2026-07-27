@@ -197,8 +197,10 @@
   .day{flex:1;height:38px;border-radius:8px;border:1px solid var(--divider);background:var(--panel);color:var(--ink2);font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:border-color .15s,background .15s}
   .day.active{background:#fff;color:var(--teal);border:1.5px solid var(--teal);box-shadow:none}
   .day.dis{opacity:.38;cursor:not-allowed;pointer-events:none}
-  .day.twoline{flex-direction:column;gap:2px;height:auto;padding:9px 4px;line-height:1.2}
-  .day .dayfee{font-size:12px;font-weight:600;color:var(--ink2)}
+  .day.twoline{flex-direction:column;gap:1px;height:auto;padding:8px 4px;line-height:1.2}
+  .day .dayline{display:flex;align-items:center;justify-content:center;gap:3px;font-size:13px}
+  .day .dayline svg{width:12px;height:12px;display:inline-block}
+  .day .dayfee{font-size:11px;font-weight:600;color:var(--ink2)}
   .day.active .dayfee{color:var(--teal)}
   .day .dayfee .strike{color:var(--muted);text-decoration:line-through;font-weight:400;margin-left:3px}
   .day svg{width:14px;height:14px;display:block}
@@ -247,9 +249,9 @@
   .sec-chk{width:15px;height:15px;border-radius:50%;background:var(--teal);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9px}
   .ns-rows{display:flex;flex-direction:column;gap:14px}
   #ns-rep .drow2{display:flex;align-items:center;justify-content:space-between;min-height:22px}
-  #ns-rep .drow2 .l{font-size:14px;font-weight:400;color:var(--ink2)}
+  #ns-rep .drow2 .l{font-size:12px;font-weight:400;color:var(--ink2)}
   #ns-rep .ns-rows .drow2:first-child .l{font-weight:600;color:var(--ink)}   /* "Total new loan" is the emphasized row */
-  #ns-rep .drow2 .v{font-size:14px;font-weight:700;color:var(--ink)}
+  #ns-rep .drow2 .v{font-size:12px;font-weight:700;color:var(--ink)}
   #ns-rep .drow2 .v.teal{color:var(--teal)}
   /* V2 plain amount (no green card) — V1-style title+icon, no expiry chip */
   body.lay-v2.hero-plain #card-hero{background:transparent;padding:0 0 20px;text-align:left;border-bottom:1px solid var(--divider)}
