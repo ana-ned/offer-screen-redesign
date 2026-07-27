@@ -49,6 +49,7 @@
   .card{width:426px;background:var(--surface);border-radius:12px;padding:24px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
   .rightcol{width:426px;padding:24px;background:transparent;align-self:flex-start}
   .rc-title{font-size:16px;font-weight:600;color:var(--ink);line-height:1.5;margin:0 0 20px}
+  .rc-sub{font-size:12px;color:var(--ink2);line-height:1.5;margin:-16px 0 20px}
   /* ---- Layout V1: two equal, flush cards — the white summary (left) casts a rightward shadow onto the grey customize (right), same approach as V2 (Figma 2211-4462) ---- */
   body:not(.lay-v2) .panel{background:transparent;padding:0;gap:0;border-radius:16px;overflow:hidden}
   body:not(.lay-v2) .card{box-shadow:8px 0 22px -2px rgba(0,0,0,.06);position:relative;z-index:1;border-radius:0;width:450px;padding:24px;align-self:stretch}
@@ -67,10 +68,11 @@
   .chip.expiry.soon .edot{background:#e5484d}
   /* Green card: nicer white pill centered under the amount, yellow dot (red when near expiry) — works in either layout via .green-hero */
   body.green-hero #card-hero{position:relative}
-  body.green-hero #card-hero .chip.expiry{display:inline-flex;margin-top:14px;background:#fff;border-color:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.18)}
+  body.green-hero #card-hero .chip.expiry{display:inline-flex;margin-top:14px;background:rgba(255,255,255,.22);border-color:transparent;color:#f7fcfc;box-shadow:none}
+  body.green-hero #card-hero .chip.expiry b{color:#fff}
   body.green-hero #card-hero .cents{color:#fff}
   body.green-hero #card-hero .chip.expiry .edot{background:#ffc531}
-  body.green-hero #card-hero .chip.expiry.soon{background:#fff;color:var(--ink)}
+  body.green-hero #card-hero .chip.expiry.soon{background:rgba(255,255,255,.22);color:#f7fcfc}
   body.green-hero #card-hero .chip.expiry.soon .edot{background:#e5484d}
 
   .amount{font-family:Commissioner;font-size:36px;font-weight:700;color:var(--ink);line-height:1.1;margin-top:24px}
@@ -212,7 +214,7 @@
   body.lay-v2 .rightcol{background:var(--surface);box-shadow:8px 0 22px -2px rgba(0,0,0,.06);position:relative;z-index:1;border-radius:0;width:450px;padding:24px;align-self:stretch}
   body.lay-v2 .card{background:var(--panel);box-shadow:none;border-radius:0;position:relative;z-index:0;width:450px;padding:24px;align-self:stretch}
   /* Green amount card (either layout) */
-  body.green-hero #card-hero{background:linear-gradient(120deg,#0d5a5c 0%,#128081 45%,#1f4b73 100%);border-radius:16px;padding:24px 32px;text-align:center;margin-bottom:16px}
+  body.green-hero #card-hero{background:linear-gradient(120deg,#0d5a5c 0%,#128081 45%,#1f4b73 100%);border-radius:16px;padding:24px 32px;text-align:center;margin-bottom:16px;overflow:hidden}
   body.green-hero #card-hero .titlerow{justify-content:center}
   body.green-hero #card-hero .tile{display:none}
   body.green-hero #card-hero .chip{display:none}
@@ -222,31 +224,29 @@
   body.green-hero #card-hero .amount .cents{color:#fff;opacity:1;font-size:.7em}
   body.green-hero #card-hero .cardsub{color:rgba(255,255,255,.85)}
   /* green-card key stats row: fee · term · per-payment */
-  .hero-stats{display:none;justify-content:space-between;gap:8px;margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,.22);text-align:center}
+  .hero-stats{display:none;justify-content:space-between;gap:8px;margin:24px -32px -24px;padding:20px 32px;background:rgba(0,0,0,.14);text-align:center}
   .hstat{flex:1}
   .hstat-top{font-size:12px;color:rgba(255,255,255,.82);line-height:1.35}
   .hstat-top b{color:#fff;font-weight:700}
   .hstat-val{margin-top:2px;font-size:16px;font-weight:700;color:#fff}
   /* new sectioned layout — bordered sub-cards inside the summary */
   .sec-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px}
-  .sec-card>.divider,#fb-body .divider{margin:12px 0}
+  .sec-card>.divider{margin:12px 0}
   .sec-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
   .sec-head>span:first-child{font-size:14px;font-weight:700;color:var(--ink)}
   .sec-head-r{font-size:13px;font-weight:600;color:var(--teal);display:inline-flex;align-items:center;gap:6px}
   .sec-chk{width:18px;height:18px;border-radius:50%;background:var(--teal);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px}
-  #ns-det .drow2{display:flex;align-items:center;justify-content:space-between;min-height:24px}
-  #ns-det .drow2+.drow2{margin-top:12px}
-  #ns-det .drow2 .l{font-size:14px;color:var(--ink2)}
-  #ns-det .drow2 .v{font-size:14px;font-weight:700;color:var(--ink)}
-  #ns-det .drow2 .v.teal{color:var(--teal)}
-  .fb-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;font-size:14px;color:var(--ink2)}
-  .fb-exp{display:inline-flex;align-items:center;gap:4px;color:var(--teal);font-weight:700}
-  .fb-chev{transition:transform .2s;display:inline-flex}
-  .fb-chev svg{width:14px;height:14px;display:block}
-  .fb-toggle.open .fb-chev{transform:rotate(180deg)}
-  .fb-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
-  .fb-body.open{max-height:520px;margin-top:16px}
-  #fb-body .divider:first-child{display:none}
+  #ns-rep .drow2{display:flex;align-items:center;justify-content:space-between;min-height:24px}
+  #ns-rep .drow2 .l{font-size:14px;font-weight:600;color:var(--ink)}
+  #ns-rep .drow2 .v{font-size:14px;font-weight:700;color:var(--ink)}
+  #ns-rep .drow2 .v.teal{color:var(--teal);font-size:13px}
+  /* Total-new-loan breakdown bar: teal = additional funds · hatched = paid off existing */
+  .ns-brk{display:flex;flex-direction:column;gap:12px}
+  .brk-bar{display:flex;gap:2px;height:12px}
+  .brk-fill{background:var(--teal);border-radius:3px 0 0 3px;min-width:4px}
+  .brk-rest{background:#eaf6f6;border-radius:0 3px 3px 0;background-image:repeating-linear-gradient(45deg,rgba(18,128,129,.32),rgba(18,128,129,.32) 2px,transparent 2px,transparent 6px)}
+  .brk-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+  .brk-labels b{color:var(--ink);font-weight:600}
   /* V2 plain amount (no green card) — V1-style title+icon, no expiry chip */
   body.lay-v2.hero-plain #card-hero{background:transparent;padding:0 0 20px;text-align:left;border-bottom:1px solid var(--divider)}
   body.lay-v2.hero-plain #card-hero .titlerow{justify-content:flex-start}
@@ -437,18 +437,20 @@
           </div>
         </div>
 
-        <!-- NEW sectioned layout (loan green): Repayment schedule card + Details card w/ Full breakdown -->
+        <!-- NEW sectioned layout (loan green): one card = Repayment schedule + Total-new-loan breakdown + Method -->
         <div id="ns-rep" class="sec-card" style="display:none">
           <div class="sec-head"><span>Repayment schedule</span><span class="sec-head-r" id="ns-noearly">No early repayment fee <span class="sec-chk">✓</span></span></div>
           <div id="ns-graph-slot"></div>
-        </div>
-        <div id="ns-det" class="sec-card" style="display:none">
-          <div class="drow2"><span class="l">Total new loan</span><span class="v teal" id="ns-totalnewloan"></span></div>
-          <div class="drow2"><span class="l">Method</span><span class="v rm-val"><span id="ns-method">Automated Repayment</span> <button class="infoi" id="ns-method-info" aria-label="How Automated Repayment works"></button></span></div>
           <div class="divider"></div>
-          <button class="fb-toggle" id="fb-toggle"><span>Full breakdown</span><span class="fb-exp"><span id="fb-exp-label">Expand</span> <span class="fb-chev" id="fb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></span></button>
-          <div class="fb-body" id="fb-body"></div>
+          <div class="ns-brk">
+            <div class="drow2"><span class="l">Total new loan</span><span class="v teal" id="ns-totalnewloan"></span></div>
+            <div class="brk-bar"><div class="brk-fill" id="brk-fill"></div><div class="brk-rest" id="brk-rest"></div></div>
+            <div class="brk-labels"><span id="brk-left"></span><span id="brk-right"></span></div>
+          </div>
+          <div class="divider"></div>
+          <div class="drow2"><span class="l">Method</span><span class="v rm-val"><span id="ns-method">Automated Repayment</span> <button class="infoi" id="ns-method-info" aria-label="How Automated Repayment works"></button></span></div>
         </div>
+        <div id="ns-hidden" style="display:none"></div>
 
         <div id="v2-heading"></div>
         <div id="v2-expiry"><span class="noticetile" data-icon="calendar"></span><span>Offer expires in 7 days on <b>24 Nov 2025</b></span></div>
@@ -525,6 +527,7 @@
       <section class="rightcol">
 
         <div id="rc-title" class="rc-title" style="display:none">Customize your offer</div>
+        <div id="rc-sub" class="rc-sub" style="display:none"></div>
 
         <div id="block-refinance">
           <div class="divider"></div>
@@ -1260,17 +1263,32 @@ function refresh(){
   // NEW sectioned layout (V1 loan + green card): Repayment-schedule card + Details card; detail rows go into a Full-breakdown accordion
   document.body.classList.toggle('sec-layout', newSec);
   $('ns-rep').style.display = newSec ? 'block' : 'none';
-  $('ns-det').style.display = newSec ? 'block' : 'none';
   $('graph-head').style.display = newSec ? 'none' : '';
   if(newSec){
     if($('strip-wrap').parentNode!==$('ns-graph-slot')) $('ns-graph-slot').appendChild($('strip-wrap'));
     $('strip-wrap').style.display='block'; $('strip-wrap').style.marginTop='0';
-    ['grp-ladder','grp-schedule','grp-fees'].forEach(function(id){ if($(id).parentNode!==$('fb-body')) $('fb-body').appendChild($(id)); });
-    $('ns-totalnewloan').innerHTML = smallCents(fmt2(c.loanBase));
+    // the itemised rows are replaced by the green-card stats + the breakdown bar → hide those groups
+    ['grp-ladder','grp-schedule','grp-fees'].forEach(function(id){ if($(id).parentNode!==$('ns-hidden')) $('ns-hidden').appendChild($(id)); });
+    $('ns-totalnewloan').textContent = fmt2(c.loanBase);
     $('ns-method').textContent = offer.autoRepay ? 'Automated Repayment' : 'ACH bank debit';
     $('ns-method-info').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
     $('ns-method-info').style.display = offer.autoRepay ? 'inline-flex' : 'none';
     $('ns-noearly').style.display = offer.autoRepay ? '' : 'none';
+    // breakdown bar: additional funds (teal) vs paid off existing (hatched). Clamp the smaller so it stays visible.
+    var paidOff = (pc.hasRefinance && offer.refinance) ? pc.existingBalance : 0;
+    var total = offer.additional + paidOff;
+    var restPct = total>0 ? paidOff/total*100 : 0;
+    if(paidOff>0 && restPct<14) restPct=14;   // keep the "paid off" sliver visible
+    $('brk-rest').style.display = paidOff>0 ? 'block' : 'none';
+    $('brk-rest').style.width = restPct+'%';
+    $('brk-fill').style.width = (100-restPct)+'%';
+    $('brk-left').innerHTML = '<b>'+fmt2(offer.additional)+'</b> Additional funds';
+    $('brk-right').innerHTML = paidOff>0 ? 'Paid off existing <b>'+fmt2(paidOff)+'</b>' : '';
+    // subtitle moves under "Customize your offer" (right), off the page header
+    $('rc-sub').style.display='block'; $('rc-sub').textContent = pc.hdrSub;
+    $('hdr-sub').style.display='none';
+  } else {
+    $('rc-sub').style.display='none'; $('hdr-sub').style.display='';
   }
 
   // tidy summary dividers: no line at the very top of the summary; no line where the graph sits directly above the schedule
@@ -1458,7 +1476,6 @@ function arSyncWarn(){
 }
 $('repay-info').addEventListener('click',function(){ $('tg-autorepay').className='tog on'; arSyncWarn(); $('ar-popup').classList.add('open'); });   // (i) opens the info popup (starts in the ON state)
 $('ns-method-info').addEventListener('click',function(){ $('tg-autorepay').className='tog on'; arSyncWarn(); $('ar-popup').classList.add('open'); });   // Details-card (i) opens the same popup
-$('fb-toggle').addEventListener('click',function(){ var open=$('fb-body').classList.toggle('open'); this.classList.toggle('open', open); $('fb-exp-label').textContent = open ? 'Collapse' : 'Expand'; });
 $('tg-autorepay').addEventListener('click',function(){ this.classList.toggle('on'); arSyncWarn(); });   // pending only — no offer change yet
 $('ar-got').addEventListener('click',function(){ $('ar-popup').classList.remove('open'); });
 $('ar-cancel').addEventListener('click',function(){ $('tg-autorepay').className='tog on'; arSyncWarn(); $('ar-popup').classList.remove('open'); });
