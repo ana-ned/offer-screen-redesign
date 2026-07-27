@@ -84,6 +84,11 @@
   .strip>div.short{height:10px;background:var(--barFaded)}
   .strip>div.fade{background:var(--barFaded)}
   .strip>div.hol{height:5px;background:#d6dad9}
+  /* new sectioned layout: taller square bars; holiday bars are full-height diagonal hatch (matches Figma 2426-5789) */
+  body.sec-layout .strip{height:34px}
+  body.sec-layout .strip>div{border-radius:4px}
+  body.sec-layout .strip>div.full{height:34px}
+  body.sec-layout .strip>div.hol{height:34px;background:repeating-linear-gradient(45deg,#c8d2d0,#c8d2d0 2px,#e9edec 2px,#e9edec 6px)}
   .graph-head{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px}
   .strip-axis{position:relative;height:18px;margin-top:12px;font-size:12px;color:var(--muted)}
   .strip-axis #sa-l{position:absolute;left:0}
