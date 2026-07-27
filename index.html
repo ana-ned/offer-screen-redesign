@@ -187,6 +187,7 @@
   .rng::-moz-range-thumb{box-sizing:border-box;width:18px;height:18px;border-radius:50%;background:var(--teal);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.18);cursor:pointer}
 
   .phlabel{font-size:14px;font-weight:700;color:var(--ink)}
+  .ph-sub{margin-top:4px;font-size:12px;color:var(--ink2);line-height:1.5}
   .promo{margin-top:8px;background:var(--successBg);border:1px solid var(--successBorder);border-radius:12px;padding:8px;display:flex;gap:8px;align-items:flex-start}
   .gifticon{flex:none;width:24px;height:24px;border-radius:6px;background:#eaf6f6;border:.5px solid var(--successBorder);color:var(--tealBright);display:flex;align-items:center;justify-content:center}
   .gifticon svg{width:16px;height:16px;display:block}
@@ -196,8 +197,10 @@
   .day{flex:1;height:38px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--ink2);font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:background .15s}
   .day.active{background:#fff;color:var(--teal);border:1px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,.08)}
   .day.dis{opacity:.38;cursor:not-allowed;pointer-events:none}
-  .day.twoline{flex-direction:column;gap:1px;line-height:1.15}
-  .day .dayfee{font-size:11px;font-weight:600;opacity:.7}
+  .day.twoline{flex-direction:column;gap:2px;height:auto;padding:9px 4px;line-height:1.2}
+  .day .dayfee{font-size:12px;font-weight:600;color:var(--ink2)}
+  .day.active .dayfee{color:var(--teal)}
+  .day .dayfee .strike{color:var(--muted);text-decoration:line-through;font-weight:400;margin-left:3px}
   .day svg{width:14px;height:14px;display:block}
   .accept{margin-top:24px;width:100%;height:44px;border-radius:12px;border:none;background:var(--teal);color:#fff;font-weight:600;font-size:14px;cursor:pointer}
   .accept-sec{margin-top:10px;width:100%;background:none;border:none;color:var(--teal);font-weight:700;font-size:14px;cursor:pointer;padding:6px}
@@ -561,11 +564,12 @@
         <div id="block-holiday">
           <div class="divider"></div>
           <div class="phlabel" id="ph-title">Payment holiday</div>
+          <div class="ph-sub" id="ph-sub">You can start the repayment after the payment holiday</div>
+          <div class="days" id="days"></div>
           <div class="promo" id="promo">
             <span class="gifticon" data-icon="gift"></span>
             <div><div class="pt">1 month of payment holiday on us</div><div class="pd">Pick 42 days and pay no extra fee</div></div>
           </div>
-          <div class="days" id="days"></div>
         </div>
 
         <div id="ca-select">
@@ -810,7 +814,7 @@ var PRODUCTS = {
     termMin:3, termMax:6, defaultTerm:6,
     freq:'biweekly', feeMode:'flat', defaultFeeRate:0.04,
     holidayTitle:'Payment holiday', holidayPromo:true, defaultHolidayDay:42,
-    holidays:[{day:14},{day:42,promo:true},{day:70},{day:98}],
+    holidays:[{day:14,fee:0.036},{day:42,promo:true,fee:0.04,base:0.0524},{day:70,fee:0.0632},{day:98,fee:0.0723}],
     rows:{additional:true,paysOff:true,totalNewLoan:true,fixedFee:true,totalFee:true,paymentHoliday:true,noEarlyFee:true,totalRepayable:true}
   },
   termloan: {
@@ -1242,8 +1246,16 @@ function refresh(){
     pc.holidays.forEach(function(hobj){
       var d=hobj.day, avail=holidayAvailable(d);
       var btn=document.createElement('button');
-      btn.className='day'+(offer.holidayDay===d?' active':'')+(avail?'':' dis');
-      btn.innerHTML='day '+d+(hobj.promo?' '+svgIcon('gift'):'');
+      var hasFee = hobj.fee!=null;
+      btn.className='day'+(hasFee?' twoline':'')+(offer.holidayDay===d?' active':'')+(avail?'':' dis');
+      var top='<span class="dayline">day '+d+(hobj.promo?' '+svgIcon('gift'):'')+'</span>';
+      var fee='';
+      if(hasFee){
+        fee = (hobj.promo && hobj.base!=null)
+          ? '<span class="dayfee"><b>'+feePctLabel(hobj.fee)+'</b><span class="strike">'+feePctLabel(hobj.base)+'</span></span>'
+          : '<span class="dayfee">'+feePctLabel(hobj.fee)+'</span>';
+      }
+      btn.innerHTML = top + fee;
       if(avail){ btn.onclick=function(){ offer.holidayDay=d; refresh(); save(); }; }
       days.appendChild(btn);
     });
@@ -1285,7 +1297,7 @@ function refresh(){
     $('ns-additional').textContent = fmt2(offer.additional);
     $('ns-paysoff').textContent = fmt2(paidOff);
     // subtitle moves under "Customize your offer" (right), off the page header
-    $('rc-sub').style.display='block'; $('rc-sub').textContent = 'Adjust the amount, term and when repayments start — your offer updates as you go.';
+    $('rc-sub').style.display='none';
     $('hdr-sub').style.display='none';
   } else {
     $('rc-sub').style.display='none';
