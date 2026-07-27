@@ -444,7 +444,7 @@
           <div id="ns-graph-slot"></div>
           <div class="divider"></div>
           <div class="ns-rows">
-            <div class="drow2"><span class="l">Total new loan</span><span class="v teal" id="ns-totalnewloan"></span></div>
+            <div class="drow2" id="ns-row-total"><span class="l">Total new loan</span><span class="v teal" id="ns-totalnewloan"></span></div>
             <div class="drow2" id="ns-row-add"><span class="l">Additional funds to you</span><span class="v" id="ns-additional"></span></div>
             <div class="drow2" id="ns-row-paysoff"><span class="l">Pays off existing balance</span><span class="v" id="ns-paysoff"></span></div>
             <div class="drow2"><span class="l">Repayment Method</span><span class="v rm-val"><span id="ns-method">Automated Repayment</span> <button class="infoi" id="ns-method-info" aria-label="How Automated Repayment works"></button></span></div>
@@ -1014,6 +1014,7 @@ function refresh(){
   $('hdr-prefix').textContent = 'Your offer is ready';
   $('hdr-amount').textContent = '';
   $('hdr-sub').textContent = pc.hdrSub;
+  $('hdr-sub').style.display='none';   // page-title subtitle dropped — the card + product name convey the product
   $('card-title').textContent = pc.cardTitle;
   $('card-amount').innerHTML = smallCents(fmt(isLoC ? pc.maxAmount : (isCA ? c.amount : offer.additional)));   // LoC hero: the full credit limit
   $('card-sub').style.display = pc.subtitle ? 'block':'none';
@@ -1269,21 +1270,25 @@ function refresh(){
     $('strip-wrap').style.display='block'; $('strip-wrap').style.marginTop='0';
     // the itemised rows are replaced by the green-card stats + the breakdown bar → hide those groups
     ['grp-ladder','grp-schedule','grp-fees'].forEach(function(id){ if($(id).parentNode!==$('ns-hidden')) $('ns-hidden').appendChild($(id)); });
-    $('ns-totalnewloan').textContent = fmt2(c.loanBase);
     $('ns-method').textContent = offer.autoRepay ? 'Automated Repayment' : 'ACH bank debit';
     $('ns-method-info').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
     $('ns-method-info').style.display = offer.autoRepay ? 'inline-flex' : 'none';
     $('ns-noearly').style.display = offer.autoRepay ? '' : 'none';
-    // simple itemised rows (cleaner than the breakdown bar)
-    $('ns-additional').textContent = fmt2(offer.additional);
+    // simple itemised rows. The Total-new-loan / Additional / Pays-off split only makes sense with a refinance;
+    // for a plain term loan those are redundant, so we keep just the Method row.
     var paidOff = (pc.hasRefinance && offer.refinance) ? pc.existingBalance : 0;
-    $('ns-row-paysoff').style.display = paidOff>0 ? 'flex' : 'none';
+    var showBrk = paidOff>0;
+    $('ns-row-total').style.display = showBrk ? 'flex' : 'none';
+    $('ns-row-add').style.display = showBrk ? 'flex' : 'none';
+    $('ns-row-paysoff').style.display = showBrk ? 'flex' : 'none';
+    $('ns-totalnewloan').textContent = fmt2(c.loanBase);
+    $('ns-additional').textContent = fmt2(offer.additional);
     $('ns-paysoff').textContent = fmt2(paidOff);
     // subtitle moves under "Customize your offer" (right), off the page header
     $('rc-sub').style.display='block'; $('rc-sub').textContent = 'Adjust the amount, term and when repayments start — your offer updates as you go.';
     $('hdr-sub').style.display='none';
   } else {
-    $('rc-sub').style.display='none'; $('hdr-sub').style.display='';
+    $('rc-sub').style.display='none';
   }
 
   // tidy summary dividers: no line at the very top of the summary; no line where the graph sits directly above the schedule
