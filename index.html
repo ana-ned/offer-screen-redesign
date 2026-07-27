@@ -1280,6 +1280,9 @@ function refresh(){
     feeDiv.style.display = loanLike ? 'none' : '';
     $('grp-fees').style.marginTop = loanLike ? '19px' : '';
   }
+  // sectioned layout: the Details card already separates things, so drop the divider above Total repayable
+  var totDiv=$('sec-totalrep').firstElementChild;
+  if(totDiv && totDiv.classList.contains('divider')){ totDiv.style.display = newSec ? 'none' : ''; $('sec-totalrep').style.marginTop = newSec ? '20px' : ''; }
 
   equalizeCard();
   if(document.body.classList.contains('mobile-view')) syncMobile();
